@@ -9,7 +9,12 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node bin/mip.js",
-    "test": "node tests/benchmark.js"
+    "test": "node tests/benchmark.js",
+    "build:linux:x64": "node scripts/build-linux-x64.js",
+    "build:linux:x86": "node scripts/build-linux-x86.js",
+    "build:macos": "node scripts/build-macos.js",
+    "build:windows": "node scripts/build-windows.js",
+    "build:all": "npm run build:linux:x64 && npm run build:linux:x86 && npm run build:macos && npm run build:windows"
   },
   "dependencies": {
     "axios": "latest",
