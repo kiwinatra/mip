@@ -1,0 +1,30 @@
+{
+  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.unknown_command": "❓ Неизвестная команда: {{command}}",
+  "cli.try_help": "Попробуй: mip --help",
+  "cli.error": "❌ Ошибка: {{message}}",
+
+  "cli.help.title": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.help.core_commands": "📦 Основные команды:",
+  "cli.help.info_commands": "🔍 Информация:",
+  "cli.help.security": "🔒 Безопасность:",
+  "cli.help.dev": "🚀 Разработка:",
+  "cli.help.monorepo": "📚 Мультипроекты:",
+  "cli.help.maintenance": "🧹 Обслуживание:",
+  "cli.help.examples": "💡 Примеры:",
+  "cli.help.super_fast_features": "⚡ Возможности SUPER FAST:",
+
+  "commands.init.already_exists": "⚠️ mip.json уже существует",
+  "commands.init.created": "✅ MIP проект инициализирован!",
+  "commands.init.used_mip": "@used MIP",
+
+  "commands.list.no_mip_json": "❌ Нет mip.json в этом проекте",
+  "commands.list.installed_packages": "📦 Установленные пакеты:",
+  "commands.list.empty": "  (пусто)",
+  "commands.list.total": "📊 Всего: {{count}} пакетов",
+
+  "commands.language.current": "Текущий язык: {{lang}}",
+  "commands.language.available": "Доступные языки: {{langs}}",
+  "commands.language.set_ok": "Язык установлен: {{lang}}",
+  "commands.language.invalid": "Неподдерживаемый язык: {{lang}}"
+}

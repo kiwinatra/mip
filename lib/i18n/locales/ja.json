@@ -1,0 +1,30 @@
+{
+  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.unknown_command": "❓ 不明なコマンド: {{command}}",
+  "cli.try_help": "試す: mip --help",
+  "cli.error": "❌ エラー: {{message}}",
+
+  "cli.help.title": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.help.core_commands": "📦 基本コマンド:",
+  "cli.help.info_commands": "🔍 情報:",
+  "cli.help.security": "🔒 セキュリティ:",
+  "cli.help.dev": "🚀 開発:",
+  "cli.help.monorepo": "📚 Monorepo:",
+  "cli.help.maintenance": "🧹 メンテナンス:",
+  "cli.help.examples": "💡 例:",
+  "cli.help.super_fast_features": "⚡ SUPER FAST モード機能:",
+
+  "commands.init.already_exists": "⚠️ mip.json は既に存在します",
+  "commands.init.created": "✅ MIP プロジェクトを初期化しました！",
+  "commands.init.used_mip": "@used MIP",
+
+  "commands.list.no_mip_json": "❌ このプロジェクトに mip.json がありません",
+  "commands.list.installed_packages": "📦 インストール済みパッケージ:",
+  "commands.list.empty": "  （空）",
+  "commands.list.total": "📊 合計: {{count}} 個のパッケージ",
+
+  "commands.language.current": "現在の言語: {{lang}}",
+  "commands.language.available": "利用可能な言語: {{langs}}",
+  "commands.language.set_ok": "言語を設定しました: {{lang}}",
+  "commands.language.invalid": "未対応の言語: {{lang}}"
+}

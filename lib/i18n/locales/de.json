@@ -1,0 +1,30 @@
+{
+  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.unknown_command": "❓ Unbekannter Befehl: {{command}}",
+  "cli.try_help": "Versuche: mip --help",
+  "cli.error": "❌ Fehler: {{message}}",
+
+  "cli.help.title": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.help.core_commands": "📦 Hauptbefehle:",
+  "cli.help.info_commands": "🔍 Informationen:",
+  "cli.help.security": "🔒 Sicherheit:",
+  "cli.help.dev": "🚀 Entwicklung:",
+  "cli.help.monorepo": "📚 Monorepo:",
+  "cli.help.maintenance": "🧹 Wartung:",
+  "cli.help.examples": "💡 Beispiele:",
+  "cli.help.super_fast_features": "⚡ Funktionen des SUPER FAST Modus:",
+
+  "commands.init.already_exists": "⚠️ mip.json existiert bereits",
+  "commands.init.created": "✅ MIP-Projekt wurde initialisiert!",
+  "commands.init.used_mip": "@used MIP",
+
+  "commands.list.no_mip_json": "❌ Kein mip.json in diesem Projekt",
+  "commands.list.installed_packages": "📦 Installierte Pakete:",
+  "commands.list.empty": "  (leer)",
+  "commands.list.total": "📊 Insgesamt: {{count}} Pakete",
+
+  "commands.language.current": "Aktuelle Sprache: {{lang}}",
+  "commands.language.available": "Verfügbare Sprachen: {{langs}}",
+  "commands.language.set_ok": "Sprache gesetzt auf: {{lang}}",
+  "commands.language.invalid": "Nicht unterstützte Sprache: {{lang}}"
+}

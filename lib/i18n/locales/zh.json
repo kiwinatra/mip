@@ -1,0 +1,30 @@
+{
+  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.unknown_command": "❓ 未知命令：{{command}}",
+  "cli.try_help": "尝试：mip --help",
+  "cli.error": "❌ 错误：{{message}}",
+
+  "cli.help.title": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.help.core_commands": "📦 核心命令：",
+  "cli.help.info_commands": "🔍 信息：",
+  "cli.help.security": "🔒 安全：",
+  "cli.help.dev": "🚀 开发：",
+  "cli.help.monorepo": "📚 Monorepo：",
+  "cli.help.maintenance": "🧹 维护：",
+  "cli.help.examples": "💡 示例：",
+  "cli.help.super_fast_features": "⚡ SUPER FAST 模式功能：",
+
+  "commands.init.already_exists": "⚠️ mip.json 已存在",
+  "commands.init.created": "✅ 已初始化 MIP 项目！",
+  "commands.init.used_mip": "@used MIP",
+
+  "commands.list.no_mip_json": "❌ 此项目中没有 mip.json",
+  "commands.list.installed_packages": "📦 已安装的包：",
+  "commands.list.empty": "  （空）",
+  "commands.list.total": "📊 总计：{{count}} 个包",
+
+  "commands.language.current": "当前语言：{{lang}}",
+  "commands.language.available": "可用语言：{{langs}}",
+  "commands.language.set_ok": "语言已设置为：{{lang}}",
+  "commands.language.invalid": "不支持的语言：{{lang}}"
+}

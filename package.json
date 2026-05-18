@@ -1,0 +1,23 @@
+{
+  "name": "mip",
+  "version": "5.0.0",
+  "description": "🚀 SUPER FAST MInimal Package Manager",
+  "main": "bin/mip.js",
+  "bin": {
+    "mip": "./bin/mip.js"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node bin/mip.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "axios": "^1.16.1",
+    "lru-cache": "^10.1.0",
+    "semver": "^7.8.0",
+    "tar": "^7.5.15"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.0"
+  }
+}
