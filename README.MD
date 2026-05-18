@@ -1,4 +1,4 @@
-
+99
 # mip — package manager that just works
 
 No magic. No hidden node_modules. Just `.mip/` and your code.
@@ -185,6 +185,7 @@ When NOT to use mip
 · Production where you need battle-tested tools
 · Windows-only environments (it works, but less tested)
 
+(**will be fixed soon, check commits. i wanna make it stable**)
 License
 
 MIT. Do whatever you want.
