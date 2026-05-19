@@ -67,8 +67,16 @@ async function main() {
       break;
 
     case 'audit':
-      await audit();
-      break;
+  const { audit } = require('../lib/commands/audit');
+  await audit({
+    fix: process.argv.includes('--fix')
+  });
+  break;
+
+  case 'legacy':
+  const { legacy } = require('../lib/commands/legacy');
+  await legacy(arg, arg2);
+  break;
 
     case 'ci':
   const { ci } = require('../lib/commands/ci');
