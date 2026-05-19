@@ -4,3 +4,4 @@ test/
 node_modules/
 mip-lock.json
 package-lock.json
+release/
