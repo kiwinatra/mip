@@ -1,4 +1,10 @@
-99
+<div align="center">
+  <img src="https://i.pinimg.com/originals/f8/d1/9f/f8d19f881828014ceebd4fe342fe32a7.jpg?nii=t" width="200">
+  <br>
+  <sub>mip</sub>
+</div>
+
+
 # mip — package manager that just works
 
 No magic. No hidden node_modules. Just `.mip/` and your code.
