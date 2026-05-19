@@ -170,6 +170,10 @@
 "commands.genlock.complete": "\n✅ Lockfile generated with {{count}} packages",
 "commands.exports.usage": "📦 Usage: mip exports <package>",
 "commands.exports.not_found": "❌ Package {{package}} not found",
-"commands.exports.title": "\n📦 Exports for {{package}}:"
+"commands.exports.title": "\n📦 Exports for {{package}}:",
+"commands.ci.checking_lockfile": "🔒 Checking frozen lockfile...",
+"commands.ci.frozen_mismatch": "\n❌ Lockfile mismatch detected:\n",
+"commands.ci.run_install": "\n💡 Run 'mip install' to update lockfile",
+"commands.ci.frozen_ok": "✅ Lockfile matches mip.json"
 
 }

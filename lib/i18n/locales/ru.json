@@ -57,5 +57,9 @@
 "commands.genlock.complete": "\n✅ Lockfile создан с {{count}} пакетами",
 "commands.exports.usage": "📦 Использование: mip exports <пакет>",
 "commands.exports.not_found": "❌ Пакет {{package}} не найден",
-"commands.exports.title": "\n📦 Экспорты пакета {{package}}:"
+"commands.exports.title": "\n📦 Экспорты пакета {{package}}:",
+"commands.ci.checking_lockfile": "🔒 Проверка замороженного lockfile...",
+"commands.ci.frozen_mismatch": "\n❌ Обнаружено несоответствие lockfile:\n",
+"commands.ci.run_install": "\n💡 Запустите 'mip install' для обновления lockfile",
+"commands.ci.frozen_ok": "✅ Lockfile соответствует mip.json"
 }

@@ -71,8 +71,11 @@ async function main() {
       break;
 
     case 'ci':
-      await ci();
-      break;
+  const { ci } = require('../lib/commands/ci');
+  await ci({
+    frozenLockfile: process.argv.includes('--frozen-lockfile')
+  });
+  break;
 
     case 'run':
       await runScript(arg);
