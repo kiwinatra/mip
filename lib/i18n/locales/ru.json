@@ -1,5 +1,5 @@
 {
-  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.version": "mip v{{version}} - just because npm sucks",
   "cli.unknown_command": "❓ Неизвестная команда: {{command}}",
   "cli.try_help": "Попробуй: mip --help",
   "cli.error": "❌ Ошибка: {{message}}",
@@ -26,5 +26,19 @@
   "commands.language.current": "Текущий язык: {{lang}}",
   "commands.language.available": "Доступные языки: {{langs}}",
   "commands.language.set_ok": "Язык установлен: {{lang}}",
-  "commands.language.invalid": "Неподдерживаемый язык: {{lang}}"
+  "commands.language.invalid": "Неподдерживаемый язык: {{lang}}",
+  "commands.install.peer.conflict_title": "❌ Конфликт peer-зависимостей:",
+"commands.install.peer.warning_title": "⚠️ Предупреждения peer-зависимостей:",
+"commands.install.peer.package": "  📦 {{package}}",
+"commands.install.peer.requires": "     └── требует {{peer}}@{{required}}",
+"commands.install.peer.but_installed": "         но установлена {{version}}",
+"commands.install.peer.not_installed": "         не установлена",
+"commands.install.peer.options_title": "\nВарианты:",
+"commands.install.peer.option_cancel": "  1. Отменить установку (рекомендуется)",
+"commands.install.peer.option_ignore": "  2. Игнорировать и продолжить (может сломаться)",
+"commands.install.peer.option_install": "  3. Всё равно установить с предупреждениями",
+"commands.install.peer.choose": "\nВыберите (1-3): ",
+"commands.install.peer.cancelled": "\n❌ Установка отменена из-за конфликта peer-зависимостей",
+"commands.install.peer.continuing": "\n⚠️ Продолжаем несмотря на конфликты...",
+"commands.install.peer.installing_warnings": "\n⚠️ Устанавливаем с предупреждениями..."
 }

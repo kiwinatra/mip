@@ -26,5 +26,19 @@
   "commands.language.current": "当前语言：{{lang}}",
   "commands.language.available": "可用语言：{{langs}}",
   "commands.language.set_ok": "语言已设置为：{{lang}}",
-  "commands.language.invalid": "不支持的语言：{{lang}}"
+  "commands.language.invalid": "不支持的语言：{{lang}}",
+  "commands.install.peer.conflict_title": "❌ Peer 依赖冲突:",
+"commands.install.peer.warning_title": "⚠️ Peer 依赖警告:",
+"commands.install.peer.package": "  📦 {{package}}",
+"commands.install.peer.requires": "     └── 需要 {{peer}}@{{required}}",
+"commands.install.peer.but_installed": "         但已安装 {{version}}",
+"commands.install.peer.not_installed": "         未安装",
+"commands.install.peer.options_title": "\n选项:",
+"commands.install.peer.option_cancel": "  1. 取消安装（推荐）",
+"commands.install.peer.option_ignore": "  2. 忽略并继续（可能出问题）",
+"commands.install.peer.option_install": "  3. 仍然安装（带警告）",
+"commands.install.peer.choose": "\n选择 (1-3): ",
+"commands.install.peer.cancelled": "\n❌ 因 Peer 依赖冲突取消安装",
+"commands.install.peer.continuing": "\n⚠️ 忽略冲突继续...",
+"commands.install.peer.installing_warnings": "\n⚠️ 带警告安装..."
 }

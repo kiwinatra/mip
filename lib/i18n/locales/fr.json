@@ -26,5 +26,19 @@
   "commands.language.current": "Langue actuelle : {{lang}}",
   "commands.language.available": "Langues disponibles : {{langs}}",
   "commands.language.set_ok": "Langue définie : {{lang}}",
-  "commands.language.invalid": "Langue non prise en charge : {{lang}}"
+  "commands.language.invalid": "Langue non prise en charge : {{lang}}",
+  "commands.install.peer.conflict_title": "❌ Conflits de dépendances peer :",
+"commands.install.peer.warning_title": "⚠️ Avertissements de dépendances peer :",
+"commands.install.peer.package": "  📦 {{package}}",
+"commands.install.peer.requires": "     └── nécessite {{peer}}@{{required}}",
+"commands.install.peer.but_installed": "         mais {{version}} est installée",
+"commands.install.peer.not_installed": "         non installée",
+"commands.install.peer.options_title": "\nOptions :",
+"commands.install.peer.option_cancel": "  1. Annuler l'installation (recommandé)",
+"commands.install.peer.option_ignore": "  2. Ignorer et continuer (peut casser)",
+"commands.install.peer.option_install": "  3. Installer quand même avec avertissements",
+"commands.install.peer.choose": "\nChoisissez (1-3) : ",
+"commands.install.peer.cancelled": "\n❌ Installation annulée à cause de conflits de dépendances peer",
+"commands.install.peer.continuing": "\n⚠️ Continuation malgré les conflits...",
+"commands.install.peer.installing_warnings": "\n⚠️ Installation avec avertissements..."
 }

@@ -1,7 +1,7 @@
 {
   "name": "mip",
-  "version": "5.0.0",
-  "description": "🚀 SUPER FAST MInimal Package Manager",
+  "version": "0.9.2",
+  "description": "just because npm sucks",
   "main": "bin/mip.js",
   "bin": {
     "mip": "./bin/mip.js"

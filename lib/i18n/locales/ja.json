@@ -26,5 +26,19 @@
   "commands.language.current": "現在の言語: {{lang}}",
   "commands.language.available": "利用可能な言語: {{langs}}",
   "commands.language.set_ok": "言語を設定しました: {{lang}}",
-  "commands.language.invalid": "未対応の言語: {{lang}}"
+  "commands.language.invalid": "未対応の言語: {{lang}}",
+  "commands.install.peer.conflict_title": "❌ ピア依存関係の競合:",
+"commands.install.peer.warning_title": "⚠️ ピア依存関係の警告:",
+"commands.install.peer.package": "  📦 {{package}}",
+"commands.install.peer.requires": "     └── {{peer}}@{{required}} が必要",
+"commands.install.peer.but_installed": "         しかし {{version}} がインストールされている",
+"commands.install.peer.not_installed": "         未インストール",
+"commands.install.peer.options_title": "\nオプション:",
+"commands.install.peer.option_cancel": "  1. インストールをキャンセル（推奨）",
+"commands.install.peer.option_ignore": "  2. 無視して続行（壊れる可能性あり）",
+"commands.install.peer.option_install": "  3. 警告付きでインストール",
+"commands.install.peer.choose": "\n選択 (1-3): ",
+"commands.install.peer.cancelled": "\n❌ ピア依存関係の競合によりインストールをキャンセル",
+"commands.install.peer.continuing": "\n⚠️ 競合を無視して続行...",
+"commands.install.peer.installing_warnings": "\n⚠️ 警告付きでインストール..."
 }

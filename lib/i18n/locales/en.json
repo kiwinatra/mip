@@ -1,5 +1,5 @@
 {
-  "cli.version": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.version": "mip v{{version}} - just because npm sucks",
   "cli.unknown_command": "❓ Unknown command: {{command}}",
   "cli.try_help": "Try: mip --help",
   "cli.error": "❌ Error: {{message}}",
@@ -138,5 +138,21 @@
   "commands.ci.complete": "\n✅ CI installation complete! {{installed}} packages installed",
   "commands.ci.lock_integrity_verified": "📦 Lockfile integrity verified",
 
-  "cli.help.full": "\n╔═══════════════════════════════════════════════════════════════╗\n║  mip v{{version}} - SUPER FAST Package Manager                       ║\n║  ⚡ Parallel downloads + streaming extraction                ║\n╚═══════════════════════════════════════════════════════════════╝\n\n📦 Core Commands:\n  mip init                              Create new project\n  mip install [pkg]                     Install packages\n  mip install -s [pkg]                  ⚡ SUPER FAST install\n  mip uninstall <pkg>                   Remove package\n  mip update                            Update all packages\n  mip list                              Show installed packages\n\n🔍 Info:\n  mip search <query>                    Search npm registry\n  mip info <pkg>                        Show package details\n  mip outdated                          Show outdated packages\n  mip why <pkg>                         Why is this installed?\n\n🔒 Security:\n  mip audit                             Check vulnerabilities\n  mip doctor                            System diagnostics\n\n🚀 Development:\n  mip create <template> <name>          Create from template (node, react, cli, express)\n  mip run <script>                      Run npm script\n  mip exec <cmd>                        Run local binary\n  mip link                              Link local packages\n\n📚 Monorepo:\n  mip workspaces list                   List workspaces\n  mip workspaces run <script>           Run script in all workspaces\n\n🧹 Maintenance:\n  mip cache clean                       Clear cache\n  mip cache size                        Show cache size\n  mip ci                                CI installation\n\n💡 Examples:\n  mip install -s express                ⚡ Super fast install\n  mip install lodash --save-dev\n  mip create react my-app\n  mip why lodash\n  mip cache clean\n  mip doctor\n\n⚡ Super Fast Mode Features:\n  • Parallel downloads (all packages at once)\n  • Streaming extraction (no temp files)\n  • Smart caching\n  • Lightning fast repeat installs\n  "
+  "cli.help.full": "\n╔═══════════════════════════════════════════════════════════════╗\n║  mip v{{version}} - SUPER FAST Package Manager                       ║\n║  ⚡ Parallel downloads + streaming extraction                ║\n╚═══════════════════════════════════════════════════════════════╝\n\n📦 Core Commands:\n  mip init                              Create new project\n  mip install [pkg]                     Install packages\n  mip install -s [pkg]                  ⚡ SUPER FAST install\n  mip uninstall <pkg>                   Remove package\n  mip update                            Update all packages\n  mip list                              Show installed packages\n\n🔍 Info:\n  mip search <query>                    Search npm registry\n  mip info <pkg>                        Show package details\n  mip outdated                          Show outdated packages\n  mip why <pkg>                         Why is this installed?\n\n🔒 Security:\n  mip audit                             Check vulnerabilities\n  mip doctor                            System diagnostics\n\n🚀 Development:\n  mip create <template> <name>          Create from template (node, react, cli, express)\n  mip run <script>                      Run npm script\n  mip exec <cmd>                        Run local binary\n  mip link                              Link local packages\n\n📚 Monorepo:\n  mip workspaces list                   List workspaces\n  mip workspaces run <script>           Run script in all workspaces\n\n🧹 Maintenance:\n  mip cache clean                       Clear cache\n  mip cache size                        Show cache size\n  mip ci                                CI installation\n\n💡 Examples:\n  mip install -s express                ⚡ Super fast install\n  mip install lodash --save-dev\n  mip create react my-app\n  mip why lodash\n  mip cache clean\n  mip doctor\n\n⚡ Super Fast Mode Features:\n  • Parallel downloads (all packages at once)\n  • Streaming extraction (no temp files)\n  • Smart caching\n  • Lightning fast repeat installs\n  ",
+
+"commands.install.peer.conflict_title": "❌ Peer dependency conflicts:",
+"commands.install.peer.warning_title": "⚠️ Peer dependency warnings:",
+"commands.install.peer.package": "  📦 {{package}}",
+"commands.install.peer.requires": "     └── requires {{peer}}@{{required}}",
+"commands.install.peer.but_installed": "         but {{version}} is installed",
+"commands.install.peer.not_installed": "         not installed",
+"commands.install.peer.options_title": "\nOptions:",
+"commands.install.peer.option_cancel": "  1. Cancel installation (recommended)",
+"commands.install.peer.option_ignore": "  2. Ignore and continue (may break things)",
+"commands.install.peer.option_install": "  3. Install anyway with warnings",
+"commands.install.peer.choose": "\nChoose (1-3): ",
+"commands.install.peer.cancelled": "\n❌ Installation cancelled due to peer dependency conflicts",
+"commands.install.peer.continuing": "\n⚠️ Continuing despite conflicts...",
+"commands.install.peer.installing_warnings": "\n⚠️ Installing with warnings..."
+
 }
