@@ -40,5 +40,13 @@
 "commands.install.peer.choose": "\n选择 (1-3): ",
 "commands.install.peer.cancelled": "\n❌ 因 Peer 依赖冲突取消安装",
 "commands.install.peer.continuing": "\n⚠️ 忽略冲突继续...",
-"commands.install.peer.installing_warnings": "\n⚠️ 带警告安装..."
+"commands.install.peer.installing_warnings": "\n⚠️ 带警告安装...",
+"commands.dedupe.analyzing": "🔍 正在分析依赖项重复...",
+"commands.dedupe.none_found": "✅ 未发现重复包",
+"commands.dedupe.confirm": "\n删除兼容的重复包？(y/N): ",
+"commands.dedupe.running": "🧹 正在执行去重...",
+"commands.dedupe.complete": "\n✅ 已删除 {{removed}} 个重复包，剩余 {{remaining}} 个包",
+"commands.dedupe.removed_list": "\n📦 已删除的重复包:",
+"commands.dedupe.cancelled": "\n❌ 去重已取消",
+"commands.dedupe.error": "❌ 错误: {{message}}"
 }

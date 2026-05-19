@@ -40,5 +40,13 @@
 "commands.install.peer.choose": "\nScegli (1-3): ",
 "commands.install.peer.cancelled": "\n❌ Installazione annullata per conflitti dipendenze peer",
 "commands.install.peer.continuing": "\n⚠️ Continuando nonostante i conflitti...",
-"commands.install.peer.installing_warnings": "\n⚠️ Installazione con avvertenze..."
+"commands.install.peer.installing_warnings": "\n⚠️ Installazione con avvertenze...",
+"commands.dedupe.analyzing": "🔍 Analisi delle dipendenze per duplicati...",
+"commands.dedupe.none_found": "✅ Nessun duplicato trovato",
+"commands.dedupe.confirm": "\nRimuovere i duplicati compatibili? (y/N): ",
+"commands.dedupe.running": "🧹 Esecuzione deduplicazione...",
+"commands.dedupe.complete": "\n✅ Rimossi {{removed}} pacchetti duplicati. {{remaining}} pacchetti rimasti",
+"commands.dedupe.removed_list": "\n📦 Duplicati rimossi:",
+"commands.dedupe.cancelled": "\n❌ Deduplicazione annullata",
+"commands.dedupe.error": "❌ Errore: {{message}}"
 }

@@ -111,6 +111,18 @@ async function main() {
     case '-v':
       console.log(t('cli.version', { version: pkg.version }));
       break;
+    
+    case 'dedupe':
+      const { dedupe } = require('../lib/commands/dedupe');
+      await dedupe({
+      full: process.argv.includes('--full') || process.argv.includes('-f')
+  });
+  break;
+
+  case 'genlock':
+  const { genlock } = require('../lib/commands/genlock');
+  await genlock();
+  break;
 
     default:
       console.log(t('cli.unknown_command', { command }));

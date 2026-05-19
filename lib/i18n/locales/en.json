@@ -153,6 +153,20 @@
 "commands.install.peer.choose": "\nChoose (1-3): ",
 "commands.install.peer.cancelled": "\n❌ Installation cancelled due to peer dependency conflicts",
 "commands.install.peer.continuing": "\n⚠️ Continuing despite conflicts...",
-"commands.install.peer.installing_warnings": "\n⚠️ Installing with warnings..."
+"commands.install.peer.installing_warnings": "\n⚠️ Installing with warnings...",
+"commands.dedupe.analyzing": "🔍 Analyzing dependencies for duplicates...",
+"commands.dedupe.none_found": "✅ No duplicates found",
+"commands.dedupe.confirm": "\nRemove compatible duplicates? (y/N): ",
+"commands.dedupe.running": "🧹 Running deduplication...",
+"commands.dedupe.complete": "\n✅ Removed {{removed}} duplicate packages. {{remaining}} packages remaining",
+"commands.dedupe.removed_list": "\n📦 Removed duplicates:",
+"commands.dedupe.cancelled": "\n❌ Deduplication cancelled",
+"commands.dedupe.error": "❌ Error: {{message}}",
+"commands.genlock.no_mip_json": "❌ mip.json not found",
+"commands.genlock.generating": "🔒 Generating lockfile from mip.json...",
+"commands.genlock.no_deps": "No dependencies to lock",
+"commands.genlock.progress": "Generating...",
+"commands.genlock.failed": "❌ Failed to resolve {{name}}: {{message}}",
+"commands.genlock.complete": "\n✅ Lockfile generated with {{count}} packages"
 
 }

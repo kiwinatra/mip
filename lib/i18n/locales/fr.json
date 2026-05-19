@@ -40,5 +40,13 @@
 "commands.install.peer.choose": "\nChoisissez (1-3) : ",
 "commands.install.peer.cancelled": "\n❌ Installation annulée à cause de conflits de dépendances peer",
 "commands.install.peer.continuing": "\n⚠️ Continuation malgré les conflits...",
-"commands.install.peer.installing_warnings": "\n⚠️ Installation avec avertissements..."
+"commands.install.peer.installing_warnings": "\n⚠️ Installation avec avertissements...",
+"commands.dedupe.analyzing": "🔍 Analyse des dépendances pour les doublons...",
+"commands.dedupe.none_found": "✅ Aucun doublon trouvé",
+"commands.dedupe.confirm": "\nSupprimer les doublons compatibles? (y/N): ",
+"commands.dedupe.running": "🧹 Exécution de la déduplication...",
+"commands.dedupe.complete": "\n✅ {{removed}} paquets doublons supprimés. {{remaining}} paquets restants",
+"commands.dedupe.removed_list": "\n📦 Doublons supprimés:",
+"commands.dedupe.cancelled": "\n❌ Déduplication annulée",
+"commands.dedupe.error": "❌ Erreur: {{message}}"
 }

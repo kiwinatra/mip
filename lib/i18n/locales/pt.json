@@ -40,5 +40,13 @@
 "commands.install.peer.choose": "\nEscolha (1-3): ",
 "commands.install.peer.cancelled": "\n❌ Instalação cancelada devido a conflitos de dependências peer",
 "commands.install.peer.continuing": "\n⚠️ Continuando apesar dos conflitos...",
-"commands.install.peer.installing_warnings": "\n⚠️ Instalando com avisos..."
+"commands.install.peer.installing_warnings": "\n⚠️ Instalando com avisos...",
+"commands.dedupe.analyzing": "🔍 Analisando dependências em busca de duplicatas...",
+"commands.dedupe.none_found": "✅ Nenhuma duplicata encontrada",
+"commands.dedupe.confirm": "\nRemover duplicatas compatíveis? (y/N): ",
+"commands.dedupe.running": "🧹 Executando deduplicação...",
+"commands.dedupe.complete": "\n✅ {{removed}} pacotes duplicados removidos. {{remaining}} pacotes restantes",
+"commands.dedupe.removed_list": "\n📦 Duplicatas removidas:",
+"commands.dedupe.cancelled": "\n❌ Deduplicação cancelada",
+"commands.dedupe.error": "❌ Erro: {{message}}"
 }

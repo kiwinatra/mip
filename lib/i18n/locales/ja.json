@@ -40,5 +40,13 @@
 "commands.install.peer.choose": "\n選択 (1-3): ",
 "commands.install.peer.cancelled": "\n❌ ピア依存関係の競合によりインストールをキャンセル",
 "commands.install.peer.continuing": "\n⚠️ 競合を無視して続行...",
-"commands.install.peer.installing_warnings": "\n⚠️ 警告付きでインストール..."
+"commands.install.peer.installing_warnings": "\n⚠️ 警告付きでインストール...",
+"commands.dedupe.analyzing": "🔍 依存関係の重複を分析中...",
+"commands.dedupe.none_found": "✅ 重複は見つかりませんでした",
+"commands.dedupe.confirm": "\n互換性のある重複を削除しますか？ (y/N): ",
+"commands.dedupe.running": "🧹 重複排除を実行中...",
+"commands.dedupe.complete": "\n✅ {{removed}} 個の重複パッケージを削除しました。残り {{remaining}} 個",
+"commands.dedupe.removed_list": "\n📦 削除された重複:",
+"commands.dedupe.cancelled": "\n❌ 重複排除がキャンセルされました",
+"commands.dedupe.error": "❌ エラー: {{message}}"
 }
