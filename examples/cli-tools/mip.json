@@ -1,0 +1,11 @@
+{
+  "name": "my-cli",
+  "version": "1.0.0",
+  "bin": {
+    "mycli": "./bin/cli.js"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0"
+  }
+}

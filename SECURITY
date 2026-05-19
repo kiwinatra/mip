@@ -1,0 +1,30 @@
+# Security Policy
+
+## Supported Versions
+
+| Version | Supported |
+|---------|-----------|
+| 1.0.x   | ✅ |
+| < 1.0   | ❌ |
+
+## Reporting a Vulnerability
+
+**Please DO NOT file a public issue.**
+
+Email: security@mip.dev
+
+You should receive a response within 48 hours.
+
+## What to include
+
+- Affected version(s)
+- Steps to reproduce
+- Potential impact
+- Any suggested fixes
+
+## Disclosure policy
+
+We will:
+- Confirm the issue within 48 hours
+- Fix it in a patch release
+- Credit the reporter (if desired)

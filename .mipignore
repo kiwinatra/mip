@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
-.mip/
+.mip/cache/
+.mip/temp/
 
-# Build
+# Build artifacts
 dist/
 release/
 *.exe
@@ -13,7 +14,7 @@ release/
 *.log
 npm-debug.log*
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -23,26 +24,20 @@ desktop.ini
 .idea/
 *.swp
 *.swo
-*~
 
-# Env
+# Environment
 .env
 .env.local
 .env.*.local
 
-# Temp
-*.tmp
-*.temp
-temp/
+# Test and temp
 tmp/
+temp/
+test-*
+*~
 
-# Coverage
-coverage/
-.nyc_output/
-
-# Misc
-*.pid
-*.seed
-*.pid.lock
-
-*-lock.json
+# Secrets
+*.pem
+*.key
+*.crt
+.secrets/

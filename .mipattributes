@@ -1,0 +1,23 @@
+# Package attributes for mip behavior
+
+# Never install these as dev dependencies
+*.test.js dev=false
+*.spec.js dev=false
+__tests__/* dev=false
+
+# Always mark as optional
+*.d.ts optional=true
+
+# Platform specific
+*.win32.js platform=win32
+*.linux.js platform=linux
+*.darwin.js platform=darwin
+
+# Bundle these always
+CHANGELOG.md bundle=true
+LICENSE bundle=true
+README.md bundle=true
+
+# Never bundle
+*.map bundle=false
+*.log bundle=false

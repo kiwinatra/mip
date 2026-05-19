@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mip:
+    build: .
+    volumes:
+      - ./:/app
+      - mip-cache:/root/.mip
+    command: --help
+
+volumes:
+  mip-cache:

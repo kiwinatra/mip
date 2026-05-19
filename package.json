@@ -1,6 +1,6 @@
 {
   "name": "mip",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "description": "just because npm sucks",
   "main": "bin/mip.js",
   "bin": {
@@ -14,7 +14,9 @@
     "build:linux:x86": "node scripts/build-linux-x86.js",
     "build:macos": "node scripts/build-macos.js",
     "build:windows": "node scripts/build-windows.js",
-    "build:all": "npm run build:linux:x64 && npm run build:linux:x86 && npm run build:macos && npm run build:windows"
+    "build:all": "npm run build:linux:x64 && npm run build:linux:x86 && npm run build:macos && npm run build:windows",
+    "lint": "eslint bin/ lib/",
+    "format": "prettier --write \"**/*.js\""
   },
   "dependencies": {
     "axios": "^1.16.1",

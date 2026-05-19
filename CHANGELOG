@@ -1,0 +1,20 @@
+# Changelog
+
+## [1.0.0] - 2026-05-19
+
+### Added
+- Initial release
+- Peer dependencies resolver
+- Smart deduplication (`mip dedupe`)
+- `mip ci --frozen-lockfile`
+- `mip audit --fix`
+- Legacy packages fallback
+- Auto-save dependencies
+- i18n support (10 languages)
+- Windows, Linux, macOS builds
+- GitHub Actions CI/CD
+
+### Fixed
+- No more node_modules duplication
+- Peer dependency conflicts handling
+- Lockfile integrity checks
