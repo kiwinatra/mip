@@ -146,14 +146,15 @@ No node_modules at all — good luck debugging that.
 
 What mip does differently
 
-Feature npm pnpm yarn mip
-No node_modules duplication ❌ ✅ (global store) ❌ ✅
-No symlink magic ❌ ❌ ❌ ✅
-Simple cache structure ❌ ❌ ❌ ✅
-Source lines of code 10k+ 15k+ 20k+ 2000
-Works offline after first install ❌ ✅ ❌ ✅
-Windows support ✅ ✅ ✅ ✅
-Can read entire codebase in one day ❌ ❌ ❌ ✅
+| Feature | npm | pnpm | yarn | mip |
+|---------|-----|------|------|-----|
+| No node_modules duplication | ❌ | ✅ (global store) | ❌ | ✅ |
+| No symlink magic | ❌ | ❌ | ❌ | ✅ |
+| Simple cache structure | ❌ | ❌ | ❌ | ✅ |
+| Source lines of code | 10k+ | 15k+ | 20k+ | 2000 |
+| Works offline after first install | ❌ | ✅ | ❌ | ✅ |
+| Windows support | ✅ | ✅ | ✅ | ✅ |
+| Can read entire codebase in one day | ❌ | ❌ | ❌ | ✅ |
 
 Benchmarks
 
@@ -171,21 +172,8 @@ pnpm   : 0.9s
 mip    : 0.4s  ← 4.5x faster than npm, 2.2x faster than pnpm
 ```
 
-When to use mip
+Now you can use mip for any production!
 
-· Personal projects (you want to understand your tools)
-· CI/CD pipelines (fast cold installs)
-· Docker images (smaller layers)
-· Learning (read the source, change anything)
-· When npm/ pnpm/ yarn annoy you
-
-When NOT to use mip
-
-· Large team projects with complex peer dependencies
-· Production where you need battle-tested tools
-· Windows-only environments (it works, but less tested)
-
-(**will be fixed soon, check commits. i wanna make it stable**)
 License
 
 MIT. Do whatever you want.
