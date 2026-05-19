@@ -167,6 +167,9 @@
 "commands.genlock.no_deps": "No dependencies to lock",
 "commands.genlock.progress": "Generating...",
 "commands.genlock.failed": "❌ Failed to resolve {{name}}: {{message}}",
-"commands.genlock.complete": "\n✅ Lockfile generated with {{count}} packages"
+"commands.genlock.complete": "\n✅ Lockfile generated with {{count}} packages",
+"commands.exports.usage": "📦 Usage: mip exports <package>",
+"commands.exports.not_found": "❌ Package {{package}} not found",
+"commands.exports.title": "\n📦 Exports for {{package}}:"
 
 }

@@ -54,5 +54,8 @@
 "commands.genlock.no_deps": "Нет зависимостей для блокировки",
 "commands.genlock.progress": "Генерация...",
 "commands.genlock.failed": "❌ Не удалось разрешить {{name}}: {{message}}",
-"commands.genlock.complete": "\n✅ Lockfile создан с {{count}} пакетами"
+"commands.genlock.complete": "\n✅ Lockfile создан с {{count}} пакетами",
+"commands.exports.usage": "📦 Использование: mip exports <пакет>",
+"commands.exports.not_found": "❌ Пакет {{package}} не найден",
+"commands.exports.title": "\n📦 Экспорты пакета {{package}}:"
 }

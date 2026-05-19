@@ -124,6 +124,11 @@ async function main() {
   await genlock();
   break;
 
+  case 'exports':
+  const { exports } = require('../lib/commands/exports');
+  await exports(arg);
+  break;
+
     default:
       console.log(t('cli.unknown_command', { command }));
       console.log(t('cli.try_help'));
