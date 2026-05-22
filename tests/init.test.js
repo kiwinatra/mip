@@ -20,7 +20,9 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const MIP = 'node bin/mip.js';
+const MIP = `node ${path.join(process.cwd(), 'bin', 'mip.js')}`;
+
+
 const TEST_DIR = 'tmp/test-init';
 
 describe('mip init', () => {

@@ -10,7 +10,8 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node bin/mip.js",
-    "test": "node --test",
+    "test": "node --require ./tests/test-globals.cjs --test",
+
     "build:linux:x64": "node scripts/build-linux-x64.js",
     "build:linux:x86": "node scripts/build-linux-x86.js",
     "build:macos": "node scripts/build-macos.js",
@@ -27,5 +28,10 @@
   },
   "devDependencies": {
     "pkg": "^5.8.0"
+  },
+  "pkg": {
+    "assets": [
+      "lib/i18n/locales/*.json"
+    ]
   }
 }

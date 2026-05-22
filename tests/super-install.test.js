@@ -53,6 +53,7 @@ test('SuperInstaller: bounded parallel extraction (no sequential bottleneck)', a
       return 30;
     };
 
+
     // mock resolver/downloader
     const installer = new SuperInstaller();
 
