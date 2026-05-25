@@ -1,0 +1,10 @@
+{
+  "commands.outdated.checking": "🔍 Comprobando paquetes desactualizados...\n",
+  "commands.outdated.table_header": "┌─────────────────────┬──────────────┬──────────────┐\n│ Paquete             │ Actual       │ Última       │\n├─────────────────────┼──────────────┼──────────────┤",
+  "commands.outdated.table_footer": "└─────────────────────┴──────────────┴──────────────┘",
+  "commands.outdated.result": "\n📊 {{outdatedCount}} paquete(s) desactualizado(s) de {{total}}",
+  "commands.outdated.suggest_update": "\n💡 Ejecuta \"mip update\" para actualizar todos los paquetes\n💡 Ejecuta \"mip update --latest\" para actualizar a las últimas versiones",
+  "commands.outdated.no_mip_json": "❌ No hay mip.json",
+  "commands.outdated.no_dependencies": "✨ No hay dependencias"
+}
+

@@ -1,0 +1,10 @@
+{
+  "commands.outdated.checking": "🔍 Checking for outdated packages...\n",
+  "commands.outdated.table_header": "┌─────────────────────┬──────────────┬──────────────┐\n│ Package             │ Current      │ Latest       │\n├─────────────────────┼──────────────┼──────────────┤",
+  "commands.outdated.table_footer": "└─────────────────────┴──────────────┴──────────────┘",
+  "commands.outdated.result": "\n📊 {{outdatedCount}} package(s) outdated out of {{total}}",
+  "commands.outdated.suggest_update": "\n💡 Run \"mip update\" to update all packages\n💡 Run \"mip update --latest\" to update to latest versions",
+  "commands.outdated.no_mip_json": "❌ No mip.json found",
+  "commands.outdated.no_dependencies": "✨ No dependencies found"
+}
+

@@ -1,6 +1,11 @@
 # TODO
 
-- [ ] Добавить создание `node_modules/<pkg>` (junction на Windows + fallback copy) в `lib/commands/install.js` после распаковки пакета.
-- [ ] При необходимости обновить/добавить тесты для проверки, что после `mip install <pkg>` появляется папка в `node_modules`.
-- [ ] Запустить `npm test` и/или локальную проверку `mip install expo` на наличие `node_modules/expo`.
+## Task: `mip outdated --json`
 
+- [ ] Add `--json` flag support to `lib/commands/outdated.js`
+- [ ] When `--json` is provided: output machine-readable JSON with entries `{name,current,latest,outdated}`
+- [ ] Preserve current human-readable output when `--json` is not provided
+- [ ] Ensure command exits with code `1` if any outdated packages are found
+- [ ] Update `bin/mip.js` to pass `--json` to the outdated command
+- [ ] Add/extend tests to validate JSON output + exit code behavior
+- [ ] Run test suite (`npm test`)

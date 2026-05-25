@@ -1,0 +1,10 @@
+{
+  "commands.outdated.checking": "🔍 Проверка устаревших пакетов...\n",
+  "commands.outdated.table_header": "┌─────────────────────┬──────────────┬──────────────┐\n│ Пакет               │ Текущая     │ Последняя   │\n├─────────────────────┼──────────────┼──────────────┤",
+  "commands.outdated.table_footer": "└─────────────────────┴──────────────┴──────────────┘",
+  "commands.outdated.result": "\n📊 {{outdatedCount}} пакетов устарело из {{total}}",
+  "commands.outdated.suggest_update": "\n💡 Запустите \"mip update\" чтобы обновить все пакеты\n💡 Запустите \"mip update --latest\" чтобы обновить до последних версий",
+  "commands.outdated.no_mip_json": "❌ Нет mip.json",
+  "commands.outdated.no_dependencies": "✨ Зависимостей не найдено"
+}
+
