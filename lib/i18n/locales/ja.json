@@ -22,6 +22,7 @@
   "commands.list.installed_packages": "📦 インストール済みパッケージ:",
   "commands.list.empty": "  （空）",
   "commands.list.total": "📊 合計: {{count}} 個のパッケージ",
+  "commands.list.missing_package": "{{name}}（見つかりません — 'mip install' を実行）",
 
   "commands.language.current": "現在の言語: {{lang}}",
   "commands.language.available": "利用可能な言語: {{langs}}",

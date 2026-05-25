@@ -22,6 +22,7 @@
   "commands.list.installed_packages": "📦 Installierte Pakete:",
   "commands.list.empty": "  (leer)",
   "commands.list.total": "📊 Insgesamt: {{count}} Pakete",
+  "commands.list.missing_package": "{{name}} (fehlt — 'mip install' ausführen)",
 
   "commands.language.current": "Aktuelle Sprache: {{lang}}",
   "commands.language.available": "Verfügbare Sprachen: {{langs}}",

@@ -22,6 +22,7 @@
   "commands.list.installed_packages": "📦 Установленные пакеты:",
   "commands.list.empty": "  (пусто)",
   "commands.list.total": "📊 Всего: {{count}} пакетов",
+  "commands.list.missing_package": "{{name}} (отсутствует — запустите 'mip install')",
 
   "commands.language.current": "Текущий язык: {{lang}}",
   "commands.language.available": "Доступные языки: {{langs}}",

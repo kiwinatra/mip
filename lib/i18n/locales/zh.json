@@ -22,6 +22,7 @@
   "commands.list.installed_packages": "📦 已安装的包：",
   "commands.list.empty": "  （空）",
   "commands.list.total": "📊 总计：{{count}} 个包",
+  "commands.list.missing_package": "{{name}}（缺失 — 运行 'mip install'）",
 
   "commands.language.current": "当前语言：{{lang}}",
   "commands.language.available": "可用语言：{{langs}}",

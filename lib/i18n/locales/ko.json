@@ -22,6 +22,7 @@
   "commands.list.installed_packages": "📦 설치된 패키지:",
   "commands.list.empty": "  (비어있음)",
   "commands.list.total": "📊 총 {{count}}개 패키지",
+  "commands.list.missing_package": "{{name}} (누락됨 — 'mip install' 실행)",
 
   "commands.language.current": "현재 언어: {{lang}}",
   "commands.language.available": "사용 가능한 언어: {{langs}}",
