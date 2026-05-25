@@ -1,11 +1,6 @@
 # TODO
 
-## Task: `mip outdated --json`
-
-- [ ] Add `--json` flag support to `lib/commands/outdated.js`
-- [ ] When `--json` is provided: output machine-readable JSON with entries `{name,current,latest,outdated}`
-- [ ] Preserve current human-readable output when `--json` is not provided
-- [ ] Ensure command exits with code `1` if any outdated packages are found
-- [ ] Update `bin/mip.js` to pass `--json` to the outdated command
-- [ ] Add/extend tests to validate JSON output + exit code behavior
-- [ ] Run test suite (`npm test`)
+- [ ] Изучить текущий механизм скачивания в `lib/core/parallel-download.js` и где выводится UI в `lib/commands/super-install.js`.
+- [ ] Реализовать прогресс/спиннер при скачивании в `ParallelDownloader` через callback `onProgress` (прогресс по X/Y пакетов).
+- [ ] Подключить `onProgress` из `super-install` и обновить вывод в консоль (без тестов).
+- [ ] Проверить, что изменения не ломают текущие тесты/поведение (но тесты не запускать по требованию пользователя).
