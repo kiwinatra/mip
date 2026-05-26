@@ -17,13 +17,13 @@
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
-
+// Hey! Im doing refactor of code, so if anything looks bad open up an issue!
 
 
 const fs = require('fs');
 const path = require('path');
 
-// Определяем режим супер-установки
+// getting super install mode
 const isSuperFast = process.argv.includes('--super') || process.argv.includes('-s');
 const command = process.argv[2];
 const arg = process.argv[3];
@@ -33,13 +33,13 @@ async function main() {
   const pkg = require('../package.json');
   const { t } = getI18n(loadLangForCwd(process.cwd()));
 
-  // СУПЕР-БЫСТРЫЙ РЕЖИМ
+  // fast
   if ((command === 'install' || command === 'i') && isSuperFast) {
     await superInstall(arg);
     return;
   }
 
-  // Обычные команды
+  // simple commands
   switch (command) {
     case 'init':
       await init();
@@ -166,7 +166,7 @@ async function main() {
   }
 }
 
-// СУПЕР-БЫСТРАЯ УСТАНОВКА (встроенная, без лишних зависимостей)
+// fast install RIGH
 async function superInstall(packageName) {
   console.log(t('super.mode_start'));
   
@@ -175,7 +175,7 @@ async function superInstall(packageName) {
   const { execSync } = require('child_process');
   const axios = require('axios');
   
-  // Функция быстрого скачивания
+  // fast download speed
   async function fastDownload(name, version) {
     const info = await getPackageInfo(name, version);
     const url = info.tarball;
@@ -186,13 +186,13 @@ async function superInstall(packageName) {
     const cacheDir = path.join(process.cwd(), '.mip', name, info.version);
     fs.mkdirSync(cacheDir, { recursive: true });
     
-    // Распаковка на лету
+    // extract while downloading
     execSync(`tar -xzf - -C "${cacheDir}" --strip-components=1`, {
       input: response.data,
       stdio: 'pipe'
     });
     
-    // Симлинк
+    // symlink
     const installPath = path.join(process.cwd(), 'node_modules', name);
     if (fs.existsSync(installPath)) fs.rmSync(installPath, { recursive: true, force: true });
     fs.symlinkSync(cacheDir, installPath, 'junction');
@@ -201,23 +201,23 @@ async function superInstall(packageName) {
   }
   
   if (!packageName) {
-    // Установка всех из mip.json
+    // install all from mip.json
     const config = JSON.parse(fs.readFileSync('mip.json', 'utf8'));
     const deps = { ...config.dependencies, ...config.devDependencies };
     const packages = Object.entries(deps);
     
     console.log(t('super.installing_all', { count: packages.length }));
     
-    // Параллельная загрузка
+    // parralel loading
     const promises = packages.map(([name, version]) => fastDownload(name, version));
     await Promise.all(promises);
     
   } else {
-    // Установка одного пакета
+    // install only one package per 1
     const [name, version] = packageName.includes('@') ? packageName.split('@') : [packageName, 'latest'];
     await fastDownload(name, version);
     
-    // Обновляем mip.json
+    // update mip json
     const pkgPath = 'mip.json';
     if (fs.existsSync(pkgPath)) {
       const config = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
@@ -232,7 +232,7 @@ async function superInstall(packageName) {
   console.log(t('super.done', { ms: totalTime }));
 }
 
-// Импорт остальных команд
+// other comands
 async function init() { return require('../lib/commands/init').init(); }
 async function install(pkg, opts) { return require('../lib/commands/install').install(pkg, opts); }
 async function uninstall(pkg) { return require('../lib/commands/uninstall').uninstall(pkg); }
