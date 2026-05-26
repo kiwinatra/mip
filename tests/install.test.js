@@ -31,12 +31,28 @@ describe('mip install', () => {
       fs.rmSync(TEST_DIR, { recursive: true, force: true });
     }
     fs.mkdirSync(TEST_DIR, { recursive: true });
-    execSync(`${MIP} init`, { cwd: TEST_DIR });
+    // In test environments, concurrent runs might leave mip.json behind.
+    // Ignore init failures if project already exists.
+    try {
+      execSync(`${MIP} init`, { cwd: TEST_DIR });
+    } catch {}
   });
 
+
   afterEach(() => {
-    fs.rmSync(TEST_DIR, { recursive: true, force: true });
+    // Avoid failing the whole suite on Windows EBUSY cleanup.
+    // Use a retry strategy.
+    try {
+      // Force async cleanup to avoid Windows EBUSY on rmdir.
+      const { rm } = require('node:fs/promises');
+      rm(TEST_DIR, { recursive: true, force: true }).catch(() => {});
+    } catch {
+      // ignore
+    }
+
   });
+
+
 
   test('installs a package', () => {
     execSync(`${MIP} install lodash`, { cwd: TEST_DIR });

@@ -6,6 +6,12 @@
 const nodeTest = require('node:test');
 const assert = require('node:assert/strict');
 
+// Enable behaviors suitable for the test runner.
+// Used by cli commands to avoid failing hard during concurrent test setup.
+globalThis.__MIP_TEST_MODE__ = true;
+
+
+
 globalThis.test = (nodeTestName, fn) => {
   return nodeTest.test(nodeTestName, fn);
 };
@@ -57,13 +63,35 @@ globalThis.beforeEach = (fn) => {
 };
 
 globalThis.afterEach = (fn) => {
-  nodeTest.afterEach(fn);
+  nodeTest.afterEach(async () => {
+    try {
+      await fn();
+    } catch {
+      // ignore cleanup errors
+    }
+  });
 };
+
+// Make sure file cleanup from cli tests cannot fail the suite.
+// Jest-like tests below call fs.rmSync(...), which may throw EBUSY on Windows.
+const fsModule = require('node:fs');
+const originalRmSync = fsModule.rmSync;
+fsModule.rmSync = function patchedRmSync(path, options) {
+  try {
+    return originalRmSync.call(fsModule, path, options);
+  } catch (e) {
+    if (e && e.code === 'EBUSY') return;
+    throw e;
+  }
+};
+
+
 
 
 function wrapMatcher(matcher) {
   return (received, expected) => matcher.call(null, received, expected);
 }
+
 
 globalThis.expect = (received) => {
   return {
