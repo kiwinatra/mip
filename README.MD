@@ -15,7 +15,7 @@ No magic. No hidden node_modules. Just `.mip/` and your code.
 git clone https://github.com/zshx/mip
 cd mip
 npm install
-npm run build:linux:x64   # or your platform
+npm run build   # or your platform
 ```
 
 The builder will ask where to install and add to PATH.
