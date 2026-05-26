@@ -202,4 +202,5 @@
 "commands.legacy.fixed": "✅ Emulated {{count}} dependencies for {{package}}",
 "commands.legacy.cleaned": "🧹 Removed {{count}} emulated symlinks"
 
+
 }
