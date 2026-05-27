@@ -1,12 +1,12 @@
 # mip — package manager that just works
 
 <p align="center">
-  <a href="https://github.com/zshx/mip/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/zshx/mip?style=social"></a>
-  <a href="https://github.com/zshx/mip/forks"><img alt="Forks" src="https://img.shields.io/github/forks/zshx/mip?style=social"></a>
-  <a href="https://github.com/zshx/mip/issues"><img alt="Issues" src="https://img.shields.io/github/issues/zshx/mip"></a>
-  <a href="https://github.com/zshx/mip/pulls"><img alt="PRs" src="https://img.shields.io/github/issues-pr/zshx/mip"></a>
-  <a href="https://github.com/zshx/mip/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/zshx/mip"></a>
-  <a href="https://www.npmjs.com/package/mip"><img alt="npm" src="https://img.shields.io/npm/v/mip?label=npm"></a>
+  <a href="https://github.com/kiwinatra/mip/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kiwinatra/mip?style=social"></a>
+  <a href="https://github.com/kiwinatra/mip/forks"><img alt="Forks" src="https://img.shields.io/github/forks/kiwinatra/mip?style=social"></a>
+  <a href="https://github.com/zshx/mip/issues"><img alt="Issues" src="https://img.shields.io/github/issues/kiwinatra/mip"></a>
+  <a href="https://github.com/zshx/mip/pulls"><img alt="PRs" src="https://img.shields.io/github/issues-pr/kiwinatra/mip"></a>
+  <a href="https://github.com/zshx/mip/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/kiwinatra/mip"></a>
+  <a href="https://www.npmjs.com/package/mip"><img alt="npm" src="https://img.shields.io/npm/v/mip?label=mip"></a>
 </p>
 
 ---
