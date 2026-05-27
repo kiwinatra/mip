@@ -7,6 +7,26 @@
 
 # mip — package manager that just works
 
+## Documentation
+
+Полная документация доступна в папке `docs/`:
+
+- [Users: Quick start](./docs/users/quick-start.md)
+- [Users: Commands](./docs/users/commands.md)
+- [Users: `mip.json` + `mip-lock.json`](./docs/users/config-and-lockfile.md)
+- [Users: Examples](./docs/users/examples.md)
+- [Users: CI & Security](./docs/users/ci-and-security.md)
+- [Users: Troubleshooting](./docs/users/troubleshooting.md)
+
+Для тех, кто хочет разобраться в коде:
+- [Developers: Architecture](./docs/dev/architecture.md)
+- [Developers: Command system](./docs/dev/commands-system.md)
+- [Developers: Install flow & `.mip`](./docs/dev/install-flow.md)
+- [Developers: i18n](./docs/dev/i18n.md)
+- [Developers: Hacking / debugging](./docs/dev/hacking.md)
+
+---
+
 No magic. No hidden node_modules. Just `.mip/` and your code.
 
 ## Installation
