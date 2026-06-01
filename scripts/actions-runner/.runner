@@ -1,0 +1,11 @@
+﻿{
+  "agentId": 21,
+  "agentName": "mip",
+  "poolId": 1,
+  "poolName": "Default",
+  "serverUrl": "https://pipelinesghubeus6.actions.githubusercontent.com/e8t0zM3GDfWQVbMeEBaSJXRjtPDpDpXjW3BWNXmOBHPvzrhnr7/",
+  "gitHubUrl": "https://github.com/meeple-packager/mip",
+  "workFolder": "_work",
+  "useV2Flow": true,
+  "serverUrlV2": "https://broker.actions.githubusercontent.com/"
+}
