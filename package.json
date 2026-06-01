@@ -1,7 +1,6 @@
-
 {
   "name": "mip",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "just because npm sucks",
   "main": "bin/mip.js",
   "bin": {
@@ -10,8 +9,8 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node bin/mip.js",
-    "test": "node --require ./tests/test-globals.cjs --test",
-
+    "test": "npm run test:all",
+    "test:all": "mocha \"test/**/*.spec.js\" --exit",
     "build:linux:x64": "node scripts/build-linux-x64.js",
     "build:linux:x86": "node scripts/build-linux-x86.js",
     "build:macos": "node scripts/build-macos.js",
@@ -27,7 +26,11 @@
     "tar": "^7.5.15"
   },
   "devDependencies": {
-    "pkg": "^5.8.0"
+    "chai": "^6.2.2",
+    "mocha": "^11.7.6",
+    "nock": "^14.0.15",
+    "pkg": "^5.8.0",
+    "sinon": "^22.0.0"
   },
   "pkg": {
     "assets": [

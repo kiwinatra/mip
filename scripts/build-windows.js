@@ -143,10 +143,10 @@ async function main() {
   let target, outputName;
   
   if (archChoice === '1') {
-    target = 'node18-win-x64';
+    target = 'node20-win-x64';
     outputName = 'mip-windows-x64.exe';
   } else if (archChoice === '2') {
-    target = 'node18-win-x86';
+    target = 'node20-win-x86';
     outputName = 'mip-windows-x86.exe';
   } else {
     log('❌ Invalid choice', 'red');
