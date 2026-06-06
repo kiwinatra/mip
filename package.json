@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "axios": "^1.16.1",
+    "blessed": "^0.1.81",
     "lru-cache": "^10.1.0",
     "semver": "^7.8.0",
     "tar": "^7.5.15"

@@ -133,6 +133,24 @@ async function main() {
       await workspacesCommand(arg, process.argv[4]);
       break;
 
+    case 'repo': {
+      const { repo } = require('../lib/commands/repo');
+
+      // mip repo <username>/<repository> --branch <main> --path <dir>
+      const branchIndex = process.argv.indexOf('--branch');
+      const branch = branchIndex !== -1 ? process.argv[branchIndex + 1] : 'main';
+
+      const pathIndex = process.argv.indexOf('--path');
+      const downloadPath = pathIndex !== -1 ? process.argv[pathIndex + 1] : 'download';
+
+      // bin passes only argv[3] as `arg`, so use arg as repoRef and allow flags via process.argv
+      await repo(arg, {
+        branch: branch || 'main',
+        downloadPath: downloadPath || 'download'
+      });
+      break;
+    }
+
     case '--help':
     case '-h':
       showHelp(t, pkg.version);
