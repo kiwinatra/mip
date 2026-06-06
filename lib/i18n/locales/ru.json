@@ -1,10 +1,10 @@
 {
   "cli.version": "mip v{{version}} - just because npm sucks",
-  "cli.unknown_command": "❓ Неизвестная команда: {{command}}",
+  "cli.unknown_command": "❓ что за команда: {{command}}",
   "cli.try_help": "Попробуй: mip --help",
   "cli.error": "❌ Ошибка: {{message}}",
 
-  "cli.help.title": "mip v{{version}} - SUPER FAST Package Manager",
+  "cli.help.title": "mip v{{version}} - супер дупер софия",
   "cli.help.core_commands": "📦 Основные команды:",
   "cli.help.info_commands": "🔍 Информация:",
   "cli.help.security": "🔒 Безопасность:",

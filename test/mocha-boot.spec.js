@@ -1,3 +1,5 @@
+// Initial mocha spec
+
 const INDENT = '  ';
 
 function nowMs() {
