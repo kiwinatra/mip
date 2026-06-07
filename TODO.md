@@ -1,9 +1,8 @@
 # TODO
 
-- [ ] Исправить `mip repo`: убрать автопоказ README (по умолчанию как проводник — только tree/ls)
-- [ ] Добавить команду внутри REPL `readme`/`cat`, которая выводит README в полноэкранном “окошке” (аналог vim по управлению экраном)
-- [ ] Не использовать запуск внешнего редактора (vim/nano) — только TUI/renderer в терминале
-- [ ] Обновить `docs/users/commands.md` под новые команды/поведение
-- [ ] Прогнать тесты `npm test`
-- [ ] Провести ручную проверку: `mip repo kiwinatra/mip` затем `readme`
+- [ ] Fix TUI input handling in `lib/commands/repo.js` (focus/Enter/Backspace) so text entry works.
+- [ ] Add left panel scrolling (`leftOffset`) so selection stays visible on small terminals.
+- [ ] Add right panel scrolling (`rightOffset`) and key bindings (j/k + PgUp/PgDn if supported).
+- [ ] Ensure redraw respects terminal height and clamps offsets.
+- [ ] Run tests / quick manual check `mip repo owner/repo` in small terminal.
 
