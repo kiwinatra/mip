@@ -33,7 +33,7 @@
 
 ## Quick start
 
-### Do this in 30–60 seconds
+### This done in 30-60 seconds btw
 
 ```bash
 git clone https://github.com/zshx/mip
