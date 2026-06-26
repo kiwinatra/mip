@@ -10,8 +10,7 @@
 </p>
 
 ---
-
-## 🚀 Quick Start
+# You can do it in like 60 seconds
 
 ```bash
 # Install MIP
@@ -193,4 +192,4 @@ MIT © [kiwinatra](https://github.com/kiwinatra)
 
 ---
 
-<p align="center">Made with ❤️ by the MIP team</p>
+<p align="center">Made with ❤️ by the MIP team</p> (and kiwinatra <3)
