@@ -1,3 +1,6 @@
 [submodule "mip-plugins"]
 	path = mip-plugins
 	url = https://github.com/meeple-packager/mip-plugins.git
+[submodule "docs"]
+	path = docs
+	url = https://github.com/meeple-packager/mip-docs.git
