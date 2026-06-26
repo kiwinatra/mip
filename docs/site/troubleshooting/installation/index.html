@@ -1,0 +1,2103 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "en";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      Installation Errors : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Problems encountered when installing packages and how to solve them.">
+<link rel="canonical" href="https://mip.fwh.is/troubleshooting/installation/">
+<meta property="og:title" content="Installation Errors - MIP - Modern Package Manager">
+<meta property="og:description" content="Problems encountered when installing packages and how to solve them.">
+<meta property="og:url" content="https://mip.fwh.is/troubleshooting/installation/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Installation Errors - MIP - Modern Package Manager">
+<meta name="twitter:description" content="Problems encountered when installing packages and how to solve them.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/troubleshooting/installation/">
+<link rel="alternate" hreflang="en" href="/troubleshooting/installation/">
+<link rel="alternate" hreflang="x-default" href="/troubleshooting/installation/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/en/troubleshooting/installation.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/troubleshooting/installation" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/troubleshooting/installation" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Introduction
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Welcome
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Commands
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/run/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Setup
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Creating a Project
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Pros
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Performance
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Developers
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Adding Commands
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Testing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            All About Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Hooks &amp; Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            General List
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Network &amp; Registries
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock Files
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Other
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Extended FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Installation Errors
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Installation%20Errors%22%0Adescription%3A%20%22Problems%20encountered%20when%20installing%20packages%20and%20how%20to%20solve%20them.%22%0A---%0A%0A%23%20Installation%20Errors%20%F0%9F%93%A6%0A%0AThe%20most%20common%20issues%20that%20occur%20when%20installing%20packages%20and%20how%20to%20solve%20them.%0A%0A---%0A%0A%23%23%20%F0%9F%94%8D%20General%20diagnostics%0A%0A%23%23%23%20Check%20the%20environment%0A%0A%60%60%60bash%0Amip%20doctor%0A%60%60%60%0A%0A%23%23%23%20Check%20the%20lockfile%0A%0A%60%60%60bash%0Acat%20mip-lock.yml%0A%60%60%60%0A%0A%23%23%23%20Check%20the%20cache%0A%0A%60%60%60bash%0Amip%20cache%20size%0Amip%20cache%20size%20--global%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%90%9B%20Common%20errors%0A%0A%23%23%23%201.%20%60mip-lock.yml%60%20not%20found%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20Lockfile%20not%20found.%20Run%20mip%20install%20first%0A%60%60%60%0A%0A**Cause%3A**%20The%20lockfile%20is%20missing%20or%20was%20deleted.%0A%0A**Solution%3A**%0A%60%60%60bash%0Amip%20install%0A%60%60%60%0A%0A---%0A%0A%23%23%23%202.%20Package%20not%20found%20in%20registry%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20Package%20not%20found%3A%20some-package%0A%60%60%60%0A%0A**Cause%3A**%20The%20package%20does%20not%20exist%20in%20the%20registry.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Check%20the%20name%0Amip%20search%20some-package%0A%0A%23%20Verify%20the%20package%20exists%0Amip%20info%20some-package%0A%60%60%60%0A%0A---%0A%0A%23%23%23%203.%20Version%20not%20found%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20Version%20not%20found%3A%20some-package%4099.99.99%0A%60%60%60%0A%0A**Cause%3A**%20A%20non-existent%20version%20was%20specified.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20View%20available%20versions%0Amip%20info%20some-package%0A%60%60%60%0A%0A---%0A%0A%23%23%23%204.%20Permission%20denied%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20EACCES%3A%20permission%20denied%0A%60%60%60%0A%0A**Cause%3A**%20No%20write%20permissions%20for%20%60.mip%2F%60%20or%20%60node_modules%2F%60.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Fix%20permissions%0Asudo%20chown%20-R%20%24(whoami)%20.%0A%0A%23%20Or%20delete%20and%20recreate%0Arm%20-rf%20node_modules%20.mip%0Amip%20install%0A%60%60%60%0A%0A---%0A%0A%23%23%23%205.%20SSL%20error%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20UNABLE_TO_VERIFY_LEAF_SIGNATURE%0A%60%60%60%0A%0A**Cause%3A**%20SSL%20certificate%20issues.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Temporarily%20disable%20strict%20verification%0ANODE_TLS_REJECT_UNAUTHORIZED%3D0%20mip%20install%0A%0A%23%20Or%20update%20Node.js%0A%60%60%60%0A%0A---%0A%0A%23%23%23%206.%20Package%20already%20installed%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9C%85%20Package%20already%20installed%0A%60%60%60%0A%0A**This%20is%20not%20an%20error.**%20The%20package%20is%20already%20there.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Force%20reinstall%0Amip%20install%20lodash%20--force%0A%60%60%60%0A%0A---%0A%0A%23%23%23%207.%20No%20free%20space%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20ENOSPC%3A%20no%20space%20left%20on%20device%0A%60%60%60%0A%0A**Cause%3A**%20Disk%20space%20is%20full.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Clear%20cache%0Amip%20cache%20clean%0Amip%20cache%20clean%20--global%0A%0A%23%20Remove%20old%20packages%0Amip%20uninstall%20%3Cpackage%3E%0A%0A%23%20Check%20size%0Amip%20cache%20size%0Amip%20cache%20size%20--global%0A%60%60%60%0A%0A---%0A%0A%23%23%23%208.%20Dependency%20conflict%0A%0A**Error%3A**%0A%60%60%60%0A%E2%9D%8C%20Peer%20dependency%20conflict%0A%60%60%60%0A%0A**Cause%3A**%20The%20package%20requires%20a%20different%20version%20of%20a%20dependency.%0A%0A**Solution%3A**%0A%60%60%60bash%0A%23%20Install%20the%20required%20version%0Amip%20install%20lodash%404.17.20%0A%0A%23%20Or%20update%20all%20packages%0Amip%20update%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%B9%20Cleaning%20and%20reinstalling%0A%0A%23%23%23%20Full%20reinstall%0A%0A%60%60%60bash%0A%23%20Clean%20everything%0Arm%20-rf%20node_modules%20.mip%0Arm%20-f%20mip-lock.yml%0Amip%20cache%20clean%0A%0A%23%20Install%20again%0Amip%20install%0A%60%60%60%0A%0A%23%23%23%20Cache%20only%0A%0A%60%60%60bash%0Amip%20cache%20clean%0Amip%20install%0A%60%60%60%0A%0A%23%23%23%20Lockfile%20only%0A%0A%60%60%60bash%0Arm%20-f%20mip-lock.yml%0Amip%20install%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%9B%A0%EF%B8%8F%20Debugging%0A%0A%23%23%23%20Enable%20debug%20mode%0A%0A%60%60%60bash%0ADEBUG%3D1%20mip%20install%20lodash%0A%60%60%60%0A%0A%23%23%23%20Check%20logs%0A%0A%60%60%60bash%0A%23%20Logs%20are%20printed%20to%20the%20console%0A%23%20For%20logger%20plugins%3A%0Acat%20mip.log%0A%60%60%60%0A%0A%23%23%23%20Check%20versions%0A%0A%60%60%60bash%0Amip%20--version%0Anode%20--version%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%97%20Related%20pages%0A%0A-%20%5BNetwork%20%26%20Registries%5D(%2Ftroubleshooting%2Fnetwork)%20%E2%80%94%20network%20issues%0A-%20%5BLock%20Files%5D(%2Ftroubleshooting%2Flockfile)%20%E2%80%94%20lockfile%20issues%0A-%20%5Bmip%20doctor%5D(%2Fcommands%2Fdoctor)%20%E2%80%94%20environment%20diagnostics%0A-%20%5Bmip%20cache%5D(%2Fcommands%2Fcache)%20%E2%80%94%20cache%20management%0A" style="display: none;"></div>
+                  
+                    <div class="docmd-breadcrumbs-spacer"></div>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="installation-errors" class="docmd-heading"><a href="#installation-errors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Installation Errors 📦</h1>
+<p>The most common issues that occur when installing packages and how to solve them.</p>
+<hr>
+<h2 id="installation-errors-general-diagnostics" class="docmd-heading"><a href="#installation-errors-general-diagnostics" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔍 General diagnostics</h2>
+<h3 id="installation-errors-general-diagnostics-check-the-environment" class="docmd-heading"><a href="#installation-errors-general-diagnostics-check-the-environment" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Check the environment</h3>
+<pre class="hljs"><code class="language-bash">mip doctor
+</code></pre>
+<h3 id="installation-errors-general-diagnostics-check-the-lockfile" class="docmd-heading"><a href="#installation-errors-general-diagnostics-check-the-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Check the lockfile</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-keyword">cat</span> mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span>
+</code></pre>
+<h3 id="installation-errors-general-diagnostics-check-the-cache" class="docmd-heading"><a href="#installation-errors-general-diagnostics-check-the-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Check the cache</h3>
+<pre class="hljs"><code class="language-bash">mip cache size
+mip cache size <span class="hljs-punctuation">--</span>global
+</code></pre>
+<hr>
+<h2 id="installation-errors-common-errors" class="docmd-heading"><a href="#installation-errors-common-errors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🐛 Common errors</h2>
+<h3 id="installation-errors-common-errors-1-mip-lockyml-not-found" class="docmd-heading"><a href="#installation-errors-common-errors-1-mip-lockyml-not-found" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>1. <code>mip-lock.yml</code> not found</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ Lockfile not found. Run mip install first
+</code></pre>
+<p><strong>Cause:</strong> The lockfile is missing or was deleted.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash">mip install
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-2-package-not-found-in-registry" class="docmd-heading"><a href="#installation-errors-common-errors-2-package-not-found-in-registry" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>2. Package not found in registry</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ Package not found<span class="hljs-punctuation">:</span> some<span class="hljs-punctuation">-</span>package
+</code></pre>
+<p><strong>Cause:</strong> The package does not exist in the registry.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Check the name</span>
+mip search some<span class="hljs-punctuation">-</span>package
+
+<span class="hljs-comment"># Verify the package exists</span>
+mip info some<span class="hljs-punctuation">-</span>package
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-3-version-not-found" class="docmd-heading"><a href="#installation-errors-common-errors-3-version-not-found" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>3. Version not found</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ Version not found<span class="hljs-punctuation">:</span> some<span class="hljs-punctuation">-</span>package@<span class="hljs-number">99.99</span>.<span class="hljs-number">99</span>
+</code></pre>
+<p><strong>Cause:</strong> A non-existent version was specified.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># View available versions</span>
+mip info some<span class="hljs-punctuation">-</span>package
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-4-permission-denied" class="docmd-heading"><a href="#installation-errors-common-errors-4-permission-denied" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>4. Permission denied</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ EACCES<span class="hljs-punctuation">:</span> permission denied
+</code></pre>
+<p><strong>Cause:</strong> No write permissions for <code>.mip/</code> or <code>node_modules/</code>.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Fix permissions</span>
+<span class="hljs-keyword">sudo</span> <span class="hljs-keyword">chown</span> <span class="hljs-punctuation">-</span>R <span class="hljs-title function_">$</span>(<span class="hljs-keyword">whoami</span>) .
+
+<span class="hljs-comment"># Or delete and recreate</span>
+<span class="hljs-keyword">rm</span> <span class="hljs-punctuation">-</span>rf node_modules .<span class="hljs-attr">mip</span>
+mip install
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-5-ssl-error" class="docmd-heading"><a href="#installation-errors-common-errors-5-ssl-error" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>5. SSL error</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ UNABLE_TO_VERIFY_LEAF_SIGNATURE
+</code></pre>
+<p><strong>Cause:</strong> SSL certificate issues.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Temporarily disable strict verification</span>
+NODE_TLS_REJECT_UNAUTHORIZED<span class="hljs-punctuation">=</span><span class="hljs-number">0</span> mip install
+
+<span class="hljs-comment"># Or update Node.js</span>
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-6-package-already-installed" class="docmd-heading"><a href="#installation-errors-common-errors-6-package-already-installed" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>6. Package already installed</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>✅ Package already installed
+</code></pre>
+<p><strong>This is not an error.</strong> The package is already there.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Force reinstall</span>
+mip install lodash <span class="hljs-punctuation">--</span>force
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-7-no-free-space" class="docmd-heading"><a href="#installation-errors-common-errors-7-no-free-space" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>7. No free space</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ ENOSPC<span class="hljs-punctuation">:</span> no space left on device
+</code></pre>
+<p><strong>Cause:</strong> Disk space is full.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Clear cache</span>
+mip cache clean
+mip cache clean <span class="hljs-punctuation">--</span>global
+
+<span class="hljs-comment"># Remove old packages</span>
+mip uninstall <span class="hljs-punctuation">&lt;</span>package<span class="hljs-punctuation">&gt;</span>
+
+<span class="hljs-comment"># Check size</span>
+mip cache size
+mip cache size <span class="hljs-punctuation">--</span>global
+</code></pre>
+<hr>
+<h3 id="installation-errors-common-errors-8-dependency-conflict" class="docmd-heading"><a href="#installation-errors-common-errors-8-dependency-conflict" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>8. Dependency conflict</h3>
+<p><strong>Error:</strong></p>
+<pre class="hljs"><code>❌ Peer dependency conflict
+</code></pre>
+<p><strong>Cause:</strong> The package requires a different version of a dependency.</p>
+<p><strong>Solution:</strong></p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Install the required version</span>
+mip install lodash@<span class="hljs-number">4.17</span>.<span class="hljs-number">20</span>
+
+<span class="hljs-comment"># Or update all packages</span>
+mip update
+</code></pre>
+<hr>
+<h2 id="installation-errors-cleaning-and-reinstalling" class="docmd-heading"><a href="#installation-errors-cleaning-and-reinstalling" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧹 Cleaning and reinstalling</h2>
+<h3 id="installation-errors-cleaning-and-reinstalling-full-reinstall" class="docmd-heading"><a href="#installation-errors-cleaning-and-reinstalling-full-reinstall" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Full reinstall</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Clean everything</span>
+<span class="hljs-keyword">rm</span> <span class="hljs-punctuation">-</span>rf node_modules .<span class="hljs-attr">mip</span>
+<span class="hljs-keyword">rm</span> <span class="hljs-punctuation">-</span>f mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span>
+mip cache clean
+
+<span class="hljs-comment"># Install again</span>
+mip install
+</code></pre>
+<h3 id="installation-errors-cleaning-and-reinstalling-cache-only" class="docmd-heading"><a href="#installation-errors-cleaning-and-reinstalling-cache-only" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Cache only</h3>
+<pre class="hljs"><code class="language-bash">mip cache clean
+mip install
+</code></pre>
+<h3 id="installation-errors-cleaning-and-reinstalling-lockfile-only" class="docmd-heading"><a href="#installation-errors-cleaning-and-reinstalling-lockfile-only" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Lockfile only</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-keyword">rm</span> <span class="hljs-punctuation">-</span>f mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span>
+mip install
+</code></pre>
+<hr>
+<h2 id="installation-errors-debugging" class="docmd-heading"><a href="#installation-errors-debugging" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🛠️ Debugging</h2>
+<h3 id="installation-errors-debugging-enable-debug-mode" class="docmd-heading"><a href="#installation-errors-debugging-enable-debug-mode" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Enable debug mode</h3>
+<pre class="hljs"><code class="language-bash">DEBUG<span class="hljs-punctuation">=</span><span class="hljs-number">1</span> mip install lodash
+</code></pre>
+<h3 id="installation-errors-debugging-check-logs" class="docmd-heading"><a href="#installation-errors-debugging-check-logs" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Check logs</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Logs are printed to the console</span>
+<span class="hljs-comment"># For logger plugins:</span>
+<span class="hljs-keyword">cat</span> mip.<span class="hljs-attr">log</span>
+</code></pre>
+<h3 id="installation-errors-debugging-check-versions" class="docmd-heading"><a href="#installation-errors-debugging-check-versions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Check versions</h3>
+<pre class="hljs"><code class="language-bash">mip <span class="hljs-punctuation">--</span>version
+<span class="hljs-keyword">node</span> <span class="hljs-punctuation">--</span>version
+</code></pre>
+<hr>
+<h2 id="installation-errors-related-pages" class="docmd-heading"><a href="#installation-errors-related-pages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔗 Related pages</h2>
+<ul>
+<li><a href="/troubleshooting/network/">Network &amp; Registries</a> — network issues</li>
+<li><a href="/troubleshooting/lockfile/">Lock Files</a> — lockfile issues</li>
+<li><a href="/commands/doctor/">mip doctor</a> — environment diagnostics</li>
+<li><a href="/commands/cache/">mip cache</a> — cache management</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <div class="prev-page-placeholder">
+                      </div>
+                    
+                    
+                      <a href="../../" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Welcome
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#installation-errors" class="toc-link">Installation Errors 📦</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#installation-errors-general-diagnostics" class="toc-link">🔍 General diagnostics</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-general-diagnostics-check-the-environment" class="toc-link">Check the environment</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-general-diagnostics-check-the-lockfile" class="toc-link">Check the lockfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-general-diagnostics-check-the-cache" class="toc-link">Check the cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#installation-errors-common-errors" class="toc-link">🐛 Common errors</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-1-mip-lockyml-not-found" class="toc-link">1. mip-lock.yml not found</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-2-package-not-found-in-registry" class="toc-link">2. Package not found in registry</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-3-version-not-found" class="toc-link">3. Version not found</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-4-permission-denied" class="toc-link">4. Permission denied</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-5-ssl-error" class="toc-link">5. SSL error</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-6-package-already-installed" class="toc-link">6. Package already installed</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-7-no-free-space" class="toc-link">7. No free space</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-common-errors-8-dependency-conflict" class="toc-link">8. Dependency conflict</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#installation-errors-cleaning-and-reinstalling" class="toc-link">🧹 Cleaning and reinstalling</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-cleaning-and-reinstalling-full-reinstall" class="toc-link">Full reinstall</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-cleaning-and-reinstalling-cache-only" class="toc-link">Cache only</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-cleaning-and-reinstalling-lockfile-only" class="toc-link">Lockfile only</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#installation-errors-debugging" class="toc-link">🛠️ Debugging</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-debugging-enable-debug-mode" class="toc-link">Enable debug mode</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-debugging-check-logs" class="toc-link">Check logs</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#installation-errors-debugging-check-versions" class="toc-link">Check versions</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#installation-errors-related-pages" class="toc-link">🔗 Related pages</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

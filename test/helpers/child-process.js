@@ -4,25 +4,24 @@ function execFileStreaming(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       stdio: ['ignore', 'pipe', 'pipe'],
-      ...options
+      ...options,
     });
 
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (chunk) => {
+    child.stdout.on('data', chunk => {
       stdout += chunk.toString('utf8');
     });
-    child.stderr.on('data', (chunk) => {
+    child.stderr.on('data', chunk => {
       stderr += chunk.toString('utf8');
     });
 
     child.on('error', reject);
-    child.on('close', (code) => {
+    child.on('close', code => {
       resolve({ code, stdout, stderr });
     });
   });
 }
 
 module.exports = { execFileStreaming };
-

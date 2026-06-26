@@ -1,0 +1,2196 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "en";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      mip genlock — generate lockfile : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The genlock command creates a mip-lock.yml file based on dependencies from mip.yml, pinning exact versions and URLs for reproducible installs.">
+<link rel="canonical" href="https://mip.fwh.is/commands/genlock/">
+<meta property="og:title" content="mip genlock — generate lockfile - MIP - Modern Package Manager">
+<meta property="og:description" content="The genlock command creates a mip-lock.yml file based on dependencies from mip.yml, pinning exact versions and URLs for reproducible installs.">
+<meta property="og:url" content="https://mip.fwh.is/commands/genlock/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mip genlock — generate lockfile - MIP - Modern Package Manager">
+<meta name="twitter:description" content="The genlock command creates a mip-lock.yml file based on dependencies from mip.yml, pinning exact versions and URLs for reproducible installs.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/commands/genlock/">
+<link rel="alternate" hreflang="en" href="/commands/genlock/">
+<link rel="alternate" hreflang="x-default" href="/commands/genlock/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/en/commands/genlock.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/commands/genlock" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/commands/genlock" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Introduction
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Welcome
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Commands
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../commands/genlock/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/run/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Setup
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Creating a Project
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Pros
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Performance
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Developers
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Adding Commands
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Testing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            All About Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Hooks &amp; Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            General List
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Network &amp; Registries
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock Files
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Other
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Extended FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  mip genlock — generate lockfile
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22mip%20genlock%20%E2%80%94%20generate%20lockfile%22%0Adescription%3A%20%22The%20genlock%20command%20creates%20a%20mip-lock.yml%20file%20based%20on%20dependencies%20from%20mip.yml%2C%20pinning%20exact%20versions%20and%20URLs%20for%20reproducible%20installs.%22%0A---%0A%0A%23%20mip%20genlock%0A%0A%3A%3A%3A%20callout%20info%20%22What%20is%20this%3F%22%20icon%3Alock%0A%60mip%20genlock%60%20generates%20a%20**lockfile**%20(%60mip-lock.yml%60)%20based%20on%20the%20dependencies%20specified%20in%20%60mip.yml%60.%20Unlike%20%60mip%20install%60%2C%20this%20command%20does%20not%20install%20packages%20locally%20%E2%80%94%20it%20only%20resolves%20their%20versions%20and%20creates%20a%20file%20with%20pinned%20versions%2C%20URLs%2C%20and%20dependencies.%20This%20is%20useful%20for%20pre-generating%20a%20lockfile%20in%20CI%2FCD%20or%20after%20manually%20updating%20%60mip.yml%60.%0A%3A%3A%3A%0A%0A%23%23%20Syntax%0A%0A%60%60%60bash%0Amip%20genlock%0A%60%60%60%0A%0A%23%23%20How%20it%20works%0A%0A1.%20**Check%20for%20%60mip.yml%60**%20%E2%80%94%20the%20command%20checks%20if%20%60mip.yml%60%20exists%20in%20the%20current%20directory.%20If%20not%2C%20execution%20stops.%0A%0A2.%20**Read%20dependencies**%20%E2%80%94%20extracts%20%60dependencies%60%20and%20%60devDependencies%60%20sections%20from%20%60mip.yml%60.%0A%0A3.%20**Resolve%20versions**%20%E2%80%94%20for%20each%20dependency%20(name%20%2B%20version%20range)%2C%20queries%20the%20npm%20registry%20to%20get%20the%20exact%20latest%20version%20that%20satisfies%20the%20range.%0A%0A4.%20**Collect%20metadata**%20%E2%80%94%20for%20each%20package%2C%20fetches%3A%0A%20%20%20-%20Exact%20version%20(%60version%60).%0A%20%20%20-%20Tarball%20URL%20(%60resolved%60).%0A%20%20%20-%20List%20of%20dependencies%20(%60dependencies%60).%0A%20%20%20-%20List%20of%20peer%20dependencies%20(%60peerDependencies%60).%0A%0A5.%20**Generate%20lockfile**%20%E2%80%94%20creates%20%60mip-lock.yml%60%20with%20the%20following%20structure%3A%0A%20%20%20%60%60%60yaml%0A%20%20%20version%3A%201.0.0%0A%20%20%20generatedAt%3A%20&#039;2026-01-15T14%3A23%3A00.000Z&#039;%0A%20%20%20packages%3A%0A%20%20%20%20%20lodash%404.17.21%3A%0A%20%20%20%20%20%20%20version%3A%204.17.21%0A%20%20%20%20%20%20%20resolved%3A%20https%3A%2F%2Fregistry.npmjs.org%2Flodash%2F-%2Flodash-4.17.21.tgz%0A%20%20%20%20%20%20%20dependencies%3A%20%7B%7D%0A%20%20%20%20%20%20%20peerDependencies%3A%20%7B%7D%0A%20%20%20%20%20%20%20installPath%3A%20.mip%2Flodash%2F4.17.21%0A%20%20%20%60%60%60%0A%0A6.%20**Output%20results**%20%E2%80%94%20shows%20how%20many%20packages%20were%20successfully%20added%20to%20the%20lockfile.%0A%0A%23%23%20Examples%0A%0A%3A%3A%3A%20tabs%0A%3D%3D%20tab%20%22Generate%20lockfile%22%0A%60%60%60bash%0Amip%20genlock%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%94%92%20Generating%20lockfile...%0A%20%20%E2%8F%B3%20Resolving%20packages...%201%2F42%0A%20%20%E2%8F%B3%20Resolving%20packages...%2042%2F42%0A%0A%E2%9C%85%20Generated%20mip-lock.yml%20with%2042%20packages%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22When%20mip.yml%20is%20empty%22%0A%60%60%60bash%0Amip%20genlock%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%E2%84%B9%EF%B8%8F%20No%20dependencies%20found%20in%20mip.yml%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22On%20resolve%20error%22%0A%60%60%60bash%0Amip%20genlock%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%94%92%20Generating%20lockfile...%0A%20%20%E2%8F%B3%20Resolving%20packages...%201%2F42%0A%20%20%E2%9D%8C%20Failed%20to%20resolve%20some-package%40%5E2.0.0%3A%20Package%20not%20found%0A%0A%E2%9C%85%20Generated%20mip-lock.yml%20with%2041%20packages%0A%60%60%60%0A%3A%3A%3A%0A%0A%23%23%20Common%20errors%0A%0A%3A%3A%3A%20callout%20danger%20%22%E2%9D%8C%20mip.yml%20not%20found%22%20icon%3Askull%0A**Cause%3A**%20No%20%60mip.yml%60%20file%20in%20the%20current%20directory.%0A%0A**Solution%3A**%0A1.%20Make%20sure%20you%20are%20in%20the%20project%20root.%0A2.%20If%20it&#039;s%20a%20new%20project%20%E2%80%94%20create%20%60mip.yml%60%20with%20%60mip%20init%60.%0A3.%20Or%20use%20%60mip%20create%60%20to%20generate%20a%20ready-made%20project.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22%E2%9D%8C%20No%20dependencies%20found%22%20icon%3Ainfo%0A**Cause%3A**%20No%20dependencies%20specified%20in%20%60mip.yml%60%20(empty%20%60dependencies%60%20and%20%60devDependencies%60%20sections).%0A%0A**Solution%3A**%20This%20is%20not%20an%20error%2C%20just%20a%20warning.%20If%20you%20want%20to%20pin%20dependencies%20%E2%80%94%20add%20them%20to%20%60mip.yml%60%20and%20run%20%60mip%20genlock%60%20again.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20danger%20%22%E2%9D%8C%20Failed%20to%20resolve%20package%22%20icon%3Aalert-circle%0A**Cause%3A**%20Package%20not%20found%20in%20the%20registry%20or%20the%20specified%20version%20does%20not%20exist.%0A%0A**Solution%3A**%0A1.%20Check%20the%20package%20name%20and%20version%20in%20%60mip.yml%60.%0A2.%20Check%20your%20internet%20connection.%0A3.%20If%20the%20package%20is%20private%20%E2%80%94%20make%20sure%20the%20correct%20registries%20are%20configured.%0A4.%20After%20fixing%2C%20run%20%60mip%20genlock%60%20again.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20tip%20%22%F0%9F%92%A1%20Tip%22%20icon%3Alightbulb%0A%60mip%20genlock%60%20**requires%20registry%20access**%2C%20as%20it%20resolves%20versions%20in%20real%20time.%0A%0AIt%20is%20recommended%20to%20use%20%60mip%20genlock%60%3A%0A-%20**After%20manually%20editing**%20%60mip.yml%60.%0A-%20**In%20CI%2FCD**%20to%20generate%20a%20lockfile%20from%20%60mip.yml%60%20without%20installing%20packages.%0A-%20**In%20automation%20scripts**%20to%20check%20dependency%20availability.%0A%3A%3A%3A%0A%0A%23%23%20Related%20commands%0A%0A-%20%5Bmip%20install%5D(%2Fcommands%2Finstall)%20%E2%80%94%20installs%20dependencies%20and%20generates%20a%20lockfile.%0A-%20%5Bmip%20ci%5D(%2Fcommands%2Fci)%20%E2%80%94%20installs%20dependencies%20**from%20the%20lockfile**.%0A-%20%5Bmip%20update%5D(%2Fcommands%2Fupdate)%20%E2%80%94%20updates%20dependencies%20and%20regenerates%20the%20lockfile.%0A%0A%3A%3A%3A%20collapsible%20%22%F0%9F%A7%A0%20Why%20do%20you%20need%20a%20lockfile%3F%22%0AA%20lockfile%20is%20a%20**snapshot%20of%20the%20dependency%20tree**%20at%20a%20specific%20point%20in%20time.%20It%20guarantees%3A%0A%0A1.%20**Reproducibility**%20%E2%80%94%20all%20developers%20and%20CI%20get%20**identical**%20package%20versions.%0A2.%20**Speed**%20%E2%80%94%20no%20need%20to%20resolve%20dependencies%20on%20every%20install.%0A3.%20**Security**%20%E2%80%94%20if%20a%20package%20is%20removed%20from%20the%20registry%2C%20you%20still%20have%20the%20pinned%20version.%0A%0A**Difference%20between%20%60mip%20install%60%20and%20%60mip%20genlock%60%3A**%0A%7C%20Command%20%7C%20Installs%20packages%20to%20global%20cache%20%7C%20Generates%20lockfile%20%7C%0A%7C---------%7C-----------------------------------%7C-------------------%7C%0A%7C%20%60mip%20install%60%20%7C%20%E2%9C%85%20Yes%20%7C%20%E2%9C%85%20Yes%20(if%20no%20lockfile)%20%7C%0A%7C%20%60mip%20genlock%60%20%7C%20%E2%9D%8C%20No%20%7C%20%E2%9C%85%20Yes%20(always)%20%7C%0A%0A%60mip%20genlock%60%20allows%20you%20to%20**prepare%20a%20lockfile%20in%20advance**%20in%20CI%2C%20without%20spending%20time%20on%20installing%20packages.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20collapsible%20%22%F0%9F%94%A7%20mip-lock.yml%20format%22%0A%60%60%60yaml%0Aversion%3A%201.0.0%0AgeneratedAt%3A%20&#039;2026-01-15T14%3A23%3A00.000Z&#039;%0Apackages%3A%0A%20%20lodash%404.17.21%3A%0A%20%20%20%20version%3A%204.17.21%0A%20%20%20%20resolved%3A%20https%3A%2F%2Fregistry.npmjs.org%2Flodash%2F-%2Flodash-4.17.21.tgz%0A%20%20%20%20dependencies%3A%20%7B%7D%0A%20%20%20%20peerDependencies%3A%20%7B%7D%0A%20%20%20%20installPath%3A%20.mip%2Flodash%2F4.17.21%0A%20%20react%4018.2.0%3A%0A%20%20%20%20version%3A%2018.2.0%0A%20%20%20%20resolved%3A%20https%3A%2F%2Fregistry.npmjs.org%2Freact%2F-%2Freact-18.2.0.tgz%0A%20%20%20%20dependencies%3A%0A%20%20%20%20%20%20loose-envify%3A%20%5E1.1.0%0A%20%20%20%20%20%20scheduler%3A%20%5E0.23.0%0A%20%20%20%20peerDependencies%3A%20%7B%7D%0A%20%20%20%20installPath%3A%20.mip%2Freact%2F18.2.0%0A%60%60%60%0A%0A**Fields%3A**%0A-%20%60version%60%20%E2%80%94%20lockfile%20format%20version%20(for%20future%20compatibility).%0A-%20%60generatedAt%60%20%E2%80%94%20generation%20time%20(ISO%208601).%0A-%20%60packages%60%20%E2%80%94%20object%20with%20keys%20in%20the%20format%20%60name%40version%60%20and%20metadata.%0A-%20%60resolved%60%20%E2%80%94%20URL%20for%20downloading%20the%20tarball.%0A-%20%60installPath%60%20%E2%80%94%20path%20where%20the%20package%20will%20be%20installed%20(relative%20to%20project%20root).%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Commands</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>genlock</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="mip-genlock" class="docmd-heading"><a href="#mip-genlock" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>mip genlock</h1>
+<div class="docmd-container callout callout-info"><div class="callout-title">
+<svg class="lucide-icon icon-lock callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+</svg>
+What is this?</div><div class="callout-content">
+<p><code>mip genlock</code> generates a <strong>lockfile</strong> (<code>mip-lock.yml</code>) based on the dependencies specified in <code>mip.yml</code>. Unlike <code>mip install</code>, this command does not install packages locally — it only resolves their versions and creates a file with pinned versions, URLs, and dependencies. This is useful for pre-generating a lockfile in CI/CD or after manually updating <code>mip.yml</code>.</p>
+</div></div>
+<h2 id="mip-genlock-syntax" class="docmd-heading"><a href="#mip-genlock-syntax" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Syntax</h2>
+<pre class="hljs"><code class="language-bash">mip genlock
+</code></pre>
+<h2 id="mip-genlock-how-it-works" class="docmd-heading"><a href="#mip-genlock-how-it-works" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How it works</h2>
+<ol>
+<li><p><strong>Check for <code>mip.yml</code></strong> — the command checks if <code>mip.yml</code> exists in the current directory. If not, execution stops.</p>
+</li>
+<li><p><strong>Read dependencies</strong> — extracts <code>dependencies</code> and <code>devDependencies</code> sections from <code>mip.yml</code>.</p>
+</li>
+<li><p><strong>Resolve versions</strong> — for each dependency (name + version range), queries the npm registry to get the exact latest version that satisfies the range.</p>
+</li>
+<li><p><strong>Collect metadata</strong> — for each package, fetches:</p>
+<ul>
+<li>Exact version (<code>version</code>).</li>
+<li>Tarball URL (<code>resolved</code>).</li>
+<li>List of dependencies (<code>dependencies</code>).</li>
+<li>List of peer dependencies (<code>peerDependencies</code>).</li>
+</ul>
+</li>
+<li><p><strong>Generate lockfile</strong> — creates <code>mip-lock.yml</code> with the following structure:</p>
+<pre class="hljs"><code class="language-yaml">version<span class="hljs-punctuation">:</span> <span class="hljs-number">1.0</span>.<span class="hljs-number">0</span>
+generatedAt<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;2026-01-15T14:23:00.000Z&#039;</span>
+packages<span class="hljs-punctuation">:</span>
+  lodash@<span class="hljs-number">4.17</span>.<span class="hljs-number">21</span><span class="hljs-punctuation">:</span>
+    version<span class="hljs-punctuation">:</span> <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>
+    resolved<span class="hljs-punctuation">:</span> https<span class="hljs-punctuation">://</span>registry.<span class="hljs-attr">npmjs</span>.<span class="hljs-attr">org</span><span class="hljs-punctuation">/</span>lodash<span class="hljs-punctuation">/-/</span>lodash<span class="hljs-punctuation">-</span><span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>.<span class="hljs-attr">tgz</span>
+    dependencies<span class="hljs-punctuation">:</span> {}
+    peerDependencies<span class="hljs-punctuation">:</span> {}
+    installPath<span class="hljs-punctuation">:</span> .<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>lodash<span class="hljs-punctuation">/</span><span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>
+</code></pre>
+</li>
+<li><p><strong>Output results</strong> — shows how many packages were successfully added to the lockfile.</p>
+</li>
+</ol>
+<h2 id="mip-genlock-examples" class="docmd-heading"><a href="#mip-genlock-examples" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Examples</h2>
+<div class="docmd-tabs">
+<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>Generate lockfile</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code class="language-bash">mip genlock
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🔒 Generating lockfile...
+  ⏳ Resolving packages... <span class="hljs-number">1</span><span class="hljs-punctuation">/</span><span class="hljs-number">42</span>
+  ⏳ Resolving packages... <span class="hljs-number">42</span><span class="hljs-punctuation">/</span><span class="hljs-number">42</span>
+
+✅ Generated mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span> <span class="hljs-keyword">with</span> <span class="hljs-number">42</span> packages
+</code></pre>
+</div></div></div><p>== tab “When mip.yml is empty”</p>
+<pre class="hljs"><code class="language-bash">mip genlock
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>ℹ️ No dependencies found <span class="hljs-keyword">in</span> mip.<span class="hljs-attr">yml</span>
+</code></pre>
+<p>:::<br>
+== tab “On resolve error”</p>
+<pre class="hljs"><code class="language-bash">mip genlock
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🔒 Generating lockfile...
+  ⏳ Resolving packages... <span class="hljs-number">1</span><span class="hljs-punctuation">/</span><span class="hljs-number">42</span>
+  ❌ Failed to resolve some<span class="hljs-punctuation">-</span>package@<span class="hljs-punctuation">^</span><span class="hljs-number">2.0</span>.<span class="hljs-number">0</span><span class="hljs-punctuation">:</span> Package not found
+
+✅ Generated mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span> <span class="hljs-keyword">with</span> <span class="hljs-number">41</span> packages
+</code></pre>
+<p>:::</p>
+<h2 id="mip-genlock-common-errors" class="docmd-heading"><a href="#mip-genlock-common-errors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Common errors</h2>
+<div class="docmd-container callout callout-danger"><div class="callout-title">
+<svg class="lucide-icon icon-skull callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-skull"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12.5 17-.5-1-.5 1h1z" />
+  <path d="M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z" />
+  <circle cx="15" cy="12" r="1" />
+  <circle cx="9" cy="12" r="1" />
+</svg>
+❌ mip.yml not found</div><div class="callout-content">
+<p><strong>Cause:</strong> No <code>mip.yml</code> file in the current directory.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li>Make sure you are in the project root.</li>
+<li>If it’s a new project — create <code>mip.yml</code> with <code>mip init</code>.</li>
+<li>Or use <code>mip create</code> to generate a ready-made project.</li>
+</ol>
+</div></div>
+<div class="docmd-container callout callout-warning"><div class="callout-title">
+<svg class="lucide-icon icon-info callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-info"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 16v-4" />
+  <path d="M12 8h.01" />
+</svg>
+❌ No dependencies found</div><div class="callout-content">
+<p><strong>Cause:</strong> No dependencies specified in <code>mip.yml</code> (empty <code>dependencies</code> and <code>devDependencies</code> sections).</p>
+<p><strong>Solution:</strong> This is not an error, just a warning. If you want to pin dependencies — add them to <code>mip.yml</code> and run <code>mip genlock</code> again.</p>
+</div></div>
+<div class="docmd-container callout callout-danger"><div class="callout-title">
+<svg class="lucide-icon icon-alert-circle callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
+❌ Failed to resolve package</div><div class="callout-content">
+<p><strong>Cause:</strong> Package not found in the registry or the specified version does not exist.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li>Check the package name and version in <code>mip.yml</code>.</li>
+<li>Check your internet connection.</li>
+<li>If the package is private — make sure the correct registries are configured.</li>
+<li>After fixing, run <code>mip genlock</code> again.</li>
+</ol>
+</div></div>
+<div class="docmd-container callout callout-tip"><div class="callout-title">
+<svg class="lucide-icon icon-lightbulb callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lightbulb"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+  <path d="M9 18h6" />
+  <path d="M10 22h4" />
+</svg>
+💡 Tip</div><div class="callout-content">
+<p><code>mip genlock</code> <strong>requires registry access</strong>, as it resolves versions in real time.</p>
+<p>It is recommended to use <code>mip genlock</code>:</p>
+<ul>
+<li><strong>After manually editing</strong> <code>mip.yml</code>.</li>
+<li><strong>In CI/CD</strong> to generate a lockfile from <code>mip.yml</code> without installing packages.</li>
+<li><strong>In automation scripts</strong> to check dependency availability.</li>
+</ul>
+</div></div>
+<h2 id="mip-genlock-related-commands" class="docmd-heading"><a href="#mip-genlock-related-commands" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Related commands</h2>
+<ul>
+<li><a href="/commands/install/">mip install</a> — installs dependencies and generates a lockfile.</li>
+<li><a href="/commands/ci/">mip ci</a> — installs dependencies <strong>from the lockfile</strong>.</li>
+<li><a href="/commands/update/">mip update</a> — updates dependencies and regenerates the lockfile.</li>
+</ul>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">🧠 Why do you need a lockfile?</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<p>A lockfile is a <strong>snapshot of the dependency tree</strong> at a specific point in time. It guarantees:</p>
+<ol>
+<li><strong>Reproducibility</strong> — all developers and CI get <strong>identical</strong> package versions.</li>
+<li><strong>Speed</strong> — no need to resolve dependencies on every install.</li>
+<li><strong>Security</strong> — if a package is removed from the registry, you still have the pinned version.</li>
+</ol>
+<p><strong>Difference between <code>mip install</code> and <code>mip genlock</code>:</strong></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Installs packages to global cache</th>
+<th>Generates lockfile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mip install</code></td>
+<td>✅ Yes</td>
+<td>✅ Yes (if no lockfile)</td>
+</tr>
+<tr>
+<td><code>mip genlock</code></td>
+<td>❌ No</td>
+<td>✅ Yes (always)</td>
+</tr>
+</tbody>
+</table>
+</div><p><code>mip genlock</code> allows you to <strong>prepare a lockfile in advance</strong> in CI, without spending time on installing packages.</p>
+</div></details>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">🔧 mip-lock.yml format</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<pre class="hljs"><code class="language-yaml">version<span class="hljs-punctuation">:</span> <span class="hljs-number">1.0</span>.<span class="hljs-number">0</span>
+generatedAt<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;2026-01-15T14:23:00.000Z&#039;</span>
+packages<span class="hljs-punctuation">:</span>
+  lodash@<span class="hljs-number">4.17</span>.<span class="hljs-number">21</span><span class="hljs-punctuation">:</span>
+    version<span class="hljs-punctuation">:</span> <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>
+    resolved<span class="hljs-punctuation">:</span> https<span class="hljs-punctuation">://</span>registry.<span class="hljs-attr">npmjs</span>.<span class="hljs-attr">org</span><span class="hljs-punctuation">/</span>lodash<span class="hljs-punctuation">/-/</span>lodash<span class="hljs-punctuation">-</span><span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>.<span class="hljs-attr">tgz</span>
+    dependencies<span class="hljs-punctuation">:</span> {}
+    peerDependencies<span class="hljs-punctuation">:</span> {}
+    installPath<span class="hljs-punctuation">:</span> .<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>lodash<span class="hljs-punctuation">/</span><span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>
+  react@<span class="hljs-number">18.2</span>.<span class="hljs-number">0</span><span class="hljs-punctuation">:</span>
+    version<span class="hljs-punctuation">:</span> <span class="hljs-number">18.2</span>.<span class="hljs-number">0</span>
+    resolved<span class="hljs-punctuation">:</span> https<span class="hljs-punctuation">://</span>registry.<span class="hljs-attr">npmjs</span>.<span class="hljs-attr">org</span><span class="hljs-punctuation">/</span>react<span class="hljs-punctuation">/-/</span>react<span class="hljs-punctuation">-</span><span class="hljs-number">18.2</span>.<span class="hljs-number">0</span>.<span class="hljs-attr">tgz</span>
+    dependencies<span class="hljs-punctuation">:</span>
+      loose<span class="hljs-punctuation">-</span>envify<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">^</span><span class="hljs-number">1.1</span>.<span class="hljs-number">0</span>
+      scheduler<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">^</span><span class="hljs-number">0.23</span>.<span class="hljs-number">0</span>
+    peerDependencies<span class="hljs-punctuation">:</span> {}
+    installPath<span class="hljs-punctuation">:</span> .<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>react<span class="hljs-punctuation">/</span><span class="hljs-number">18.2</span>.<span class="hljs-number">0</span>
+</code></pre>
+<p><strong>Fields:</strong></p>
+<ul>
+<li><code>version</code> — lockfile format version (for future compatibility).</li>
+<li><code>generatedAt</code> — generation time (ISO 8601).</li>
+<li><code>packages</code> — object with keys in the format <code>name@version</code> and metadata.</li>
+<li><code>resolved</code> — URL for downloading the tarball.</li>
+<li><code>installPath</code> — path where the package will be installed (relative to project root).</li>
+</ul>
+</div></details>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../commands/exports/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            exports
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../commands/global/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            global
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#mip-genlock" class="toc-link">mip genlock</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-genlock-syntax" class="toc-link">Syntax</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-genlock-how-it-works" class="toc-link">How it works</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-genlock-examples" class="toc-link">Examples</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-genlock-common-errors" class="toc-link">Common errors</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-genlock-related-commands" class="toc-link">Related commands</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

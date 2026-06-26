@@ -1,0 +1,2527 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/ru/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "ru";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      Всё о плагинах в MIP : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Полное руководство по плагинам: структура, хуки, API, команды, примеры и лучшие практики.">
+<link rel="canonical" href="https://mip.fwh.is/ru/dev/all-plugins/">
+<meta property="og:title" content="Всё о плагинах в MIP - MIP - Modern Package Manager">
+<meta property="og:description" content="Полное руководство по плагинам: структура, хуки, API, команды, примеры и лучшие практики.">
+<meta property="og:url" content="https://mip.fwh.is/ru/dev/all-plugins/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Всё о плагинах в MIP - MIP - Modern Package Manager">
+<meta name="twitter:description" content="Полное руководство по плагинам: структура, хуки, API, команды, примеры и лучшие практики.">
+
+
+
+<link rel="stylesheet" href="../../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/dev/all-plugins/">
+<link rel="alternate" hreflang="en" href="/dev/all-plugins/">
+<link rel="alternate" hreflang="x-default" href="/dev/all-plugins/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/ru/dev/all-plugins.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/dev/all-plugins" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/dev/all-plugins" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Введение
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добро пожаловать
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрые Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Команды
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commandsn/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Настройка
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Создание проекта
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрый старт
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Конфигурация
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Для профи
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Производительность
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Разработчикам
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Главное
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Архитектурой
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добавление команд
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Тестирование
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../../ru/dev/all-plugins/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            Все о плагинах
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Хуки и плагины
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Решение проблем
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Общий список
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/installation/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Ошибки установки
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Сеть и регистры
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock-файлы
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Прочее
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Глоссарий
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Расширенный FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Всё о плагинах в MIP
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22%D0%92%D1%81%D1%91%20%D0%BE%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D1%85%20%D0%B2%20MIP%22%0Adescription%3A%20%22%D0%9F%D0%BE%D0%BB%D0%BD%D0%BE%D0%B5%20%D1%80%D1%83%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE%20%D0%BF%D0%BE%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D0%BC%3A%20%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0%2C%20%D1%85%D1%83%D0%BA%D0%B8%2C%20API%2C%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B%2C%20%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B%20%D0%B8%20%D0%BB%D1%83%D1%87%D1%88%D0%B8%D0%B5%20%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B8.%22%0A---%0A%0A%23%20%D0%92%D1%81%D1%91%20%D0%BE%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D1%85%20%D0%B2%20MIP%20%F0%9F%A7%A9%0A%0A%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D1%8B%20%E2%80%94%20%D1%8D%D1%82%D0%BE%20%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%20%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B8%D1%82%D1%8C%20MIP%20%D0%B1%D0%B5%D0%B7%20%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BA%D0%BE%D0%B4%D0%B0.%20%D0%9E%D0%BD%D0%B8%20%D0%BC%D0%BE%D0%B3%D1%83%D1%82%3A%0A%0A-%20%D0%A0%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D1%81%D0%B2%D0%BE%D0%B8%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B%0A-%20%D0%9F%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8B%D0%B2%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%BD%D0%B0%20%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D1%8F%20(%D1%85%D1%83%D0%BA%D0%B8)%0A-%20%D0%A7%D0%B8%D1%82%D0%B0%D1%82%D1%8C%20%D0%B8%20%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D1%8F%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0%0A-%20%D0%A0%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D1%82%D1%8C%20%D1%81%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%D0%BC%D0%B8%0A-%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20API%20MIP%0A-%20%D0%9B%D0%BE%D0%B3%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F%0A-%20%D0%98%20%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE%D0%B5%20%D0%B4%D1%80%D1%83%D0%B3%D0%BE%D0%B5%0A%0A---%0A%0A%23%23%20%F0%9F%93%81%20%D0%A1%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%0A%0A%D0%9C%D0%B8%D0%BD%D0%B8%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%E2%80%94%20%D1%8D%D1%82%D0%BE%20%D0%BF%D0%B0%D0%BF%D0%BA%D0%B0%20%D1%81%20%D0%B4%D0%B2%D1%83%D0%BC%D1%8F%20%D1%84%D0%B0%D0%B9%D0%BB%D0%B0%D0%BC%D0%B8%3A%0A%0A%60%60%60%0Aplugins%2Fmy-plugin%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20index.js%20%20%20%20%20%20%20%23%20%D0%9A%D0%BE%D0%B4%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%0A%E2%94%94%E2%94%80%E2%94%80%20package.json%20%20%20%23%20%D0%9C%D0%B5%D1%82%D0%B0%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20(%D0%BE%D0%BF%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE)%0A%60%60%60%0A%0A%23%23%23%20package.json%20(%D0%BE%D0%BF%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE)%0A%0A%60%60%60json%0A%7B%0A%20%20%22name%22%3A%20%22mip-plugin-my-plugin%22%2C%0A%20%20%22version%22%3A%20%221.0.0%22%2C%0A%20%20%22description%22%3A%20%22My%20awesome%20plugin%22%2C%0A%20%20%22main%22%3A%20%22index.js%22%2C%0A%20%20%22dependencies%22%3A%20%7B%7D%0A%7D%0A%60%60%60%0A%0A%23%23%23%20index.js%20%E2%80%94%20%D0%BF%D0%BE%D0%BB%D0%BD%D0%B0%D1%8F%20%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0%0A%0A%60%60%60javascript%0Amodule.exports%20%3D%20%7B%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20%2F%2F%20%D0%9E%D0%91%D0%AF%D0%97%D0%90%D0%A2%D0%95%D0%9B%D0%AC%D0%9D%D0%9E%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20name%3A%20&#039;my-plugin&#039;%2C%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20%D0%A3%D0%BD%D0%B8%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D0%B8%D0%BC%D1%8F%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20%D0%92%D0%B5%D1%80%D1%81%D0%B8%D1%8F%0A%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20%2F%2F%20%D0%9A%D0%9E%D0%9C%D0%90%D0%9D%D0%94%D0%AB%20(%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%20%D1%87%D0%B5%D1%80%D0%B5%D0%B7%20mip%20pe)%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20commands%3A%20%7B%0A%20%20%20%20mycommand%3A%20async%20(args)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(&#039;My%20command%20executed!&#039;)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20help%3A%20async%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(&#039;Available%20commands%3A%20mycommand&#039;)%3B%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20%2F%2F%20%D0%A5%D0%A3%D0%9A%D0%98%20(%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%BA%D0%B0%20%D0%BD%D0%B0%20%D1%81%D0%BE%D0%B1%D1%8B%D1%82%D0%B8%D1%8F%20MIP)%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20hooks%3A%20%7B%0A%20%20%20%20beforeInstall%3A%20async%20(pkg%2C%20version%2C%20options)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Installing%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterInstall%3A%20async%20(pkgInfo)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Installed%20%24%7BpkgInfo.name%7D%40%24%7BpkgInfo.version%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeUninstall%3A%20async%20(pkg%2C%20options)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Removing%20%24%7Bpkg%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterUninstall%3A%20async%20(pkg)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Removed%20%24%7Bpkg%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeUpdate%3A%20async%20(pkg%2C%20currentVersion%2C%20newVersion)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Updating%20%24%7Bpkg%7D%20%24%7BcurrentVersion%7D%20-%3E%20%24%7BnewVersion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterUpdate%3A%20async%20(pkg%2C%20oldVersion%2C%20newVersion)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Updated%20%24%7Bpkg%7D%20%24%7BoldVersion%7D%20-%3E%20%24%7BnewVersion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeResolve%3A%20async%20(pkg%2C%20versionRange)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Resolving%20%24%7Bpkg%7D%40%24%7BversionRange%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterResolve%3A%20async%20(pkgInfo)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Resolved%20%24%7BpkgInfo.name%7D%40%24%7BpkgInfo.version%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeDownload%3A%20async%20(pkg%2C%20version%2C%20url)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Downloading%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterDownload%3A%20async%20(pkg%2C%20version%2C%20size%2C%20duration)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Downloaded%20%24%7Bpkg%7D%40%24%7Bversion%7D%20(%24%7Bsize%7D%20bytes%2C%20%24%7Bduration%7Dms)%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeExtract%3A%20async%20(pkg%2C%20version%2C%20targetDir)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Extracting%20%24%7Bpkg%7D%40%24%7Bversion%7D%20to%20%24%7BtargetDir%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterExtract%3A%20async%20(pkg%2C%20version%2C%20targetDir)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Extracted%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeCacheRead%3A%20async%20(pkg%2C%20version)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Reading%20cache%20for%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterCacheRead%3A%20async%20(pkg%2C%20version%2C%20data)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Cache%20read%20for%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeCacheWrite%3A%20async%20(pkg%2C%20version%2C%20data)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Writing%20cache%20for%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterCacheWrite%3A%20async%20(pkg%2C%20version)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Cache%20written%20for%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeAudit%3A%20async%20(lockData)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Auditing%20%24%7BObject.keys(lockData.packages%20%7C%7C%20%7B%7D).length%7D%20packages%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterAudit%3A%20async%20(results)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Found%20%24%7Bresults.length%7D%20vulnerabilities%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20beforeCi%3A%20async%20(options)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Running%20CI%20install%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterCi%3A%20async%20(installedCount)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(%60%5Bmy-plugin%5D%20CI%20install%20complete%3A%20%24%7BinstalledCount%7D%20packages%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20onError%3A%20async%20(err%2C%20context)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.error(%60%5Bmy-plugin%5D%20Error%3A%20%24%7Berr.message%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20%2F%2F%20%D0%98%D0%9D%D0%98%D0%A6%D0%98%D0%90%D0%9B%D0%98%D0%97%D0%90%D0%A6%D0%98%D0%AF%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20%2F%2F%20%D0%A0%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F%20%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%0A%20%20%20%20api.registerCommand(&#039;dynamic&#039;%2C%20&#039;my-plugin&#039;%2C%20async%20(args)%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(&#039;Dynamic%20command!&#039;%2C%20args)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%D0%94%D0%BE%D1%81%D1%82%D1%83%D0%BF%20%D0%BA%20API%0A%20%20%20%20const%20version%20%3D%20api.getVersion()%3B%0A%20%20%20%20const%20cwd%20%3D%20api.getCwd()%3B%0A%20%20%20%20console.log(%60%5Bmy-plugin%5D%20Initialized%20in%20%24%7Bcwd%7D%2C%20MIP%20v%24%7Bversion%7D%60)%3B%0A%20%20%7D%2C%0A%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20%2F%2F%20%D0%A3%D0%9D%D0%98%D0%A7%D0%A2%D0%9E%D0%96%D0%95%D0%9D%D0%98%D0%95%20(%D0%BF%D1%80%D0%B8%20%D0%B4%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2%D0%B0%D1%86%D0%B8%D0%B8)%0A%20%20%2F%2F%20%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%3D%0A%20%20destroy%3A%20async%20()%20%3D%3E%20%7B%0A%20%20%20%20console.log(&#039;%5Bmy-plugin%5D%20Destroyed&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%9B%A0%EF%B8%8F%20API%3A%20%D1%87%D1%82%D0%BE%20%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D0%BE%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D0%BC%0A%0A%D0%92%20%60init()%60%20%D0%B8%20%60hooks%60%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B0%D0%B5%D1%82%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%20%60api%60%20%D1%81%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B0%D0%BC%D0%B8%3A%0A%0A%7C%20%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%20%7C%20%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5%20%7C%20%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%7C%0A%7C-------%7C----------%7C--------%7C%0A%7C%20%60api.registerCommand(name%2C%20plugin%2C%20handler)%60%20%7C%20%D0%A0%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D1%83%D0%B5%D1%82%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%20%7C%20%60api.registerCommand(&#039;hello&#039;%2C%20&#039;my&#039;%2C%20async%20()%20%3D%3E%20%7B%20...%20%7D)%60%20%7C%0A%7C%20%60api.getMipJson()%60%20%7C%20%D0%A7%D0%B8%D1%82%D0%B0%D0%B5%D1%82%20%60mip.json%60%20%7C%20%60const%20config%20%3D%20api.getMipJson()%60%20%7C%0A%7C%20%60api.updateMipJson(data)%60%20%7C%20%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%20%60mip.json%60%20%7C%20%60api.updateMipJson(%7B%20...config%2C%20version%3A%20&#039;2.0.0&#039;%20%7D)%60%20%7C%0A%7C%20%60api.getLockfile()%60%20%7C%20%D0%A7%D0%B8%D1%82%D0%B0%D0%B5%D1%82%20%60mip-lock.json%60%20%7C%20%60const%20lock%20%3D%20api.getLockfile()%60%20%7C%0A%7C%20%60api.updateLockfile(data)%60%20%7C%20%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%20%60mip-lock.json%60%20%7C%20%60api.updateLockfile(%7B%20...lock%2C%20packages%3A%20%7B%7D%20%7D)%60%20%7C%0A%7C%20%60api.getPackageInfo(name%2C%20version)%60%20%7C%20%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B5%20%7C%20%60const%20info%20%3D%20await%20api.getPackageInfo(&#039;lodash&#039;%2C%20&#039;latest&#039;)%60%20%7C%0A%7C%20%60api.getInstalledPackages()%60%20%7C%20%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%7C%20%60const%20pkgs%20%3D%20api.getInstalledPackages()%60%20%7C%0A%7C%20%60api.isPackageInstalled(name%2C%20version)%60%20%7C%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B8%20%7C%20%60if%20(api.isPackageInstalled(&#039;lodash&#039;))%20%7B%20...%20%7D%60%20%7C%0A%7C%20%60api.addDependency(name%2C%20version%2C%20dev)%60%20%7C%20%D0%94%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%20%7C%20%60api.addDependency(&#039;lodash&#039;%2C%20&#039;%5E4.17.0&#039;%2C%20false)%60%20%7C%0A%7C%20%60api.removeDependency(name)%60%20%7C%20%D0%A3%D0%B4%D0%B0%D0%BB%D1%8F%D0%B5%D1%82%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%20%7C%20%60api.removeDependency(&#039;lodash&#039;)%60%20%7C%0A%7C%20%60api.runCommand(command%2C%20args)%60%20%7C%20%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D1%82%20MIP-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%20%7C%20%60api.runCommand(&#039;install&#039;%2C%20%5B&#039;lodash&#039;%5D)%60%20%7C%0A%7C%20%60api.exec(command%2C%20options)%60%20%7C%20%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D1%82%20shell-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%20%7C%20%60api.exec(&#039;echo%20%22Hello%22&#039;)%60%20%7C%0A%7C%20%60api.getCacheSize()%60%20%7C%20%D0%A0%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%20%D0%BA%D1%8D%D1%88%D0%B0%20%7C%20%60const%20size%20%3D%20api.getCacheSize()%60%20%7C%0A%7C%20%60api.clearCache()%60%20%7C%20%D0%9E%D1%87%D0%B8%D1%89%D0%B0%D0%B5%D1%82%20%D0%BA%D1%8D%D1%88%20%7C%20%60api.clearCache()%60%20%7C%0A%7C%20%60api.getCwd()%60%20%7C%20%D0%A2%D0%B5%D0%BA%D1%83%D1%89%D0%B0%D1%8F%20%D0%B4%D0%B8%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%7C%20%60const%20cwd%20%3D%20api.getCwd()%60%20%7C%0A%7C%20%60api.getVersion()%60%20%7C%20%D0%92%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20MIP%20%7C%20%60const%20version%20%3D%20api.getVersion()%60%20%7C%0A%7C%20%60api.log(message%2C%20level)%60%20%7C%20%D0%9B%D0%BE%D0%B3%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%7C%20%60api.log(&#039;Hello&#039;%2C%20&#039;info&#039;)%60%20%7C%0A%0A---%0A%0A%23%23%20%F0%9F%93%A6%20%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%BE%D0%B2%0A%0A%23%23%23%201.%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD-%D0%BA%D0%B0%D0%BB%D1%8C%D0%BA%D1%83%D0%BB%D1%8F%D1%82%D0%BE%D1%80%0A%0A%60%60%60javascript%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;calc&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20commands%3A%20%7B%0A%20%20%20%20calc%3A%20async%20(args)%20%3D%3E%20%7B%0A%20%20%20%20%20%20const%20a%20%3D%20parseFloat(args%5B0%5D)%3B%0A%20%20%20%20%20%20const%20op%20%3D%20args%5B1%5D%3B%0A%20%20%20%20%20%20const%20b%20%3D%20parseFloat(args%5B2%5D)%3B%0A%0A%20%20%20%20%20%20if%20(isNaN(a)%20%7C%7C%20isNaN(b))%20%7B%0A%20%20%20%20%20%20%20%20console.log(&#039;%E2%9D%8C%20%D0%92%D0%B2%D0%B5%D0%B4%D0%B8%D1%82%D0%B5%20%D1%87%D0%B8%D1%81%D0%BB%D0%B0&#039;)%3B%0A%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20const%20operations%20%3D%20%7B%0A%20%20%20%20%20%20%20%20&#039;%2B&#039;%3A%20(a%2C%20b)%20%3D%3E%20a%20%2B%20b%2C%0A%20%20%20%20%20%20%20%20&#039;-&#039;%3A%20(a%2C%20b)%20%3D%3E%20a%20-%20b%2C%0A%20%20%20%20%20%20%20%20&#039;*&#039;%3A%20(a%2C%20b)%20%3D%3E%20a%20*%20b%2C%0A%20%20%20%20%20%20%20%20&#039;%2F&#039;%3A%20(a%2C%20b)%20%3D%3E%20a%20%2F%20b%2C%0A%20%20%20%20%20%20%7D%3B%0A%0A%20%20%20%20%20%20if%20(!operations%5Bop%5D)%20%7B%0A%20%20%20%20%20%20%20%20console.log(%60%E2%9D%8C%20%D0%9D%D0%B5%D0%B8%D0%B7%D0%B2%D0%B5%D1%81%D1%82%D0%BD%D0%B0%D1%8F%20%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F%3A%20%24%7Bop%7D%60)%3B%0A%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20if%20(op%20%3D%3D%3D%20&#039;%2F&#039;%20%26%26%20b%20%3D%3D%3D%200)%20%7B%0A%20%20%20%20%20%20%20%20console.log(&#039;%E2%9D%8C%20%D0%9D%D0%B0%20%D0%BD%D0%BE%D0%BB%D1%8C%20%D0%B4%D0%B5%D0%BB%D0%B8%D1%82%D1%8C%20%D0%BD%D0%B5%D0%BB%D1%8C%D0%B7%D1%8F!&#039;)%3B%0A%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20console.log(%60%24%7Ba%7D%20%24%7Bop%7D%20%24%7Bb%7D%20%3D%20%24%7Boperations%5Bop%5D(a%2C%20b)%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20help%3A%20async%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20console.log(&#039;%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%3A%20mip%20pe%20calc%20%3C%D1%87%D0%B8%D1%81%D0%BB%D0%BE%3E%20%3C%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F%3E%20%3C%D1%87%D0%B8%D1%81%D0%BB%D0%BE%3E&#039;)%3B%0A%20%20%20%20%20%20console.log(&#039;%D0%9E%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D0%B8%3A%20%2B%20-%20*%20%2F&#039;)%3B%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20console.log(&#039;%5Bcalc%5D%20%D0%9A%D0%B0%D0%BB%D1%8C%D0%BA%D1%83%D0%BB%D1%8F%D1%82%D0%BE%D1%80%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B5%D0%BD!&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%202.%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD-%D0%BB%D0%BE%D0%B3%D0%B3%D0%B5%D1%80%0A%0A%60%60%60javascript%0Aconst%20fs%20%3D%20require(&#039;fs&#039;)%3B%0Aconst%20path%20%3D%20require(&#039;path&#039;)%3B%0A%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;logger&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20hooks%3A%20%7B%0A%20%20%20%20beforeInstall%3A%20async%20(pkg%2C%20version)%20%3D%3E%20%7B%0A%20%20%20%20%20%20this.log(%60INSTALL%3A%20%24%7Bpkg%7D%40%24%7Bversion%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterInstall%3A%20async%20(pkgInfo)%20%3D%3E%20%7B%0A%20%20%20%20%20%20this.log(%60INSTALLED%3A%20%24%7BpkgInfo.name%7D%40%24%7BpkgInfo.version%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20onError%3A%20async%20(err)%20%3D%3E%20%7B%0A%20%20%20%20%20%20this.log(%60ERROR%3A%20%24%7Berr.message%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20this.logFile%20%3D%20path.join(api.getCwd()%2C%20&#039;mip.log&#039;)%3B%0A%20%20%20%20this.log(&#039;LOG%3A%20Plugin%20initialized&#039;)%3B%0A%20%20%20%20console.log(&#039;%5Blogger%5D%20%D0%9B%D0%BE%D0%B3%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B2%20mip.log&#039;)%3B%0A%20%20%7D%2C%0A%0A%20%20log%3A%20(message)%20%3D%3E%20%7B%0A%20%20%20%20const%20timestamp%20%3D%20new%20Date().toISOString()%3B%0A%20%20%20%20fs.appendFileSync(this.logFile%2C%20%60%5B%24%7Btimestamp%7D%5D%20%24%7Bmessage%7D%5Cn%60)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%203.%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD-%D0%B0%D1%83%D0%B4%D0%B8%D1%82%D0%BE%D1%80%0A%0A%60%60%60javascript%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;auditor&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20hooks%3A%20%7B%0A%20%20%20%20beforeAudit%3A%20async%20(lockData)%20%3D%3E%20%7B%0A%20%20%20%20%20%20const%20total%20%3D%20Object.keys(lockData.packages%20%7C%7C%20%7B%7D).length%3B%0A%20%20%20%20%20%20this.totalPackages%20%3D%20total%3B%0A%20%20%20%20%20%20console.log(%60%5Bauditor%5D%20%D0%A1%D0%BA%D0%B0%D0%BD%D0%B8%D1%80%D1%83%D1%8E%20%24%7Btotal%7D%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2...%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%20%20afterAudit%3A%20async%20(results)%20%3D%3E%20%7B%0A%20%20%20%20%20%20const%20critical%20%3D%20results.filter(r%20%3D%3E%20r.severity%20%3D%3D%3D%20&#039;critical&#039;).length%3B%0A%20%20%20%20%20%20const%20high%20%3D%20results.filter(r%20%3D%3E%20r.severity%20%3D%3D%3D%20&#039;high&#039;).length%3B%0A%0A%20%20%20%20%20%20console.log(%60%5Bauditor%5D%20Critical%3A%20%24%7Bcritical%7D%2C%20High%3A%20%24%7Bhigh%7D%60)%3B%0A%0A%20%20%20%20%20%20if%20(critical%20%3E%200%20%7C%7C%20high%20%3E%200)%20%7B%0A%20%20%20%20%20%20%20%20console.log(&#039;%5Bauditor%5D%20%E2%9A%A0%EF%B8%8F%20%D0%9D%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%D1%8B%20%D1%83%D1%8F%D0%B7%D0%B2%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8!&#039;)%3B%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20console.log(&#039;%5Bauditor%5D%20%D0%90%D1%83%D0%B4%D0%B8%D1%82%D0%BE%D1%80%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B5%D0%BD&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%204.%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD-%D1%8D%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82%D1%91%D1%80%0A%0A%60%60%60javascript%0Aconst%20fs%20%3D%20require(&#039;fs&#039;)%3B%0Aconst%20path%20%3D%20require(&#039;path&#039;)%3B%0A%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;exporter&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20commands%3A%20%7B%0A%20%20%20%20export%3A%20async%20(args)%20%3D%3E%20%7B%0A%20%20%20%20%20%20const%20api%20%3D%20this.api%3B%0A%20%20%20%20%20%20const%20lock%20%3D%20api.getLockfile()%3B%0A%20%20%20%20%20%20const%20mip%20%3D%20api.getMipJson()%3B%0A%0A%20%20%20%20%20%20const%20data%20%3D%20%7B%0A%20%20%20%20%20%20%20%20project%3A%20mip.name%2C%0A%20%20%20%20%20%20%20%20version%3A%20mip.version%2C%0A%20%20%20%20%20%20%20%20dependencies%3A%20Object.keys(lock%3F.packages%20%7C%7C%20%7B%7D).length%2C%0A%20%20%20%20%20%20%20%20packages%3A%20lock%3F.packages%20%7C%7C%20%7B%7D%2C%0A%20%20%20%20%20%20%7D%3B%0A%0A%20%20%20%20%20%20const%20outputFile%20%3D%20args%5B0%5D%20%7C%7C%20&#039;export.json&#039;%3B%0A%20%20%20%20%20%20fs.writeFileSync(outputFile%2C%20JSON.stringify(data%2C%20null%2C%202))%3B%0A%20%20%20%20%20%20console.log(%60%E2%9C%85%20%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82%20%D0%B2%20%24%7BoutputFile%7D%60)%3B%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20this.api%20%3D%20api%3B%0A%20%20%20%20console.log(&#039;%5Bexporter%5D%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B5%D0%BD&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%205.%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD-%D0%BE%D1%87%D0%B8%D1%81%D1%82%D0%BA%D0%B0%20%D0%BA%D1%8D%D1%88%D0%B0%0A%0A%60%60%60javascript%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;cleaner&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20commands%3A%20%7B%0A%20%20%20%20clean%3A%20async%20(args)%20%3D%3E%20%7B%0A%20%20%20%20%20%20const%20api%20%3D%20this.api%3B%0A%20%20%20%20%20%20const%20size%20%3D%20api.getCacheSize()%3B%0A%20%20%20%20%20%20console.log(%60%F0%9F%93%A6%20%D0%A0%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%20%D0%BA%D1%8D%D1%88%D0%B0%3A%20%24%7B(size%20%2F%201024%20%2F%201024).toFixed(2)%7D%20MB%60)%3B%0A%0A%20%20%20%20%20%20if%20(args.includes(&#039;--force&#039;))%20%7B%0A%20%20%20%20%20%20%20%20api.clearCache()%3B%0A%20%20%20%20%20%20%20%20console.log(&#039;%E2%9C%85%20%D0%9A%D1%8D%D1%88%20%D0%BE%D1%87%D0%B8%D1%89%D0%B5%D0%BD&#039;)%3B%0A%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20console.log(&#039;%F0%9F%92%A1%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B9%D1%82%D0%B5%20--force%20%D0%B4%D0%BB%D1%8F%20%D0%BE%D1%87%D0%B8%D1%81%D1%82%D0%BA%D0%B8&#039;)%3B%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20this.api%20%3D%20api%3B%0A%20%20%20%20console.log(&#039;%5Bcleaner%5D%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B5%D0%BD&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%9A%80%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B%20%D0%B4%D0%BB%D1%8F%20%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%0A%0A%60%60%60bash%0A%23%20%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D1%82%D1%8C%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%0Amip%20plugin%20create%20my-plugin%0A%0A%23%20%D0%A1%D0%BA%D0%BE%D0%BC%D0%BF%D0%B8%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%0Amip%20plugin%20compile%20my-plugin%0A%0A%23%20%D0%90%D0%BA%D1%82%D0%B8%D0%B2%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%0Amip%20plugin%20activate%20my-plugin%0A%0A%23%20%D0%9F%D0%BE%D1%81%D0%BC%D0%BE%D1%82%D1%80%D0%B5%D1%82%D1%8C%20%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA%0Amip%20plugin%20list%0A%0A%23%20%D0%94%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%0Amip%20plugin%20deactivate%20my-plugin%0A%0A%23%20%D0%A3%D0%B4%D0%B0%D0%BB%D0%B8%D1%82%D1%8C%0Amip%20plugin%20remove%20my-plugin%0A%0A%23%20%D0%9E%D1%87%D0%B8%D1%81%D1%82%D0%B8%D1%82%D1%8C%20%D0%B2%D1%81%D1%91%0Amip%20plugin%20cleanall%0A%0A%23%20%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%0Amip%20pe%20my-plugin%20my-command%20arg1%20arg2%0A%0A%23%20%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%20(%D1%81%D0%BE%D0%BA%D1%80%D0%B0%D1%89%D1%91%D0%BD%D0%BD%D0%BE)%0Amip%20pe%20my-plugin%20my-command%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%AA%20%D0%A2%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%BE%D0%B2%0A%0A%23%23%23%20%D0%A2%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%B8%D0%B7%D0%BE%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%0A%0A%60%60%60javascript%0A%2F%2F%20tests%2Fplugin.test.js%0Aconst%20plugin%20%3D%20require(&#039;..%2Fplugins%2Fmy-plugin%2Findex&#039;)%3B%0A%0Adescribe(&#039;my-plugin&#039;%2C%20()%20%3D%3E%20%7B%0A%20%20test(&#039;plugin%20has%20name&#039;%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20expect(plugin.name).toBe(&#039;my-plugin&#039;)%3B%0A%20%20%7D)%3B%0A%0A%20%20test(&#039;plugin%20has%20commands&#039;%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20expect(plugin.commands).toBeDefined()%3B%0A%20%20%7D)%3B%0A%0A%20%20test(&#039;command%20works&#039;%2C%20async%20()%20%3D%3E%20%7B%0A%20%20%20%20const%20spy%20%3D%20jest.spyOn(console%2C%20&#039;log&#039;)%3B%0A%20%20%20%20await%20plugin.commands.mycommand(%5B&#039;test&#039;%5D)%3B%0A%20%20%20%20expect(spy).toHaveBeenCalledWith(&#039;My%20command%20executed!&#039;)%3B%0A%20%20%20%20spy.mockRestore()%3B%0A%20%20%7D)%3B%0A%7D)%3B%0A%60%60%60%0A%0A%23%23%23%20%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B9%20%D1%82%D0%B5%D1%81%D1%82%0A%0A%60%60%60javascript%0A%2F%2F%20tests%2Fintegration%2Fplugin.test.js%0Aconst%20%7B%20getPluginManager%20%7D%20%3D%20require(&#039;..%2Flib%2Fapi%2Fplugin-manager&#039;)%3B%0A%0Adescribe(&#039;plugin%20integration&#039;%2C%20()%20%3D%3E%20%7B%0A%20%20test(&#039;plugin%20loaded%20correctly&#039;%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20const%20pm%20%3D%20getPluginManager()%3B%0A%20%20%20%20const%20plugin%20%3D%20pm.getPlugin(&#039;my-plugin&#039;)%3B%0A%20%20%20%20expect(plugin).toBeDefined()%3B%0A%20%20%20%20expect(plugin.name).toBe(&#039;my-plugin&#039;)%3B%0A%20%20%7D)%3B%0A%7D)%3B%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%93%8A%20%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%3A%20%D0%B2%D1%81%D1%82%D1%80%D0%BE%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20vs%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%0A%0A%7C%20%D0%A5%D0%B0%D1%80%D0%B0%D0%BA%D1%82%D0%B5%D1%80%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0%20%7C%20%D0%92%D1%81%D1%82%D1%80%D0%BE%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20(fork)%20%7C%20%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%7C%0A%7C----------------%7C---------------------------%7C--------%7C%0A%7C%20**%D0%A1%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D1%8C**%20%7C%20%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D1%82%D1%8C%20%60bin%2Fmip.js%60%20%7C%20%D0%9F%D1%80%D0%BE%D1%81%D1%82%D0%BE%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D1%82%D1%8C%20%D1%84%D0%B0%D0%B9%D0%BB%20%7C%0A%7C%20**%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5**%20%7C%20%D0%9F%D0%B5%D1%80%D0%B5%D1%81%D0%BE%D0%B1%D0%B8%D1%80%D0%B0%D1%82%D1%8C%20MIP%20%7C%20%D0%9F%D0%B5%D1%80%D0%B5%D0%BA%D0%BE%D0%BC%D0%BF%D0%B8%D0%BB%D0%B8%D1%82%D1%8C%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%7C%0A%7C%20**%D0%A0%D0%B0%D1%81%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5**%20%7C%20%D0%A2%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D1%87%D0%B5%D1%80%D0%B5%D0%B7%20%D1%84%D0%BE%D1%80%D0%BA%20%7C%20%D0%9C%D0%BE%D0%B6%D0%BD%D0%BE%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D1%8F%D1%82%D1%8C%20%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%20%7C%0A%7C%20**i18n**%20%7C%20%E2%9C%85%20%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%D1%81%D1%8F%20%7C%20%E2%9D%8C%20%D0%9D%D0%B5%D1%82%20(%D1%81%D0%B2%D0%BE%D0%B8%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%D0%B4%D1%8B)%20%7C%0A%7C%20**%D0%A5%D1%83%D0%BA%D0%B8**%20%7C%20%E2%9D%8C%20%D0%9D%D0%B5%D1%82%20%7C%20%E2%9C%85%20%D0%95%D1%81%D1%82%D1%8C%20(%D1%85%D1%83%D0%BA%D0%B8)%20%7C%0A%7C%20**API**%20%7C%20%E2%9D%8C%20%D0%9D%D0%B5%D1%82%20%7C%20%E2%9C%85%20%D0%95%D1%81%D1%82%D1%8C%20(api%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)%20%7C%0A%7C%20**%D0%98%D0%B7%D0%BE%D0%BB%D1%8F%D1%86%D0%B8%D1%8F**%20%7C%20%D0%92%20%D0%BA%D0%BE%D0%B4%D0%B5%20MIP%20%7C%20%D0%9E%D1%82%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BF%D0%BA%D0%B0%20%7C%0A%7C%20**%D0%9E%D1%88%D0%B8%D0%B1%D0%BA%D0%B8**%20%7C%20%D0%9B%D0%BE%D0%BC%D0%B0%D1%8E%D1%82%20MIP%20%7C%20%D0%9B%D0%BE%D0%BC%D0%B0%D1%8E%D1%82%20%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%7C%0A%0A---%0A%0A%23%23%20%F0%9F%93%9A%20%D0%A1%D0%B2%D1%8F%D0%B7%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D1%8B%0A%0A-%20%5Bmip%20plugin%5D(%2Fcommands%2Fplugin)%20%E2%80%94%20%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%0A-%20%5Bmip%20pe%5D(%2Fcommands%2Fpe)%20%E2%80%94%20%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%BE%D0%B2%0A-%20%5B%D0%A5%D1%83%D0%BA%D0%B8%20%D0%B8%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D1%8B%5D(%2Fdev%2Fhooks)%20%E2%80%94%20%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8%0A-%20%5B%D0%94%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%5D(%2Fdev%2Fadding-commands)%20%E2%80%94%20%D0%B4%D0%B2%D0%B0%20%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%D0%B0%20%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Разработчикам</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Все о плагинах</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="всё-о-плагинах-в-mip" class="docmd-heading"><a href="#всё-о-плагинах-в-mip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Всё о плагинах в MIP 🧩</h1>
+<p>Плагины — это способ расширить MIP без изменения основного кода. Они могут:</p>
+<ul>
+<li>Регистрировать свои команды</li>
+<li>Подписываться на события (хуки)</li>
+<li>Читать и изменять конфигурацию проекта</li>
+<li>Работать с установленными пакетами</li>
+<li>Использовать API MIP</li>
+<li>Логировать действия</li>
+<li>И многое другое</li>
+</ul>
+<hr>
+<h2 id="всё-о-плагинах-в-mip-структура-плагина" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-структура-плагина" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📁 Структура плагина</h2>
+<p>Минимальный плагин — это папка с двумя файлами:</p>
+<pre class="hljs"><code>plugins<span class="hljs-punctuation">/</span>my<span class="hljs-punctuation">-</span>plugin<span class="hljs-punctuation">/</span>
+├── index.<span class="hljs-attr">js</span>       <span class="hljs-comment"># Код плагина</span>
+└── package.<span class="hljs-attr">json</span>   <span class="hljs-comment"># Метаданные (опционально)</span>
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-структура-плагина-packagejson-опционально" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-структура-плагина-packagejson-опционально" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>package.json (опционально)</h3>
+<pre class="hljs"><code class="language-json">{
+  <span class="hljs-string">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;mip-plugin-my-plugin&quot;</span>,
+  <span class="hljs-string">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span>,
+  <span class="hljs-string">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;My awesome plugin&quot;</span>,
+  <span class="hljs-string">&quot;main&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;index.js&quot;</span>,
+  <span class="hljs-string">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> {}
+}
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-структура-плагина-indexjs-полная-структура" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-структура-плагина-indexjs-полная-структура" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>index.js — полная структура</h3>
+<pre class="hljs"><code class="language-javascript">module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  <span class="hljs-comment">// ==========================================</span>
+  <span class="hljs-comment">// ОБЯЗАТЕЛЬНО</span>
+  <span class="hljs-comment">// ==========================================</span>
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;my-plugin&#039;</span>,           <span class="hljs-comment">// Уникальное имя</span>
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,            <span class="hljs-comment">// Версия</span>
+
+  <span class="hljs-comment">// ==========================================</span>
+  <span class="hljs-comment">// КОМАНДЫ (доступны через mip pe)</span>
+  <span class="hljs-comment">// ==========================================</span>
+  commands<span class="hljs-punctuation">:</span> {
+    mycommand<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;My command executed!&#039;</span>);
+    },
+    help<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> () <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Available commands: mycommand&#039;</span>);
+    },
+  },
+
+  <span class="hljs-comment">// ==========================================</span>
+  <span class="hljs-comment">// ХУКИ (подписка на события MIP)</span>
+  <span class="hljs-comment">// ==========================================</span>
+  hooks<span class="hljs-punctuation">:</span> {
+    beforeInstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, options) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Installing ${pkg}@${version}`</span>);
+    },
+    afterInstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (pkgInfo) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Installed ${pkgInfo.name}@${pkgInfo.version}`</span>);
+    },
+    beforeUninstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, options) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Removing ${pkg}`</span>);
+    },
+    afterUninstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Removed ${pkg}`</span>);
+    },
+    beforeUpdate<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, currentVersion, newVersion) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Updating ${pkg} ${currentVersion} -&gt; ${newVersion}`</span>);
+    },
+    afterUpdate<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, oldVersion, newVersion) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Updated ${pkg} ${oldVersion} -&gt; ${newVersion}`</span>);
+    },
+    beforeResolve<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, versionRange) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Resolving ${pkg}@${versionRange}`</span>);
+    },
+    afterResolve<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (pkgInfo) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Resolved ${pkgInfo.name}@${pkgInfo.version}`</span>);
+    },
+    beforeDownload<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, url) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Downloading ${pkg}@${version}`</span>);
+    },
+    afterDownload<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, size, duration) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Downloaded ${pkg}@${version} (${size} bytes, ${duration}ms)`</span>);
+    },
+    beforeExtract<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, targetDir) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Extracting ${pkg}@${version} to ${targetDir}`</span>);
+    },
+    afterExtract<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, targetDir) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Extracted ${pkg}@${version}`</span>);
+    },
+    beforeCacheRead<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Reading cache for ${pkg}@${version}`</span>);
+    },
+    afterCacheRead<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, data) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Cache read for ${pkg}@${version}`</span>);
+    },
+    beforeCacheWrite<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version, data) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Writing cache for ${pkg}@${version}`</span>);
+    },
+    afterCacheWrite<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Cache written for ${pkg}@${version}`</span>);
+    },
+    beforeAudit<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (lockData) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Auditing ${Object.keys(lockData.packages || {}).length} packages`</span>);
+    },
+    afterAudit<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (results) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Found ${results.length} vulnerabilities`</span>);
+    },
+    beforeCi<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (options) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Running CI install`</span>);
+    },
+    afterCi<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (installedCount) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] CI install complete: ${installedCount} packages`</span>);
+    },
+    onError<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (err, context) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">error</span>(<span class="hljs-string">`[my-plugin] Error: ${err.message}`</span>);
+    },
+  },
+
+  <span class="hljs-comment">// ==========================================</span>
+  <span class="hljs-comment">// ИНИЦИАЛИЗАЦИЯ</span>
+  <span class="hljs-comment">// ==========================================</span>
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-comment">// Регистрация динамических команд</span>
+    api.<span class="hljs-title function_">registerCommand</span>(<span class="hljs-string">&#039;dynamic&#039;</span>, <span class="hljs-string">&#039;my-plugin&#039;</span>, <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Dynamic command!&#039;</span>, args);
+    });
+
+    <span class="hljs-comment">// Доступ к API</span>
+    <span class="hljs-keyword">const</span> version <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getVersion</span>();
+    <span class="hljs-keyword">const</span> cwd <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getCwd</span>();
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[my-plugin] Initialized in ${cwd}, MIP v${version}`</span>);
+  },
+
+  <span class="hljs-comment">// ==========================================</span>
+  <span class="hljs-comment">// УНИЧТОЖЕНИЕ (при деактивации)</span>
+  <span class="hljs-comment">// ==========================================</span>
+  destroy<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> () <span class="hljs-punctuation">=&gt;</span> {
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[my-plugin] Destroyed&#039;</span>);
+  },
+};
+</code></pre>
+<hr>
+<h2 id="всё-о-плагинах-в-mip-api-что-доступно-плагинам" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-api-что-доступно-плагинам" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🛠️ API: что доступно плагинам</h2>
+<p>В <code>init()</code> и <code>hooks</code> плагин получает объект <code>api</code> с методами:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Описание</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api.registerCommand(name, plugin, handler)</code></td>
+<td>Регистрирует команду</td>
+<td><code>api.registerCommand('hello', 'my', async () =&gt; { ... })</code></td>
+</tr>
+<tr>
+<td><code>api.getMipJson()</code></td>
+<td>Читает <code>mip.json</code></td>
+<td><code>const config = api.getMipJson()</code></td>
+</tr>
+<tr>
+<td><code>api.updateMipJson(data)</code></td>
+<td>Обновляет <code>mip.json</code></td>
+<td><code>api.updateMipJson({ ...config, version: '2.0.0' })</code></td>
+</tr>
+<tr>
+<td><code>api.getLockfile()</code></td>
+<td>Читает <code>mip-lock.json</code></td>
+<td><code>const lock = api.getLockfile()</code></td>
+</tr>
+<tr>
+<td><code>api.updateLockfile(data)</code></td>
+<td>Обновляет <code>mip-lock.json</code></td>
+<td><code>api.updateLockfile({ ...lock, packages: {} })</code></td>
+</tr>
+<tr>
+<td><code>api.getPackageInfo(name, version)</code></td>
+<td>Информация о пакете</td>
+<td><code>const info = await api.getPackageInfo('lodash', 'latest')</code></td>
+</tr>
+<tr>
+<td><code>api.getInstalledPackages()</code></td>
+<td>Список установленных пакетов</td>
+<td><code>const pkgs = api.getInstalledPackages()</code></td>
+</tr>
+<tr>
+<td><code>api.isPackageInstalled(name, version)</code></td>
+<td>Проверка установки</td>
+<td><code>if (api.isPackageInstalled('lodash')) { ... }</code></td>
+</tr>
+<tr>
+<td><code>api.addDependency(name, version, dev)</code></td>
+<td>Добавляет зависимость</td>
+<td><code>api.addDependency('lodash', '^4.17.0', false)</code></td>
+</tr>
+<tr>
+<td><code>api.removeDependency(name)</code></td>
+<td>Удаляет зависимость</td>
+<td><code>api.removeDependency('lodash')</code></td>
+</tr>
+<tr>
+<td><code>api.runCommand(command, args)</code></td>
+<td>Выполняет MIP-команду</td>
+<td><code>api.runCommand('install', ['lodash'])</code></td>
+</tr>
+<tr>
+<td><code>api.exec(command, options)</code></td>
+<td>Выполняет shell-команду</td>
+<td><code>api.exec('echo &quot;Hello&quot;')</code></td>
+</tr>
+<tr>
+<td><code>api.getCacheSize()</code></td>
+<td>Размер кэша</td>
+<td><code>const size = api.getCacheSize()</code></td>
+</tr>
+<tr>
+<td><code>api.clearCache()</code></td>
+<td>Очищает кэш</td>
+<td><code>api.clearCache()</code></td>
+</tr>
+<tr>
+<td><code>api.getCwd()</code></td>
+<td>Текущая директория</td>
+<td><code>const cwd = api.getCwd()</code></td>
+</tr>
+<tr>
+<td><code>api.getVersion()</code></td>
+<td>Версия MIP</td>
+<td><code>const version = api.getVersion()</code></td>
+</tr>
+<tr>
+<td><code>api.log(message, level)</code></td>
+<td>Логирование</td>
+<td><code>api.log('Hello', 'info')</code></td>
+</tr>
+</tbody>
+</table>
+</div><hr>
+<h2 id="всё-о-плагинах-в-mip-примеры-плагинов" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📦 Примеры плагинов</h2>
+<h3 id="всё-о-плагинах-в-mip-примеры-плагинов-1-плагин-калькулятор" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов-1-плагин-калькулятор" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>1. Плагин-калькулятор</h3>
+<pre class="hljs"><code class="language-javascript">module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;calc&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  commands<span class="hljs-punctuation">:</span> {
+    calc<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">const</span> a <span class="hljs-punctuation">=</span> <span class="hljs-title function_">parseFloat</span>(args[<span class="hljs-number">0</span>]);
+      <span class="hljs-keyword">const</span> op <span class="hljs-punctuation">=</span> args[<span class="hljs-number">1</span>];
+      <span class="hljs-keyword">const</span> b <span class="hljs-punctuation">=</span> <span class="hljs-title function_">parseFloat</span>(args[<span class="hljs-number">2</span>]);
+
+      <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isNaN</span>(a) <span class="hljs-punctuation">||</span> <span class="hljs-title function_">isNaN</span>(b)) {
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;❌ Введите числа&#039;</span>);
+        <span class="hljs-keyword">return</span>;
+      }
+
+      <span class="hljs-keyword">const</span> operations <span class="hljs-punctuation">=</span> {
+        <span class="hljs-string">&#039;+&#039;</span><span class="hljs-punctuation">:</span> (a, b) <span class="hljs-punctuation">=&gt;</span> a <span class="hljs-punctuation">+</span> b,
+        <span class="hljs-string">&#039;-&#039;</span><span class="hljs-punctuation">:</span> (a, b) <span class="hljs-punctuation">=&gt;</span> a <span class="hljs-punctuation">-</span> b,
+        <span class="hljs-string">&#039;*&#039;</span><span class="hljs-punctuation">:</span> (a, b) <span class="hljs-punctuation">=&gt;</span> a <span class="hljs-punctuation">*</span> b,
+        <span class="hljs-string">&#039;/&#039;</span><span class="hljs-punctuation">:</span> (a, b) <span class="hljs-punctuation">=&gt;</span> a <span class="hljs-punctuation">/</span> b,
+      };
+
+      <span class="hljs-keyword">if</span> (<span class="hljs-punctuation">!</span>operations[op]) {
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`❌ Неизвестная операция: ${op}`</span>);
+        <span class="hljs-keyword">return</span>;
+      }
+
+      <span class="hljs-keyword">if</span> (op <span class="hljs-punctuation">===</span> <span class="hljs-string">&#039;/&#039;</span> <span class="hljs-punctuation">&amp;&amp;</span> b <span class="hljs-punctuation">===</span> <span class="hljs-number">0</span>) {
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;❌ На ноль делить нельзя!&#039;</span>);
+        <span class="hljs-keyword">return</span>;
+      }
+
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`${a} ${op} ${b} = ${operations[op](a, b)}`</span>);
+    },
+    help<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> () <span class="hljs-punctuation">=&gt;</span> {
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Использование: mip pe calc &lt;число&gt; &lt;операция&gt; &lt;число&gt;&#039;</span>);
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Операции: + - * /&#039;</span>);
+    },
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[calc] Калькулятор загружен!&#039;</span>);
+  },
+};
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-примеры-плагинов-2-плагин-логгер" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов-2-плагин-логгер" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>2. Плагин-логгер</h3>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> fs <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;fs&#039;</span>);
+<span class="hljs-keyword">const</span> path <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;path&#039;</span>);
+
+module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;logger&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  hooks<span class="hljs-punctuation">:</span> {
+    beforeInstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>, version) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`INSTALL: ${pkg}@${version}`</span>);
+    },
+    afterInstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (pkgInfo) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`INSTALLED: ${pkgInfo.name}@${pkgInfo.version}`</span>);
+    },
+    onError<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (err) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`ERROR: ${err.message}`</span>);
+    },
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">this</span>.<span class="hljs-attr">logFile</span> <span class="hljs-punctuation">=</span> path.<span class="hljs-title function_">join</span>(api.<span class="hljs-title function_">getCwd</span>(), <span class="hljs-string">&#039;mip.log&#039;</span>);
+    <span class="hljs-keyword">this</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;LOG: Plugin initialized&#039;</span>);
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[logger] Логирование в mip.log&#039;</span>);
+  },
+
+  log<span class="hljs-punctuation">:</span> (message) <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">const</span> timestamp <span class="hljs-punctuation">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">Date</span>().<span class="hljs-title function_">toISOString</span>();
+    fs.<span class="hljs-title function_">appendFileSync</span>(<span class="hljs-keyword">this</span>.<span class="hljs-attr">logFile</span>, <span class="hljs-string">`[${timestamp}] ${message}\n`</span>);
+  },
+};
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-примеры-плагинов-3-плагин-аудитор" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов-3-плагин-аудитор" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>3. Плагин-аудитор</h3>
+<pre class="hljs"><code class="language-javascript">module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;auditor&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  hooks<span class="hljs-punctuation">:</span> {
+    beforeAudit<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (lockData) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">const</span> total <span class="hljs-punctuation">=</span> Object.<span class="hljs-title function_">keys</span>(lockData.<span class="hljs-attr">packages</span> <span class="hljs-punctuation">||</span> {}).<span class="hljs-attr">length</span>;
+      <span class="hljs-keyword">this</span>.<span class="hljs-attr">totalPackages</span> <span class="hljs-punctuation">=</span> total;
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[auditor] Сканирую ${total} пакетов...`</span>);
+    },
+    afterAudit<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (results) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">const</span> critical <span class="hljs-punctuation">=</span> results.<span class="hljs-title function_">filter</span>(r <span class="hljs-punctuation">=&gt;</span> r.<span class="hljs-attr">severity</span> <span class="hljs-punctuation">===</span> <span class="hljs-string">&#039;critical&#039;</span>).<span class="hljs-attr">length</span>;
+      <span class="hljs-keyword">const</span> high <span class="hljs-punctuation">=</span> results.<span class="hljs-title function_">filter</span>(r <span class="hljs-punctuation">=&gt;</span> r.<span class="hljs-attr">severity</span> <span class="hljs-punctuation">===</span> <span class="hljs-string">&#039;high&#039;</span>).<span class="hljs-attr">length</span>;
+
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`[auditor] Critical: ${critical}, High: ${high}`</span>);
+
+      <span class="hljs-keyword">if</span> (critical <span class="hljs-punctuation">&gt;</span> <span class="hljs-number">0</span> <span class="hljs-punctuation">||</span> high <span class="hljs-punctuation">&gt;</span> <span class="hljs-number">0</span>) {
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[auditor] ⚠️ Найдены уязвимости!&#039;</span>);
+      }
+    },
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[auditor] Аудитор загружен&#039;</span>);
+  },
+};
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-примеры-плагинов-4-плагин-экспортёр" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов-4-плагин-экспортёр" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>4. Плагин-экспортёр</h3>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> fs <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;fs&#039;</span>);
+<span class="hljs-keyword">const</span> path <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;path&#039;</span>);
+
+module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;exporter&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  commands<span class="hljs-punctuation">:</span> {
+    <span class="hljs-keyword">export</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">const</span> api <span class="hljs-punctuation">=</span> <span class="hljs-keyword">this</span>.<span class="hljs-attr">api</span>;
+      <span class="hljs-keyword">const</span> lock <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getLockfile</span>();
+      <span class="hljs-keyword">const</span> mip <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getMipJson</span>();
+
+      <span class="hljs-keyword">const</span> data <span class="hljs-punctuation">=</span> {
+        project<span class="hljs-punctuation">:</span> mip.<span class="hljs-attr">name</span>,
+        version<span class="hljs-punctuation">:</span> mip.<span class="hljs-attr">version</span>,
+        dependencies<span class="hljs-punctuation">:</span> Object.<span class="hljs-title function_">keys</span>(lock<span class="hljs-punctuation">?</span>.<span class="hljs-attr">packages</span> <span class="hljs-punctuation">||</span> {}).<span class="hljs-attr">length</span>,
+        packages<span class="hljs-punctuation">:</span> lock<span class="hljs-punctuation">?</span>.<span class="hljs-attr">packages</span> <span class="hljs-punctuation">||</span> {},
+      };
+
+      <span class="hljs-keyword">const</span> outputFile <span class="hljs-punctuation">=</span> args[<span class="hljs-number">0</span>] <span class="hljs-punctuation">||</span> <span class="hljs-string">&#039;export.json&#039;</span>;
+      fs.<span class="hljs-title function_">writeFileSync</span>(outputFile, JSON.<span class="hljs-title function_">stringify</span>(data, <span class="hljs-keyword">null</span>, <span class="hljs-number">2</span>));
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`✅ Экспорт в ${outputFile}`</span>);
+    },
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">this</span>.<span class="hljs-attr">api</span> <span class="hljs-punctuation">=</span> api;
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[exporter] Плагин загружен&#039;</span>);
+  },
+};
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-примеры-плагинов-5-плагин-очистка-кэша" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-примеры-плагинов-5-плагин-очистка-кэша" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>5. Плагин-очистка кэша</h3>
+<pre class="hljs"><code class="language-javascript">module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;cleaner&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  commands<span class="hljs-punctuation">:</span> {
+    clean<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> {
+      <span class="hljs-keyword">const</span> api <span class="hljs-punctuation">=</span> <span class="hljs-keyword">this</span>.<span class="hljs-attr">api</span>;
+      <span class="hljs-keyword">const</span> size <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getCacheSize</span>();
+      console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`📦 Размер кэша: ${(size / 1024 / 1024).toFixed(2)} MB`</span>);
+
+      <span class="hljs-keyword">if</span> (args.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#039;--force&#039;</span>)) {
+        api.<span class="hljs-title function_">clearCache</span>();
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;✅ Кэш очищен&#039;</span>);
+      } <span class="hljs-keyword">else</span> {
+        console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;💡 Используйте --force для очистки&#039;</span>);
+      }
+    },
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">this</span>.<span class="hljs-attr">api</span> <span class="hljs-punctuation">=</span> api;
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;[cleaner] Плагин загружен&#039;</span>);
+  },
+};
+</code></pre>
+<hr>
+<h2 id="всё-о-плагинах-в-mip-команды-для-управления-плагинами" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-команды-для-управления-плагинами" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🚀 Команды для управления плагинами</h2>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Создать плагин</span>
+mip plugin create my<span class="hljs-punctuation">-</span>plugin
+
+<span class="hljs-comment"># Скомпилировать</span>
+mip plugin compile my<span class="hljs-punctuation">-</span>plugin
+
+<span class="hljs-comment"># Активировать</span>
+mip plugin activate my<span class="hljs-punctuation">-</span>plugin
+
+<span class="hljs-comment"># Посмотреть список</span>
+mip plugin list
+
+<span class="hljs-comment"># Деактивировать</span>
+mip plugin deactivate my<span class="hljs-punctuation">-</span>plugin
+
+<span class="hljs-comment"># Удалить</span>
+mip plugin remove my<span class="hljs-punctuation">-</span>plugin
+
+<span class="hljs-comment"># Очистить всё</span>
+mip plugin cleanall
+
+<span class="hljs-comment"># Выполнить команду плагина</span>
+mip pe my<span class="hljs-punctuation">-</span>plugin my<span class="hljs-punctuation">-</span>command arg1 arg2
+
+<span class="hljs-comment"># Выполнить команду плагина (сокращённо)</span>
+mip pe my<span class="hljs-punctuation">-</span>plugin my<span class="hljs-punctuation">-</span>command
+</code></pre>
+<hr>
+<h2 id="всё-о-плагинах-в-mip-тестирование-плагинов" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-тестирование-плагинов" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧪 Тестирование плагинов</h2>
+<h3 id="всё-о-плагинах-в-mip-тестирование-плагинов-тестирование-изолированно" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-тестирование-плагинов-тестирование-изолированно" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Тестирование изолированно</h3>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-comment">// tests/plugin.test.js</span>
+<span class="hljs-keyword">const</span> plugin <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../plugins/my-plugin/index&#039;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#039;my-plugin&#039;</span>, () <span class="hljs-punctuation">=&gt;</span> {
+  <span class="hljs-title function_">test</span>(<span class="hljs-string">&#039;plugin has name&#039;</span>, () <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-title function_">expect</span>(plugin.<span class="hljs-attr">name</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#039;my-plugin&#039;</span>);
+  });
+
+  <span class="hljs-title function_">test</span>(<span class="hljs-string">&#039;plugin has commands&#039;</span>, () <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-title function_">expect</span>(plugin.<span class="hljs-attr">commands</span>).<span class="hljs-title function_">toBeDefined</span>();
+  });
+
+  <span class="hljs-title function_">test</span>(<span class="hljs-string">&#039;command works&#039;</span>, <span class="hljs-keyword">async</span> () <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">const</span> spy <span class="hljs-punctuation">=</span> jest.<span class="hljs-title function_">spyOn</span>(console, <span class="hljs-string">&#039;log&#039;</span>);
+    <span class="hljs-keyword">await</span> plugin.<span class="hljs-attr">commands</span>.<span class="hljs-title function_">mycommand</span>([<span class="hljs-string">&#039;test&#039;</span>]);
+    <span class="hljs-title function_">expect</span>(spy).<span class="hljs-title function_">toHaveBeenCalledWith</span>(<span class="hljs-string">&#039;My command executed!&#039;</span>);
+    spy.<span class="hljs-title function_">mockRestore</span>();
+  });
+});
+</code></pre>
+<h3 id="всё-о-плагинах-в-mip-тестирование-плагинов-интеграционный-тест" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-тестирование-плагинов-интеграционный-тест" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Интеграционный тест</h3>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-comment">// tests/integration/plugin.test.js</span>
+<span class="hljs-keyword">const</span> { getPluginManager } <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../lib/api/plugin-manager&#039;</span>);
+
+<span class="hljs-title function_">describe</span>(<span class="hljs-string">&#039;plugin integration&#039;</span>, () <span class="hljs-punctuation">=&gt;</span> {
+  <span class="hljs-title function_">test</span>(<span class="hljs-string">&#039;plugin loaded correctly&#039;</span>, () <span class="hljs-punctuation">=&gt;</span> {
+    <span class="hljs-keyword">const</span> pm <span class="hljs-punctuation">=</span> <span class="hljs-title function_">getPluginManager</span>();
+    <span class="hljs-keyword">const</span> plugin <span class="hljs-punctuation">=</span> pm.<span class="hljs-title function_">getPlugin</span>(<span class="hljs-string">&#039;my-plugin&#039;</span>);
+    <span class="hljs-title function_">expect</span>(plugin).<span class="hljs-title function_">toBeDefined</span>();
+    <span class="hljs-title function_">expect</span>(plugin.<span class="hljs-attr">name</span>).<span class="hljs-title function_">toBe</span>(<span class="hljs-string">&#039;my-plugin&#039;</span>);
+  });
+});
+</code></pre>
+<hr>
+<h2 id="всё-о-плагинах-в-mip-сравнение-встроенная-команда-vs-плагин" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-сравнение-встроенная-команда-vs-плагин" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📊 Сравнение: встроенная команда vs плагин</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Характеристика</th>
+<th>Встроенная команда (fork)</th>
+<th>Плагин</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Сложность</strong></td>
+<td>Править <code>bin/mip.js</code></td>
+<td>Просто создать файл</td>
+</tr>
+<tr>
+<td><strong>Обновление</strong></td>
+<td>Пересобирать MIP</td>
+<td>Перекомпилить плагин</td>
+</tr>
+<tr>
+<td><strong>Распространение</strong></td>
+<td>Только через форк</td>
+<td>Можно распространять отдельно</td>
+</tr>
+<tr>
+<td><strong>i18n</strong></td>
+<td>✅ Поддерживается</td>
+<td>❌ Нет (свои переводы)</td>
+</tr>
+<tr>
+<td><strong>Хуки</strong></td>
+<td>❌ Нет</td>
+<td>✅ Есть (хуки)</td>
+</tr>
+<tr>
+<td><strong>API</strong></td>
+<td>❌ Нет</td>
+<td>✅ Есть (api методы)</td>
+</tr>
+<tr>
+<td><strong>Изоляция</strong></td>
+<td>В коде MIP</td>
+<td>Отдельная папка</td>
+</tr>
+<tr>
+<td><strong>Ошибки</strong></td>
+<td>Ломают MIP</td>
+<td>Ломают только плагин</td>
+</tr>
+</tbody>
+</table>
+</div><hr>
+<h2 id="всё-о-плагинах-в-mip-связанные-страницы" class="docmd-heading"><a href="#всё-о-плагинах-в-mip-связанные-страницы" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📚 Связанные страницы</h2>
+<ul>
+<li><a href="/commands/plugin/">mip plugin</a> — управление плагинами</li>
+<li><a href="/commands/pe/">mip pe</a> — выполнение команд плагинов</li>
+<li><a href="/dev/hooks/">Хуки и плагины</a> — расширение функциональности</li>
+<li><a href="/dev/adding-commands/">Добавление команд</a> — два способа добавить команду</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../../ru/dev/testing/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Тестирование
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../../ru/dev/hooks/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Хуки и плагины
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#всё-о-плагинах-в-mip" class="toc-link">Всё о плагинах в MIP 🧩</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-структура-плагина" class="toc-link">📁 Структура плагина</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-структура-плагина-packagejson-опционально" class="toc-link">package.json (опционально)</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-структура-плагина-indexjs-полная-структура" class="toc-link">index.js — полная структура</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-api-что-доступно-плагинам" class="toc-link">🛠️ API: что доступно плагинам</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов" class="toc-link">📦 Примеры плагинов</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов-1-плагин-калькулятор" class="toc-link">1. Плагин-калькулятор</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов-2-плагин-логгер" class="toc-link">2. Плагин-логгер</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов-3-плагин-аудитор" class="toc-link">3. Плагин-аудитор</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов-4-плагин-экспортёр" class="toc-link">4. Плагин-экспортёр</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-примеры-плагинов-5-плагин-очистка-кэша" class="toc-link">5. Плагин-очистка кэша</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-команды-для-управления-плагинами" class="toc-link">🚀 Команды для управления плагинами</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-тестирование-плагинов" class="toc-link">🧪 Тестирование плагинов</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-тестирование-плагинов-тестирование-изолированно" class="toc-link">Тестирование изолированно</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#всё-о-плагинах-в-mip-тестирование-плагинов-интеграционный-тест" class="toc-link">Интеграционный тест</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-сравнение-встроенная-команда-vs-плагин" class="toc-link">📊 Сравнение: встроенная команда vs плагин</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#всё-о-плагинах-в-mip-связанные-страницы" class="toc-link">📚 Связанные страницы</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

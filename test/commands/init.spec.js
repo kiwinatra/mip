@@ -46,4 +46,3 @@ describe('mip core: init', () => {
     }
   });
 });
-

@@ -1,0 +1,2217 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "en";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      mip global — manage global packages : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The global command allows you to install, remove, and list packages installed globally for use anywhere in the system.">
+<link rel="canonical" href="https://mip.fwh.is/commands/global/">
+<meta property="og:title" content="mip global — manage global packages - MIP - Modern Package Manager">
+<meta property="og:description" content="The global command allows you to install, remove, and list packages installed globally for use anywhere in the system.">
+<meta property="og:url" content="https://mip.fwh.is/commands/global/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mip global — manage global packages - MIP - Modern Package Manager">
+<meta name="twitter:description" content="The global command allows you to install, remove, and list packages installed globally for use anywhere in the system.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/commands/global/">
+<link rel="alternate" hreflang="en" href="/commands/global/">
+<link rel="alternate" hreflang="x-default" href="/commands/global/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/en/commands/global.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/commands/global" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/commands/global" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Introduction
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Welcome
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Commands
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../commands/global/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/run/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Setup
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Creating a Project
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Pros
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Performance
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Developers
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Adding Commands
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Testing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            All About Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Hooks &amp; Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            General List
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Network &amp; Registries
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock Files
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Other
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Extended FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  mip global — manage global packages
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22mip%20global%20%E2%80%94%20manage%20global%20packages%22%0Adescription%3A%20%22The%20global%20command%20allows%20you%20to%20install%2C%20remove%2C%20and%20list%20packages%20installed%20globally%20for%20use%20anywhere%20in%20the%20system.%22%0A---%0A%0A%23%20mip%20global%0A%0A%3A%3A%3A%20callout%20info%20%22What%20is%20this%3F%22%20icon%3Aglobe%0A%60mip%20global%60%20is%20a%20command%20for%20managing%20**globally%20installed%20packages**.%20Unlike%20regular%20installation%20(which%20uses%20the%20global%20cache%20and%20symlinks%20in%20the%20project)%2C%20global%20installation%20places%20packages%20in%20%60~%2F.mip%2Fglobal%2F%60%20and%20makes%20their%20binaries%20available%20from%20anywhere%20via%20the%20command%20line.%20This%20is%20convenient%20for%20tools%20you%20use%20across%20all%20projects%2C%20such%20as%20test%20runners%2C%20linters%2C%20or%20code%20generators.%0A%3A%3A%3A%0A%0A%23%23%20Syntax%0A%0A%60%60%60bash%0Amip%20global%20%3Caction%3E%20%5Bpackage-name%5D%0A%60%60%60%0A%0A%23%23%20Arguments%0A%0A%7C%20Name%20%7C%20Type%20%7C%20Required%20%7C%20Description%20%7C%0A%7C------%7C------%7C----------%7C-------------%7C%0A%7C%20%60action%60%20%7C%20string%20%7C%20%E2%9C%85%20%7C%20Action%3A%20%60install%60%2C%20%60uninstall%60%2C%20%60list%60%20%7C%0A%7C%20%60package-name%60%20%7C%20string%20%7C%20%E2%9D%8C%20%7C%20Package%20name%20(required%20for%20%60install%60%20and%20%60uninstall%60)%20%7C%0A%0A%23%23%20Available%20actions%0A%0A%7C%20Action%20%7C%20Description%20%7C%0A%7C--------%7C-------------%7C%0A%7C%20%60install%60%20%7C%20Installs%20a%20package%20globally%2C%20automatically%20adds%20the%20binary%20to%20PATH%20%7C%0A%7C%20%60uninstall%60%20%7C%20Removes%20a%20globally%20installed%20package%20%7C%0A%7C%20%60list%60%20%7C%20Shows%20a%20list%20of%20all%20globally%20installed%20packages%20%7C%0A%0A%23%23%20How%20it%20works%0A%0A%23%23%23%20%60install%60%0A1.%20Creates%20the%20global%20directory%20%60~%2F.mip%2Fglobal%2F%60%20(if%20it%20doesn&#039;t%20exist).%0A2.%20Changes%20to%20that%20directory.%0A3.%20If%20%60mip.json%60%20is%20missing%20%E2%80%94%20creates%20it%20via%20%60mip%20init%60.%0A4.%20Installs%20the%20specified%20package%20via%20%60mip%20install%60.%0A5.%20Removes%20the%20temporary%20%60mip.json%60%20(if%20it%20was%20created).%0A6.%20Checks%20whether%20the%20global%20folder%20(%60~%2F.mip%2Fglobal%2Fnode_modules%2F.bin%60)%20is%20in%20PATH.%0A7.%20If%20not%20%E2%80%94%20adds%20it%20to%20%60.zshrc%60%20or%20%60.bashrc%60.%0A%0A%23%23%23%20%60uninstall%60%0A1.%20Removes%20the%20package%20folder%20from%20%60~%2F.mip%2Fglobal%2Fnode_modules%2F%60.%0A2.%20Reports%20successful%20removal%20or%20that%20the%20package%20was%20not%20found.%0A%0A%23%23%23%20%60list%60%0A1.%20Scans%20the%20%60~%2F.mip%2Fglobal%2Fnode_modules%2F%60%20folder.%0A2.%20Outputs%20a%20list%20of%20all%20installed%20packages%20(excluding%20internal%20ones).%0A%0A%23%23%20Examples%0A%0A%3A%3A%3A%20tabs%0A%3D%3D%20tab%20%22Install%20a%20global%20package%22%0A%60%60%60bash%0Amip%20global%20install%20eslint%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%8C%8D%20Installing%20eslint%20globally...%0A%E2%9C%85%20Added%20to%20PATH%20in%20%2Fhome%2Fuser%2F.zshrc%0A%F0%9F%94%84%20Run%3A%20source%20%2Fhome%2Fuser%2F.zshrc%0A%E2%9C%85%20eslint%20installed%20globally%0A%F0%9F%93%81%20Location%3A%20%2Fhome%2Fuser%2F.mip%2Fglobal%2Fnode_modules%2F.bin%2Feslint%0A%60%60%60%0A%0ANow%20you%20can%20use%20%60eslint%60%20from%20anywhere%3A%0A%60%60%60bash%0Aeslint%20--fix%20src%2F%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22Install%20multiple%20packages%22%0A%60%60%60bash%0Amip%20global%20install%20jest%20typescript%20nodemon%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%8C%8D%20Installing%20jest%20globally...%0A%E2%9C%85%20jest%20installed%20globally%0A%F0%9F%8C%8D%20Installing%20typescript%20globally...%0A%E2%9C%85%20typescript%20installed%20globally%0A%F0%9F%8C%8D%20Installing%20nodemon%20globally...%0A%E2%9C%85%20nodemon%20installed%20globally%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22List%20global%20packages%22%0A%60%60%60bash%0Amip%20global%20list%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%8C%8D%20Globally%20installed%20packages%3A%0A%0A%20%20%E2%80%A2%20eslint%0A%20%20%E2%80%A2%20jest%0A%20%20%E2%80%A2%20typescript%0A%20%20%E2%80%A2%20nodemon%0A%0A%F0%9F%93%8A%20Total%3A%204%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22Uninstall%20a%20global%20package%22%0A%60%60%60bash%0Amip%20global%20uninstall%20eslint%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%97%91%EF%B8%8F%20Uninstalling%20eslint%20globally...%0A%E2%9C%85%20eslint%20removed%20globally%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22Attempt%20to%20remove%20a%20non-existent%20package%22%0A%60%60%60bash%0Amip%20global%20uninstall%20some-package%0A%60%60%60%0A%0A**Example%20output%3A**%0A%60%60%60%0A%F0%9F%97%91%EF%B8%8F%20Uninstalling%20some-package%20globally...%0A%E2%9D%8C%20some-package%20not%20found%20globally%0A%60%60%60%0A%3A%3A%3A%0A%0A%23%23%20Common%20errors%0A%0A%3A%3A%3A%20callout%20warning%20%22%E2%9A%A0%EF%B8%8F%20Package%20not%20found%22%20icon%3Aalert-triangle%0A**Cause%3A**%20The%20specified%20package%20does%20not%20exist%20in%20the%20registry.%0A%0A**Solution%3A**%0A1.%20Check%20the%20spelling%20of%20the%20package%20name.%0A2.%20Make%20sure%20the%20package%20is%20available%20in%20the%20registry%3A%20%60mip%20search%20%3Cpackage-name%3E%60%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20info%20%22%F0%9F%94%84%20PATH%20not%20updated%22%20icon%3Ainfo%0A**Cause%3A**%20The%20global%20folder%20has%20not%20been%20added%20to%20PATH.%0A%0A**Solution%3A**%0AAfter%20installation%2C%20the%20command%20tries%20to%20add%20PATH%20automatically.%20If%20it%20doesn&#039;t%20work%20%E2%80%94%20add%20it%20manually%3A%0A%60%60%60bash%0Aecho%20&#039;export%20PATH%3D%22%24PATH%3A~%2F.mip%2Fglobal%2Fnode_modules%2F.bin%22&#039;%20%3E%3E%20~%2F.zshrc%0Asource%20~%2F.zshrc%0A%60%60%60%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20tip%20%22%F0%9F%92%A1%20Tip%22%20icon%3Alightbulb%0A**When%20to%20use%20global%20installation%3A**%0A-%20Tools%20you%20use%20**across%20all%20projects**%20(e.g.%2C%20%60eslint%60%2C%20%60prettier%60%2C%20%60jest%60).%0A-%20CLI%20utilities%20that%20should%20be%20available%20from%20anywhere%20(e.g.%2C%20%60create-react-app%60%2C%20%60vue-cli%60).%0A%0A**When%20NOT%20to%20use%20global%20installation%3A**%0A-%20Dependencies%20specific%20to%20a%20single%20project.%0A-%20Packages%20that%20may%20conflict%20across%20different%20project%20versions.%0A%0A**Best%20practice%3A**%20Prefer%20local%20installations%20(%60mip%20install%60)%20for%20projects%2C%20and%20use%20global%20only%20for%20universal%20tools.%0A%3A%3A%3A%0A%0A%23%23%20Related%20commands%0A%0A-%20%5Bmip%20install%5D(%2Fcommands%2Finstall)%20%E2%80%94%20local%20installation%20in%20the%20current%20project.%0A-%20%5Bmip%20list%5D(%2Fcommands%2Flist)%20%E2%80%94%20shows%20locally%20installed%20packages.%0A-%20%5Bmip%20doctor%5D(%2Fcommands%2Fdoctor)%20%E2%80%94%20environment%20diagnostics%20(checks%20PATH).%0A%0A%3A%3A%3A%20collapsible%20%22%F0%9F%A7%A0%20Where%20are%20global%20packages%20stored%3F%22%0A%60%60%60%0A~%2F.mip%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20global%2F%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20node_modules%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20eslint%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20jest%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20.bin%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20eslint%20%20%20%20%20%20%20%20%E2%86%90%20link%20to%20executable%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20jest%20%20%20%20%20%20%20%20%20%20%E2%86%90%20link%20to%20executable%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20mip.json%20(temporary)%0A%E2%94%94%E2%94%80%E2%94%80%20store%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(global%20package%20cache)%0A%60%60%60%0A%0A**Structure%3A**%0A-%20%60~%2F.mip%2Fglobal%2F%60%20%E2%80%94%20root%20of%20the%20global%20environment.%0A-%20%60node_modules%2F%60%20%E2%80%94%20installed%20packages.%0A-%20%60.bin%2F%60%20%E2%80%94%20executable%20files%20(added%20to%20PATH).%0A%0A**Important%3A**%20Global%20packages%20**do%20not%20depend**%20on%20the%20local%20%60mip.yml%60%20and%20are%20not%20included%20in%20%60mip-lock.yml%60.%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Commands</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>global</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="mip-global" class="docmd-heading"><a href="#mip-global" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>mip global</h1>
+<div class="docmd-container callout callout-info"><div class="callout-title">
+<svg class="lucide-icon icon-globe callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+What is this?</div><div class="callout-content">
+<p><code>mip global</code> is a command for managing <strong>globally installed packages</strong>. Unlike regular installation (which uses the global cache and symlinks in the project), global installation places packages in <code>~/.mip/global/</code> and makes their binaries available from anywhere via the command line. This is convenient for tools you use across all projects, such as test runners, linters, or code generators.</p>
+</div></div>
+<h2 id="mip-global-syntax" class="docmd-heading"><a href="#mip-global-syntax" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Syntax</h2>
+<pre class="hljs"><code class="language-bash">mip global <span class="hljs-punctuation">&lt;</span>action<span class="hljs-punctuation">&gt;</span> [package<span class="hljs-punctuation">-</span>name]
+</code></pre>
+<h2 id="mip-global-arguments" class="docmd-heading"><a href="#mip-global-arguments" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Arguments</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>action</code></td>
+<td>string</td>
+<td>✅</td>
+<td>Action: <code>install</code>, <code>uninstall</code>, <code>list</code></td>
+</tr>
+<tr>
+<td><code>package-name</code></td>
+<td>string</td>
+<td>❌</td>
+<td>Package name (required for <code>install</code> and <code>uninstall</code>)</td>
+</tr>
+</tbody>
+</table>
+</div><h2 id="mip-global-available-actions" class="docmd-heading"><a href="#mip-global-available-actions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Available actions</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>install</code></td>
+<td>Installs a package globally, automatically adds the binary to PATH</td>
+</tr>
+<tr>
+<td><code>uninstall</code></td>
+<td>Removes a globally installed package</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>Shows a list of all globally installed packages</td>
+</tr>
+</tbody>
+</table>
+</div><h2 id="mip-global-how-it-works" class="docmd-heading"><a href="#mip-global-how-it-works" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How it works</h2>
+<h3 id="mip-global-how-it-works-install" class="docmd-heading"><a href="#mip-global-how-it-works-install" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>install</code></h3>
+<ol>
+<li>Creates the global directory <code>~/.mip/global/</code> (if it doesn’t exist).</li>
+<li>Changes to that directory.</li>
+<li>If <code>mip.json</code> is missing — creates it via <code>mip init</code>.</li>
+<li>Installs the specified package via <code>mip install</code>.</li>
+<li>Removes the temporary <code>mip.json</code> (if it was created).</li>
+<li>Checks whether the global folder (<code>~/.mip/global/node_modules/.bin</code>) is in PATH.</li>
+<li>If not — adds it to <code>.zshrc</code> or <code>.bashrc</code>.</li>
+</ol>
+<h3 id="mip-global-how-it-works-uninstall" class="docmd-heading"><a href="#mip-global-how-it-works-uninstall" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>uninstall</code></h3>
+<ol>
+<li>Removes the package folder from <code>~/.mip/global/node_modules/</code>.</li>
+<li>Reports successful removal or that the package was not found.</li>
+</ol>
+<h3 id="mip-global-how-it-works-list" class="docmd-heading"><a href="#mip-global-how-it-works-list" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>list</code></h3>
+<ol>
+<li>Scans the <code>~/.mip/global/node_modules/</code> folder.</li>
+<li>Outputs a list of all installed packages (excluding internal ones).</li>
+</ol>
+<h2 id="mip-global-examples" class="docmd-heading"><a href="#mip-global-examples" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Examples</h2>
+<div class="docmd-tabs">
+<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>Install a global package</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code class="language-bash">mip global install eslint
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🌍 Installing eslint globally...
+✅ Added to PATH <span class="hljs-keyword">in</span> <span class="hljs-punctuation">/</span>home<span class="hljs-punctuation">/</span>user<span class="hljs-punctuation">/</span>.<span class="hljs-attr">zshrc</span>
+🔄 Run<span class="hljs-punctuation">:</span> <span class="hljs-keyword">source</span> <span class="hljs-punctuation">/</span>home<span class="hljs-punctuation">/</span>user<span class="hljs-punctuation">/</span>.<span class="hljs-attr">zshrc</span>
+✅ eslint installed globally
+📁 Location<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">/</span>home<span class="hljs-punctuation">/</span>user<span class="hljs-punctuation">/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>global<span class="hljs-punctuation">/</span>node_modules<span class="hljs-punctuation">/</span>.<span class="hljs-attr">bin</span><span class="hljs-punctuation">/</span>eslint
+</code></pre>
+<p>Now you can use <code>eslint</code> from anywhere:</p>
+<pre class="hljs"><code class="language-bash">eslint <span class="hljs-punctuation">--</span>fix src<span class="hljs-punctuation">/</span>
+</code></pre>
+</div></div></div><p>== tab “Install multiple packages”</p>
+<pre class="hljs"><code class="language-bash">mip global install jest typescript nodemon
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🌍 Installing jest globally...
+✅ jest installed globally
+🌍 Installing typescript globally...
+✅ typescript installed globally
+🌍 Installing nodemon globally...
+✅ nodemon installed globally
+</code></pre>
+<p>:::<br>
+== tab “List global packages”</p>
+<pre class="hljs"><code class="language-bash">mip global list
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🌍 Globally installed packages<span class="hljs-punctuation">:</span>
+
+  • eslint
+  • jest
+  • typescript
+  • nodemon
+
+📊 Total<span class="hljs-punctuation">:</span> <span class="hljs-number">4</span>
+</code></pre>
+<p>:::<br>
+== tab “Uninstall a global package”</p>
+<pre class="hljs"><code class="language-bash">mip global uninstall eslint
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🗑️ Uninstalling eslint globally...
+✅ eslint removed globally
+</code></pre>
+<p>:::<br>
+== tab “Attempt to remove a non-existent package”</p>
+<pre class="hljs"><code class="language-bash">mip global uninstall some<span class="hljs-punctuation">-</span>package
+</code></pre>
+<p><strong>Example output:</strong></p>
+<pre class="hljs"><code>🗑️ Uninstalling some<span class="hljs-punctuation">-</span>package globally...
+❌ some<span class="hljs-punctuation">-</span>package not found globally
+</code></pre>
+<p>:::</p>
+<h2 id="mip-global-common-errors" class="docmd-heading"><a href="#mip-global-common-errors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Common errors</h2>
+<div class="docmd-container callout callout-warning"><div class="callout-title">
+<svg class="lucide-icon icon-alert-triangle callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+⚠️ Package not found</div><div class="callout-content">
+<p><strong>Cause:</strong> The specified package does not exist in the registry.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li>Check the spelling of the package name.</li>
+<li>Make sure the package is available in the registry: <code>mip search &lt;package-name&gt;</code></li>
+</ol>
+</div></div>
+<div class="docmd-container callout callout-info"><div class="callout-title">
+<svg class="lucide-icon icon-info callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-info"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 16v-4" />
+  <path d="M12 8h.01" />
+</svg>
+🔄 PATH not updated</div><div class="callout-content">
+<p><strong>Cause:</strong> The global folder has not been added to PATH.</p>
+<p><strong>Solution:</strong><br>
+After installation, the command tries to add PATH automatically. If it doesn’t work — add it manually:</p>
+<pre class="hljs"><code class="language-bash"><span class="hljs-keyword">echo</span> <span class="hljs-string">&#039;export PATH=&quot;$PATH:~/.mip/global/node_modules/.bin&quot;&#039;</span> <span class="hljs-punctuation">&gt;&gt;</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">zshrc</span>
+<span class="hljs-keyword">source</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">zshrc</span>
+</code></pre>
+</div></div>
+<div class="docmd-container callout callout-tip"><div class="callout-title">
+<svg class="lucide-icon icon-lightbulb callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lightbulb"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+  <path d="M9 18h6" />
+  <path d="M10 22h4" />
+</svg>
+💡 Tip</div><div class="callout-content">
+<p><strong>When to use global installation:</strong></p>
+<ul>
+<li>Tools you use <strong>across all projects</strong> (e.g., <code>eslint</code>, <code>prettier</code>, <code>jest</code>).</li>
+<li>CLI utilities that should be available from anywhere (e.g., <code>create-react-app</code>, <code>vue-cli</code>).</li>
+</ul>
+<p><strong>When NOT to use global installation:</strong></p>
+<ul>
+<li>Dependencies specific to a single project.</li>
+<li>Packages that may conflict across different project versions.</li>
+</ul>
+<p><strong>Best practice:</strong> Prefer local installations (<code>mip install</code>) for projects, and use global only for universal tools.</p>
+</div></div>
+<h2 id="mip-global-related-commands" class="docmd-heading"><a href="#mip-global-related-commands" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Related commands</h2>
+<ul>
+<li><a href="/commands/install/">mip install</a> — local installation in the current project.</li>
+<li><a href="/commands/list/">mip list</a> — shows locally installed packages.</li>
+<li><a href="/commands/doctor/">mip doctor</a> — environment diagnostics (checks PATH).</li>
+</ul>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">🧠 Where are global packages stored?</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<pre class="hljs"><code><span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>
+├── global<span class="hljs-punctuation">/</span>
+│   ├── node_modules<span class="hljs-punctuation">/</span>
+│   │   ├── eslint<span class="hljs-punctuation">/</span>
+│   │   ├── jest<span class="hljs-punctuation">/</span>
+│   │   └── .<span class="hljs-attr">bin</span><span class="hljs-punctuation">/</span>
+│   │       ├── eslint        ← link to executable
+│   │       └── jest          ← link to executable
+│   └── mip.<span class="hljs-title function_">json</span> (temporary)
+└── store<span class="hljs-punctuation">/</span>                     (global package cache)
+</code></pre>
+<p><strong>Structure:</strong></p>
+<ul>
+<li><code>~/.mip/global/</code> — root of the global environment.</li>
+<li><code>node_modules/</code> — installed packages.</li>
+<li><code>.bin/</code> — executable files (added to PATH).</li>
+</ul>
+<p><strong>Important:</strong> Global packages <strong>do not depend</strong> on the local <code>mip.yml</code> and are not included in <code>mip-lock.yml</code>.</p>
+</div></details>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../commands/genlock/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            genlock
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../commands/info/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            info
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#mip-global" class="toc-link">mip global</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-syntax" class="toc-link">Syntax</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-arguments" class="toc-link">Arguments</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-available-actions" class="toc-link">Available actions</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-how-it-works" class="toc-link">How it works</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-global-how-it-works-install" class="toc-link">install</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-global-how-it-works-uninstall" class="toc-link">uninstall</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-global-how-it-works-list" class="toc-link">list</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-examples" class="toc-link">Examples</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-common-errors" class="toc-link">Common errors</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-global-related-commands" class="toc-link">Related commands</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

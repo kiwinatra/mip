@@ -1,20 +1,16 @@
-# Changelog
+# Mip update 1.6 - Documentation update
 
-## [1.0.0] - 2026-05-19
+## Documentation
+(will be added in future to website when im done with landing page)
 
-### Added
-- Initial release
-- Peer dependencies resolver
-- Smart deduplication (`mip dedupe`)
-- `mip ci --frozen-lockfile`
-- `mip audit --fix`
-- Legacy packages fallback
-- Auto-save dependencies
-- i18n support (10 languages)
-- Windows, Linux, macOS builds
-- GitHub Actions CI/CD
+### Documentation was build with DocMD, and explains everything in mip
 
-### Fixed
-- No more node_modules duplication
-- Peer dependency conflicts handling
-- Lockfile integrity checks
+## Code Review
+
+### Fixed bugs, and more.
+
+stay calm with mip.
+
+---
+
+updated and patched files better be build manually from mip sources.

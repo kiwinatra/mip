@@ -1,0 +1,3 @@
+# example-cli
+
+CLI tool

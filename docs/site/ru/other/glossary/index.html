@@ -1,0 +1,2436 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/ru/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "ru";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      Глоссарий 📚 : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="MIP — быстрый и современный пакетный менеджер / MIP — fast and modern package manager.">
+<link rel="canonical" href="https://mip.fwh.is/ru/other/glossary/">
+<meta property="og:title" content="Глоссарий 📚 - MIP - Modern Package Manager">
+<meta property="og:description" content="MIP — быстрый и современный пакетный менеджер / MIP — fast and modern package manager.">
+<meta property="og:url" content="https://mip.fwh.is/ru/other/glossary/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Глоссарий 📚 - MIP - Modern Package Manager">
+<meta name="twitter:description" content="MIP — быстрый и современный пакетный менеджер / MIP — fast and modern package manager.">
+
+
+
+<link rel="stylesheet" href="../../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/other/glossary/">
+<link rel="alternate" hreflang="en" href="/other/glossary/">
+<link rel="alternate" hreflang="x-default" href="/other/glossary/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/ru/other/glossary.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/other/glossary" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/other/glossary" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Введение
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добро пожаловать
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрые Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Команды
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commandsn/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Настройка
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Создание проекта
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрый старт
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Конфигурация
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Для профи
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Производительность
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Разработчикам
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Главное
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Архитектурой
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добавление команд
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Тестирование
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Все о плагинах
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Хуки и плагины
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Решение проблем
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Общий список
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/installation/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Ошибки установки
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Сеть и регистры
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock-файлы
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Прочее
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../../ru/other/glossary/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            Глоссарий
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Расширенный FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Глоссарий 📚
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="%D1%8B---%0Atitle%3A%20%22%D0%93%D0%BB%D0%BE%D1%81%D1%81%D0%B0%D1%80%D0%B8%D0%B9%20%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%D0%BE%D0%B2%20MIP%22%0Adescription%3A%20%22%D0%9A%D1%80%D0%B0%D1%82%D0%BA%D0%B8%D0%B9%20%D1%81%D0%BB%D0%BE%D0%B2%D0%B0%D1%80%D1%8C%20%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%D0%BE%D0%B2%2C%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D0%BC%D1%8B%D1%85%20%D0%B2%20MIP%20%D0%B8%20%D1%8D%D0%BA%D0%BE%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%B5%D1%80%D0%BE%D0%B2.%22%0A---%0A%0A%23%20%D0%93%D0%BB%D0%BE%D1%81%D1%81%D0%B0%D1%80%D0%B8%D0%B9%20%F0%9F%93%9A%0A%0A%D0%A1%D0%BE%D0%B1%D1%80%D0%B0%D0%BB%20%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5%20%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%D1%8B%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B5%20%D0%B2%D1%81%D1%82%D1%80%D0%B5%D1%87%D0%B0%D1%8E%D1%82%D1%81%D1%8F%20%D0%B2%20MIP%20%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%B5%D1%80%D0%B0%D1%85.%0A%0A---%0A%0A%23%23%20%F0%9F%94%A4%20A%E2%80%93Z%0A%0A%23%23%23%20API%0A**Application%20Programming%20Interface**%20%E2%80%94%20%D0%BD%D0%B0%D0%B1%D0%BE%D1%80%20%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2%2C%20%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D1%85%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%B0%D0%BC%20%D0%B4%D0%BB%D1%8F%20%D0%B2%D0%B7%D0%B0%D0%B8%D0%BC%D0%BE%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F%20%D1%81%20MIP.%0A%0A%23%23%23%20Audit%0A%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9.%20MIP%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8F%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D0%BD%D0%B0%20%D0%B8%D0%B7%D0%B2%D0%B5%D1%81%D1%82%D0%BD%D1%8B%D0%B5%20%D1%83%D1%8F%D0%B7%D0%B2%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8%20%D1%87%D0%B5%D1%80%D0%B5%D0%B7%20npm%20advisory%20database.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B1%EF%B8%8F%20B%0A%0A%23%23%23%20Bin%0A%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D0%B5%20%D1%84%D0%B0%D0%B9%D0%BB%D1%8B%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B5%20%D0%B4%D0%BE%D0%B1%D0%B0%D0%B2%D0%BB%D1%8F%D1%8E%D1%82%D1%81%D1%8F%20%D0%B2%20%60PATH%60%20%D0%BF%D1%80%D0%B8%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20%D0%92%20MIP%20%D0%BD%D0%B0%D1%85%D0%BE%D0%B4%D1%8F%D1%82%D1%81%D1%8F%20%D0%B2%20%60~%2F.mip%2Fstore%2F%3Cname%3E%2F%3Cversion%3E%2Fnode_modules%2F.bin%2F%60.%0A%0A%23%23%23%20Branch%0A%D0%92%D0%B5%D1%82%D0%BA%D0%B0%20%D0%B2%20Git.%20MIP%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%20%60--branch%60%20%D0%B2%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B5%20%60repo%60%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D1%80%D0%BE%D1%81%D0%BC%D0%BE%D1%82%D1%80%D0%B0%20%D0%BA%D0%BE%D0%BD%D0%BA%D1%80%D0%B5%D1%82%D0%BD%D0%BE%D0%B9%20%D0%B2%D0%B5%D1%82%D0%BA%D0%B8.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B2%EF%B8%8F%20C%0A%0A%23%23%23%20Cache%0A%D0%9A%D1%8D%D1%88%20%E2%80%94%20%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%BE%D0%B5%20%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D0%BB%D0%B8%D1%89%D0%B5%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85%20%D0%B4%D0%BB%D1%8F%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D0%BD%D1%8B%D1%85%20%D0%BE%D0%BF%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D0%B9.%20%D0%92%20MIP%3A%20%60SuperCache%60%20(3%20%D1%83%D1%80%D0%BE%D0%B2%D0%BD%D1%8F%3A%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C%2C%20%D0%B4%D0%B8%D1%81%D0%BA%2C%20in-flight)%2C%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BA%D1%8D%D1%88%20%60~%2F.mip%2Fstore%2F%60.%0A%0A%23%23%23%20CI%0A**Continuous%20Integration**%20%E2%80%94%20%D0%BD%D0%B5%D0%BF%D1%80%D0%B5%D1%80%D1%8B%D0%B2%D0%BD%D0%B0%D1%8F%20%D0%B8%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20ci%60%20%D0%BE%D0%BF%D1%82%D0%B8%D0%BC%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0%20%D0%B4%D0%BB%D1%8F%20CI-%D1%81%D1%80%D0%B5%D0%B4.%0A%0A%23%23%23%20CLI%0A**Command%20Line%20Interface**%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%BD%D0%BE%D0%B9%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8.%20MIP%20%E2%80%94%20%D1%8D%D1%82%D0%BE%20CLI-%D0%B8%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82.%0A%0A%23%23%23%20CVSS%0A**Common%20Vulnerability%20Scoring%20System**%20%E2%80%94%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0%20%D0%BE%D1%86%D0%B5%D0%BD%D0%BA%D0%B8%20%D1%83%D1%8F%D0%B7%D0%B2%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9.%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%D1%81%D1%8F%20%D0%B2%20%60mip%20audit%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B3%EF%B8%8F%20D%0A%0A%23%23%23%20Dedupe%0A%D0%94%D0%B5%D0%B4%D1%83%D0%BF%D0%BB%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D1%8F%20%E2%80%94%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B4%D1%83%D0%B1%D0%BB%D0%B8%D1%80%D1%83%D1%8E%D1%89%D0%B8%D1%85%D1%81%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B9%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20dedupe%60.%0A%0A%23%23%23%20Dependency%0A%D0%97%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%20%E2%80%94%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B9%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D0%B5%D1%82%D1%81%D1%8F%20%D0%B4%D1%80%D1%83%D0%B3%D0%BE%D0%BC%D1%83%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%83%20%D0%B4%D0%BB%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B.%0A%0A%23%23%23%20Dependency%20Tree%0A%D0%94%D0%B5%D1%80%D0%B5%D0%B2%D0%BE%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9%20%E2%80%94%20%D0%B3%D1%80%D0%B0%D1%84%20%D0%B2%D1%81%D0%B5%D1%85%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%2C%20%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B0%D1%8F%20%D1%82%D1%80%D0%B0%D0%BD%D0%B7%D0%B8%D1%82%D0%B8%D0%B2%D0%BD%D1%8B%D0%B5.%0A%0A%23%23%23%20Dev%20Dependency%0A%D0%97%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%2C%20%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%B0%D1%8F%20%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE%20%D0%B4%D0%BB%D1%8F%20%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B8%20(%D1%82%D0%B5%D1%81%D1%82%D1%8B%2C%20%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0).%20%D0%A5%D1%80%D0%B0%D0%BD%D0%B8%D1%82%D1%81%D1%8F%20%D0%B2%20%60devDependencies%60%20%D0%B2%20%60mip.yml%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B4%EF%B8%8F%20E%0A%0A%23%23%23%20Exec%0A%D0%92%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%D0%BD%D0%B8%D0%BA%D0%B0%20%D0%B8%D0%B7%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20exec%60.%0A%0A%23%23%23%20Exports%0A%D0%A1%D0%B5%D0%BA%D1%86%D0%B8%D1%8F%20%D0%B2%20%60package.json%60%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%B0%D1%8F%20%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8F%D0%B5%D1%82%20%D0%BF%D1%83%D0%B1%D0%BB%D0%B8%D1%87%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%83%D1%82%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B5%EF%B8%8F%20F%0A%0A%23%23%23%20Fallback%0A%D0%97%D0%B0%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D0%B9%20%D0%B2%D0%B0%D1%80%D0%B8%D0%B0%D0%BD%D1%82.%20%D0%9D%D0%B0%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%2C%20%60LegacyFallback%60%20%D0%B2%20MIP.%0A%0A%23%23%23%20Frozen%20Lockfile%0ALock-%D1%84%D0%B0%D0%B9%D0%BB%20%D0%B2%20%D0%B7%D0%B0%D0%BC%D0%BE%D1%80%D0%BE%D0%B6%D0%B5%D0%BD%D0%BD%D0%BE%D0%BC%20%D1%81%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B8.%20%D0%9F%D1%80%D0%B8%20%60mip%20ci%20--frozen-lockfile%60%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BF%D1%80%D0%B5%D1%80%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%D1%81%D1%8F%2C%20%D0%B5%D1%81%D0%BB%D0%B8%20lock-%D1%84%D0%B0%D0%B9%D0%BB%20%D0%BD%D0%B5%20%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%20%D1%81%20%60mip.yml%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B6%EF%B8%8F%20G%0A%0A%23%23%23%20Global%20Install%0A%D0%93%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%E2%80%94%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%B8%D1%82%D1%81%D1%8F%20%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%B5%D0%BD%20%D0%B8%D0%B7%20%D0%BB%D1%8E%D0%B1%D0%BE%D0%B3%D0%BE%20%D0%BC%D0%B5%D1%81%D1%82%D0%B0.%20%D0%92%20MIP%3A%20%60mip%20global%20install%60.%0A%0A%23%23%23%20Global%20Store%0A%D0%93%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D0%BB%D0%B8%D1%89%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D0%B2%20%60~%2F.mip%2Fstore%2F%60.%20%D0%92%D1%81%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D1%85%D1%80%D0%B0%D0%BD%D1%8F%D1%82%D1%81%D1%8F%20%D0%BE%D0%B4%D0%B8%D0%BD%20%D1%80%D0%B0%D0%B7%20%D0%B8%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D1%8E%D1%82%D1%81%D1%8F%20%D0%B2%D1%81%D0%B5%D0%BC%D0%B8%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0%D0%BC%D0%B8.%0A%0A%23%23%23%20GitHub%20API%0AAPI%20%D0%B4%D0%BB%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20%D1%81%20GitHub.%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%D1%81%D1%8F%20%D0%B2%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B5%20%60repo%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B7%EF%B8%8F%20H%0A%0A%23%23%23%20Hook%0A%D0%A5%D1%83%D0%BA%20%E2%80%94%20%D0%BC%D0%B5%D1%81%D1%82%D0%BE%20%D0%B2%20%D0%BA%D0%BE%D0%B4%D0%B5%2C%20%D0%B3%D0%B4%D0%B5%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D1%8B%20%D0%BC%D0%BE%D0%B3%D1%83%D1%82%20%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D1%82%D1%8C%20%D1%81%D0%B2%D0%BE%D1%8E%20%D0%BB%D0%BE%D0%B3%D0%B8%D0%BA%D1%83.%20%D0%92%20MIP%3A%20%60beforeInstall%60%2C%20%60afterInstall%60%2C%20%60onError%60%20%D0%B8%20%D0%B4%D1%80.%0A%0A%23%23%23%20HTTP%2F2%0A%D0%9F%D1%80%D0%BE%D1%82%D0%BE%D0%BA%D0%BE%D0%BB%20%D0%B4%D0%BB%D1%8F%20%D1%83%D1%81%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B8.%20MIP%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%20HTTP%2F2%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D0%B0%D1%80%D0%B0%D0%BB%D0%BB%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BE%D0%BA%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%0A%0A---%0A%0A%23%23%20%F0%9F%85%B8%EF%B8%8F%20I%0A%0A%23%23%23%20i18n%0A**Internationalization**%20%E2%80%94%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F.%20%D0%92%20MIP%3A%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0%2010%20%D1%8F%D0%B7%D1%8B%D0%BA%D0%BE%D0%B2.%0A%0A%23%23%23%20Integrity%0A%D0%A6%D0%B5%D0%BB%D0%BE%D1%81%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20%D0%92%20%60mip-lock.yml%60%20%D1%85%D1%80%D0%B0%D0%BD%D1%8F%D1%82%D1%81%D1%8F%20SHA256-%D1%85%D0%B5%D1%88%D0%B8%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B8.%0A%0A%23%23%23%20Install%0A%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20install%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%BB%EF%B8%8F%20L%0A%0A%23%23%23%20Legacy%0A%D0%A3%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D0%B9%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82.%20%D0%92%20MIP%3A%20%60mip%20legacy%60%20%D0%B4%D0%BB%D1%8F%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%20%D1%81%20%D0%BD%D0%B8%D0%BC%D0%B8.%0A%0A%23%23%23%20Lockfile%0A%D0%A4%D0%B0%D0%B9%D0%BB%20%D1%81%20%D0%B7%D0%B0%D1%84%D0%B8%D0%BA%D1%81%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%D0%BC%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%20%D0%92%20MIP%3A%20%60mip-lock.yml%60.%0A%0A%23%23%23%20LRU%20Cache%0A%D0%9A%D1%8D%D1%88%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B9%20%D1%83%D0%B4%D0%B0%D0%BB%D1%8F%D0%B5%D1%82%20%D1%81%D1%82%D0%B0%D1%80%D1%8B%D0%B5%20%D1%8D%D0%BB%D0%B5%D0%BC%D0%B5%D0%BD%D1%82%D1%8B%20%D0%BF%D1%80%D0%B8%20%D0%BF%D0%B5%D1%80%D0%B5%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D0%B8.%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%D1%81%D1%8F%20%D0%B2%20%60SuperCache%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%BC%EF%B8%8F%20M%0A%0A%23%23%23%20MIP%0A**MInimal%20Package%20Manager**%20%E2%80%94%20%D0%BC%D0%B8%D0%BD%D0%B8%D0%BC%D0%B0%D0%BB%D0%B8%D1%81%D1%82%D0%B8%D1%87%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%B5%D1%80%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%0A%0A%23%23%23%20MIP%20Cache%0A%D0%9A%D1%8D%D1%88%20MIP%20%E2%80%94%20%D0%BB%D0%B5%D0%B6%D0%B8%D1%82%20%D0%B2%20%60.mip%2Fcache%2F%60%20(%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9)%20%D0%B8%20%60~%2F.mip%2Fstore%2F%60%20(%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9).%0A%0A%23%23%23%20MIP%20Lock%0ALock-%D1%84%D0%B0%D0%B9%D0%BB%20%E2%80%94%20%60mip-lock.yml%60.%0A%0A%23%23%23%20MIP%20Store%0A%D0%93%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5%20%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D0%BB%D0%B8%D1%89%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%E2%80%94%20%60~%2F.mip%2Fstore%2F%60.%0A%0A%23%23%23%20Manifest%0A%D0%9C%D0%B0%D0%BD%D0%B8%D1%84%D0%B5%D1%81%D1%82%20%E2%80%94%20%60.mip%2Fmanifest.json%60%2C%20%D1%85%D1%80%D0%B0%D0%BD%D0%B8%D1%82%20%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BE%D0%B1%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%D1%85.%0A%0A%23%23%23%20Monorepo%0A%D0%9C%D0%BE%D0%BD%D0%BE%D1%80%D0%B5%D0%BF%D0%BE%D0%B7%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B9%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%20%D1%81%20%D0%BD%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%B8%D0%BC%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%D0%BC%D0%B8%20%D0%B2%20%D0%BE%D0%B4%D0%BD%D0%BE%D0%BC%20%D1%80%D0%B5%D0%BF%D0%BE%D0%B7%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B8.%20%D0%92%20MIP%3A%20%60mip%20workspaces%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%BD%EF%B8%8F%20N%0A%0A%23%23%23%20Node.js%0A%D0%A1%D1%80%D0%B5%D0%B4%D0%B0%20%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F%20JavaScript.%20MIP%20%D0%BD%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%20%D0%BD%D0%B0%20Node.js.%0A%0A%23%23%23%20Node%20Modules%0A%D0%9F%D0%B0%D0%BF%D0%BA%D0%B0%20%D1%81%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%D0%BC%D0%B8.%20%D0%92%20MIP%20%D0%B2%D0%BC%D0%B5%D1%81%D1%82%D0%BE%20%60node_modules%60%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D1%8E%D1%82%D1%81%D1%8F%20%D1%81%D0%B8%D0%BC%D0%BB%D0%B8%D0%BD%D0%BA%D0%B8%20%D0%BD%D0%B0%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BA%D1%8D%D1%88.%0A%0A%23%23%23%20npm%0A**Node%20Package%20Manager**%20%E2%80%94%20%D0%BE%D1%80%D0%B8%D0%B3%D0%B8%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BC%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%B5%D1%80%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D0%B4%D0%BB%D1%8F%20Node.js.%0A%0A---%0A%0A%23%23%20%F0%9F%85%BE%EF%B8%8F%20O%0A%0A%23%23%23%20Options%0A%D0%9E%D0%BF%D1%86%D0%B8%D0%B8%20%E2%80%94%20%D1%84%D0%BB%D0%B0%D0%B3%D0%B8%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%BD%D0%BE%D0%B9%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8.%20%D0%9D%D0%B0%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%2C%20%60--save-dev%60%2C%20%60--force%60.%0A%0A%23%23%23%20Outdated%0A%D0%A3%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D0%B9%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20(%D0%B5%D1%81%D1%82%D1%8C%20%D0%BD%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F).%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20outdated%60.%0A%0A---%0A%0A%23%23%20%F0%9F%85%BF%EF%B8%8F%20P%0A%0A%23%23%23%20Package%0A%D0%9F%D0%B0%D0%BA%D0%B5%D1%82%20%E2%80%94%20%D0%B5%D0%B4%D0%B8%D0%BD%D0%B8%D1%86%D0%B0%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BA%D0%BE%D0%B4%D0%B0%20%D0%B2%20MIP.%0A%0A%23%23%23%20Package.json%0A%D0%A4%D0%B0%D0%B9%D0%BB%20%D1%81%20%D0%BC%D0%B5%D1%82%D0%B0%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%BC%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20MIP%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20%D0%B5%D0%B3%D0%BE%20%D0%B4%D0%BB%D1%8F%20%D1%81%D0%BE%D0%B2%D0%BC%D0%B5%D1%81%D1%82%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8%20%D1%81%20npm.%0A%0A%23%23%23%20Parallel%20Download%0A%D0%9F%D0%B0%D1%80%D0%B0%D0%BB%D0%BB%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0%20%E2%80%94%20%D1%81%D0%BA%D0%B0%D1%87%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20%D0%BD%D0%B5%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%B8%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D0%BE%D0%B4%D0%BD%D0%BE%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%BE.%0A%0A%23%23%23%20PATH%0A%D0%9F%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F%20%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F%2C%20%D0%B2%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%BE%D0%B9%20%D0%BF%D0%B5%D1%80%D0%B5%D1%87%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D1%8B%20%D0%BF%D0%B0%D0%BF%D0%BA%D0%B8%20%D1%81%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D0%BC%D1%8B%D0%BC%D0%B8%20%D1%84%D0%B0%D0%B9%D0%BB%D0%B0%D0%BC%D0%B8.%0A%0A%23%23%23%20Peer%20Dependency%0A%D0%97%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%83%D1%8E%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%BE%D0%B6%D0%B8%D0%B4%D0%B0%D0%B5%D1%82%20%D0%BE%D1%82%20%D1%80%D0%BE%D0%B4%D0%B8%D1%82%D0%B5%D0%BB%D1%8F.%20%D0%92%20MIP%3A%20%60PeerResolver%60.%0A%0A%23%23%23%20Plugin%0A%D0%9F%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%20%E2%80%94%20%D1%80%D0%B0%D1%81%D1%88%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20MIP.%0A%0A%23%23%23%20Plugin%20Manager%0A%D0%9C%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%B5%D1%80%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%BE%D0%B2%20%E2%80%94%20%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%BE%D0%B9%20%D0%B8%20%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D0%B5%D0%B9%20%D0%BF%D0%BB%D0%B0%D0%B3%D0%B8%D0%BD%D0%BE%D0%B2.%0A%0A---%0A%0A%23%23%20%F0%9F%86%81%EF%B8%8F%20R%0A%0A%23%23%23%20Registry%0A%D0%A0%D0%B5%D0%B5%D1%81%D1%82%D1%80%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%E2%80%94%20%D0%BD%D0%B0%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%2C%20%60registry.npmjs.org%60.%0A%0A%23%23%23%20Resolved%0AURL%20tarball-%D0%B0%D1%80%D1%85%D0%B8%D0%B2%D0%B0%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%2C%20%D0%B7%D0%B0%D1%84%D0%B8%D0%BA%D1%81%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%20lock-%D1%84%D0%B0%D0%B9%D0%BB%D0%B5.%0A%0A%23%23%23%20Resolver%0A%D0%9A%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B9%20%D1%80%D0%B0%D0%B7%D1%80%D0%B5%D1%88%D0%B0%D0%B5%D1%82%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9.%0A%0A---%0A%0A%23%23%20%F0%9F%86%82%EF%B8%8F%20S%0A%0A%23%23%23%20Semver%0A**Semantic%20Versioning**%20%E2%80%94%20%D1%81%D0%B5%D0%BC%D0%B0%D0%BD%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%BE%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%20(MAJOR.MINOR.PATCH).%0A%0A%23%23%23%20Sidebar%0A%D0%91%D0%BE%D0%BA%D0%BE%D0%B2%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BD%D0%B5%D0%BB%D1%8C%20%D0%B2%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B8.%0A%0A%23%23%23%20SPA%0A**Single%20Page%20Application**%20%E2%80%94%20%D0%BE%D0%B4%D0%BD%D0%BE%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%87%D0%BD%D0%BE%D0%B5%20%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5.%20%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20MIP%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82%20%D0%B2%20SPA-%D1%80%D0%B5%D0%B6%D0%B8%D0%BC%D0%B5.%0A%0A%23%23%23%20Stream%20Extract%0A%D0%9F%D0%BE%D1%82%D0%BE%D0%BA%D0%BE%D0%B2%D0%B0%D1%8F%20%D1%80%D0%B0%D1%81%D0%BF%D0%B0%D0%BA%D0%BE%D0%B2%D0%BA%D0%B0%20%E2%80%94%20%D1%80%D0%B0%D1%81%D0%BF%D0%B0%D0%BA%D0%BE%D0%B2%D0%BA%D0%B0%20tarball%20%D0%B1%D0%B5%D0%B7%20%D1%81%D0%BE%D1%85%D1%80%D0%B0%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BD%D0%B0%20%D0%B4%D0%B8%D1%81%D0%BA.%0A%0A%23%23%23%20Super%20Cache%0A%D0%A2%D1%80%D1%91%D1%85%D1%83%D1%80%D0%BE%D0%B2%D0%BD%D0%B5%D0%B2%D1%8B%D0%B9%20%D0%BA%D1%8D%D1%88%20%D0%B2%20MIP%20(%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C%20%E2%86%92%20%D0%B4%D0%B8%D1%81%D0%BA%20%E2%86%92%20in-flight).%0A%0A%23%23%23%20Symlink%0A%D0%A1%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%20%D1%81%D1%81%D1%8B%D0%BB%D0%BA%D0%B0.%20MIP%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%20%D0%B8%D1%85%20%D0%B4%D0%BB%D1%8F%20%D1%81%D0%B2%D1%8F%D0%B7%D0%B8%20%60node_modules%2F%60%20%D1%81%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%BC%20%D0%BA%D1%8D%D1%88%D0%B5%D0%BC.%0A%0A---%0A%0A%23%23%20%F0%9F%86%83%EF%B8%8F%20T%0A%0A%23%23%23%20Tarball%0A%D0%90%D1%80%D1%85%D0%B8%D0%B2%20%60.tgz%60%20%D1%81%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%BC.%0A%0A%23%23%23%20TUI%0A**Text%20User%20Interface**%20%E2%80%94%20%D1%82%D0%B5%D0%BA%D1%81%D1%82%D0%BE%D0%B2%D1%8B%D0%B9%20%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D1%84%D0%B5%D0%B9%D1%81.%20%D0%9D%D0%B0%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%2C%20%60mip%20repo%60%20%D0%B2%20TUI-%D1%80%D0%B5%D0%B6%D0%B8%D0%BC%D0%B5.%0A%0A---%0A%0A%23%23%20%F0%9F%86%84%EF%B8%8F%20U%0A%0A%23%23%23%20Uninstall%0A%D0%A3%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20uninstall%60.%0A%0A%23%23%23%20Update%0A%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20update%60.%0A%0A---%0A%0A%23%23%20%F0%9F%86%85%EF%B8%8F%20V%0A%0A%23%23%23%20Vulnerability%0A%D0%A3%D1%8F%D0%B7%D0%B2%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C%20%E2%80%94%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B0%20%D0%B2%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B5%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%B0%D1%8F%20%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%20%D0%B1%D1%8B%D1%82%D1%8C%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0%20%D0%B7%D0%BB%D0%BE%D1%83%D0%BC%D1%8B%D1%88%D0%BB%D0%B5%D0%BD%D0%BD%D0%B8%D0%BA%D0%BE%D0%BC.%0A%0A---%0A%0A%23%23%20%F0%9F%86%86%EF%B8%8F%20W%0A%0A%23%23%23%20Workspace%0A%D0%92%D0%BE%D1%80%D0%BA%D1%81%D0%BF%D0%B5%D0%B9%D1%81%20%E2%80%94%20%D0%BE%D1%82%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%B2%20%D0%BC%D0%BE%D0%BD%D0%BE%D1%80%D0%B5%D0%BF%D0%BE%D0%B7%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B8.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20workspaces%60.%0A%0A%23%23%23%20Why%0A%D0%9F%D0%BE%D1%87%D0%B5%D0%BC%D1%83%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%3F%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20why%60.%0A%0A---%0A%0A%23%23%20%E2%9D%93%20%D0%92%D0%BE%D0%BF%D1%80%D0%BE%D1%81%D1%8B%3F%0A%0A%D0%95%D1%81%D0%BB%D0%B8%20%D0%B2%D1%81%D1%82%D1%80%D0%B5%D1%82%D0%B8%D0%BB%D0%B8%20%D1%82%D0%B5%D1%80%D0%BC%D0%B8%D0%BD%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%BE%D0%B3%D0%BE%20%D0%BD%D0%B5%D1%82%20%D0%B2%20%D0%B3%D0%BB%D0%BE%D1%81%D1%81%D0%B0%D1%80%D0%B8%D0%B8%20%E2%80%94%20%5B%D1%81%D0%BE%D0%BE%D0%B1%D1%89%D0%B8%D1%82%D0%B5%5D(https%3A%2F%2Fgithub.com%2Fkiwinatra%2Fmip%2Fissues).%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D0%BC!%20%F0%9F%93%9D%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Прочее</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Глоссарий</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h2 id="ы-title-глоссарий-терминов-mip-description-краткий-словарь-терминов-используемых-в-mip-и-экосистеме-пакетных-менеджеров" class="docmd-heading"><a href="#ы-title-глоссарий-терминов-mip-description-краткий-словарь-терминов-используемых-в-mip-и-экосистеме-пакетных-менеджеров" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>ы—<br>
+title: “Глоссарий терминов MIP”<br>
+description: “Краткий словарь терминов, используемых в MIP и экосистеме пакетных менеджеров.”</h2>
+<h1 id="глоссарий" class="docmd-heading"><a href="#глоссарий" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Глоссарий 📚</h1>
+<p>Собрал основные термины, которые встречаются в MIP и пакетных менеджерах.</p>
+<hr>
+<h2 id="глоссарий-az" class="docmd-heading"><a href="#глоссарий-az" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔤 A–Z</h2>
+<h3 id="глоссарий-az-api" class="docmd-heading"><a href="#глоссарий-az-api" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>API</h3>
+<p><strong>Application Programming Interface</strong> — набор методов, доступных плагинам для взаимодействия с MIP.</p>
+<h3 id="глоссарий-az-audit" class="docmd-heading"><a href="#глоссарий-az-audit" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Audit</h3>
+<p>Проверка безопасности зависимостей. MIP проверяет пакеты на известные уязвимости через npm advisory database.</p>
+<hr>
+<h2 id="глоссарий-b" class="docmd-heading"><a href="#глоссарий-b" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅱️ B</h2>
+<h3 id="глоссарий-b-bin" class="docmd-heading"><a href="#глоссарий-b-bin" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Bin</h3>
+<p>Исполняемые файлы, которые добавляются в <code>PATH</code> при установке пакета. В MIP находятся в <code>~/.mip/store/&lt;name&gt;/&lt;version&gt;/node_modules/.bin/</code>.</p>
+<h3 id="глоссарий-b-branch" class="docmd-heading"><a href="#глоссарий-b-branch" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Branch</h3>
+<p>Ветка в Git. MIP использует <code>--branch</code> в команде <code>repo</code> для просмотра конкретной ветки.</p>
+<hr>
+<h2 id="глоссарий-c" class="docmd-heading"><a href="#глоссарий-c" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅲️ C</h2>
+<h3 id="глоссарий-c-cache" class="docmd-heading"><a href="#глоссарий-c-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Cache</h3>
+<p>Кэш — временное хранилище данных для ускорения повторных операций. В MIP: <code>SuperCache</code> (3 уровня: память, диск, in-flight), глобальный кэш <code>~/.mip/store/</code>.</p>
+<h3 id="глоссарий-c-ci" class="docmd-heading"><a href="#глоссарий-c-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>CI</h3>
+<p><strong>Continuous Integration</strong> — непрерывная интеграция. Команда <code>mip ci</code> оптимизирована для CI-сред.</p>
+<h3 id="глоссарий-c-cli" class="docmd-heading"><a href="#глоссарий-c-cli" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>CLI</h3>
+<p><strong>Command Line Interface</strong> — интерфейс командной строки. MIP — это CLI-инструмент.</p>
+<h3 id="глоссарий-c-cvss" class="docmd-heading"><a href="#глоссарий-c-cvss" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>CVSS</h3>
+<p><strong>Common Vulnerability Scoring System</strong> — система оценки уязвимостей. Используется в <code>mip audit</code>.</p>
+<hr>
+<h2 id="глоссарий-d" class="docmd-heading"><a href="#глоссарий-d" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅳️ D</h2>
+<h3 id="глоссарий-d-dedupe" class="docmd-heading"><a href="#глоссарий-d-dedupe" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Dedupe</h3>
+<p>Дедупликация — удаление дублирующихся версий пакетов. Команда <code>mip dedupe</code>.</p>
+<h3 id="глоссарий-d-dependency" class="docmd-heading"><a href="#глоссарий-d-dependency" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Dependency</h3>
+<p>Зависимость — пакет, который требуется другому пакету для работы.</p>
+<h3 id="глоссарий-d-dependency-tree" class="docmd-heading"><a href="#глоссарий-d-dependency-tree" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Dependency Tree</h3>
+<p>Дерево зависимостей — граф всех зависимостей пакета, включая транзитивные.</p>
+<h3 id="глоссарий-d-dev-dependency" class="docmd-heading"><a href="#глоссарий-d-dev-dependency" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Dev Dependency</h3>
+<p>Зависимость, необходимая только для разработки (тесты, сборка). Хранится в <code>devDependencies</code> в <code>mip.yml</code>.</p>
+<hr>
+<h2 id="глоссарий-e" class="docmd-heading"><a href="#глоссарий-e" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅴️ E</h2>
+<h3 id="глоссарий-e-exec" class="docmd-heading"><a href="#глоссарий-e-exec" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Exec</h3>
+<p>Выполнение бинарника из установленного пакета. Команда <code>mip exec</code>.</p>
+<h3 id="глоссарий-e-exports" class="docmd-heading"><a href="#глоссарий-e-exports" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Exports</h3>
+<p>Секция в <code>package.json</code>, которая определяет публичные пути пакета.</p>
+<hr>
+<h2 id="глоссарий-f" class="docmd-heading"><a href="#глоссарий-f" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅵️ F</h2>
+<h3 id="глоссарий-f-fallback" class="docmd-heading"><a href="#глоссарий-f-fallback" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Fallback</h3>
+<p>Запасной вариант. Например, <code>LegacyFallback</code> в MIP.</p>
+<h3 id="глоссарий-f-frozen-lockfile" class="docmd-heading"><a href="#глоссарий-f-frozen-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Frozen Lockfile</h3>
+<p>Lock-файл в замороженном состоянии. При <code>mip ci --frozen-lockfile</code> установка прерывается, если lock-файл не синхронизирован с <code>mip.yml</code>.</p>
+<hr>
+<h2 id="глоссарий-g" class="docmd-heading"><a href="#глоссарий-g" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅶️ G</h2>
+<h3 id="глоссарий-g-global-install" class="docmd-heading"><a href="#глоссарий-g-global-install" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Global Install</h3>
+<p>Глобальная установка — пакет становится доступен из любого места. В MIP: <code>mip global install</code>.</p>
+<h3 id="глоссарий-g-global-store" class="docmd-heading"><a href="#глоссарий-g-global-store" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Global Store</h3>
+<p>Глобальное хранилище пакетов в <code>~/.mip/store/</code>. Все пакеты хранятся один раз и используются всеми проектами.</p>
+<h3 id="глоссарий-g-github-api" class="docmd-heading"><a href="#глоссарий-g-github-api" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>GitHub API</h3>
+<p>API для работы с GitHub. Используется в команде <code>repo</code>.</p>
+<hr>
+<h2 id="глоссарий-h" class="docmd-heading"><a href="#глоссарий-h" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅷️ H</h2>
+<h3 id="глоссарий-h-hook" class="docmd-heading"><a href="#глоссарий-h-hook" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Hook</h3>
+<p>Хук — место в коде, где плагины могут выполнять свою логику. В MIP: <code>beforeInstall</code>, <code>afterInstall</code>, <code>onError</code> и др.</p>
+<h3 id="глоссарий-h-http2" class="docmd-heading"><a href="#глоссарий-h-http2" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>HTTP/2</h3>
+<p>Протокол для ускорения загрузки. MIP использует HTTP/2 для параллельных загрузок пакетов.</p>
+<hr>
+<h2 id="глоссарий-i" class="docmd-heading"><a href="#глоссарий-i" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅸️ I</h2>
+<h3 id="глоссарий-i-i18n" class="docmd-heading"><a href="#глоссарий-i-i18n" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>i18n</h3>
+<p><strong>Internationalization</strong> — интернационализация. В MIP: поддержка 10 языков.</p>
+<h3 id="глоссарий-i-integrity" class="docmd-heading"><a href="#глоссарий-i-integrity" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Integrity</h3>
+<p>Целостность пакета. В <code>mip-lock.yml</code> хранятся SHA256-хеши для проверки.</p>
+<h3 id="глоссарий-i-install" class="docmd-heading"><a href="#глоссарий-i-install" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Install</h3>
+<p>Установка пакета. Команда <code>mip install</code>.</p>
+<hr>
+<h2 id="глоссарий-l" class="docmd-heading"><a href="#глоссарий-l" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅻️ L</h2>
+<h3 id="глоссарий-l-legacy" class="docmd-heading"><a href="#глоссарий-l-legacy" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Legacy</h3>
+<p>Устаревший пакет. В MIP: <code>mip legacy</code> для работы с ними.</p>
+<h3 id="глоссарий-l-lockfile" class="docmd-heading"><a href="#глоссарий-l-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Lockfile</h3>
+<p>Файл с зафиксированными версиями пакетов. В MIP: <code>mip-lock.yml</code>.</p>
+<h3 id="глоссарий-l-lru-cache" class="docmd-heading"><a href="#глоссарий-l-lru-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>LRU Cache</h3>
+<p>Кэш, который удаляет старые элементы при переполнении. Используется в <code>SuperCache</code>.</p>
+<hr>
+<h2 id="глоссарий-m" class="docmd-heading"><a href="#глоссарий-m" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅼️ M</h2>
+<h3 id="глоссарий-m-mip" class="docmd-heading"><a href="#глоссарий-m-mip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>MIP</h3>
+<p><strong>MInimal Package Manager</strong> — минималистичный менеджер пакетов.</p>
+<h3 id="глоссарий-m-mip-cache" class="docmd-heading"><a href="#глоссарий-m-mip-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>MIP Cache</h3>
+<p>Кэш MIP — лежит в <code>.mip/cache/</code> (локальный) и <code>~/.mip/store/</code> (глобальный).</p>
+<h3 id="глоссарий-m-mip-lock" class="docmd-heading"><a href="#глоссарий-m-mip-lock" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>MIP Lock</h3>
+<p>Lock-файл — <code>mip-lock.yml</code>.</p>
+<h3 id="глоссарий-m-mip-store" class="docmd-heading"><a href="#глоссарий-m-mip-store" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>MIP Store</h3>
+<p>Глобальное хранилище пакетов — <code>~/.mip/store/</code>.</p>
+<h3 id="глоссарий-m-manifest" class="docmd-heading"><a href="#глоссарий-m-manifest" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Manifest</h3>
+<p>Манифест — <code>.mip/manifest.json</code>, хранит информацию об установленных пакетах.</p>
+<h3 id="глоссарий-m-monorepo" class="docmd-heading"><a href="#глоссарий-m-monorepo" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Monorepo</h3>
+<p>Монорепозиторий — проект с несколькими пакетами в одном репозитории. В MIP: <code>mip workspaces</code>.</p>
+<hr>
+<h2 id="глоссарий-n" class="docmd-heading"><a href="#глоссарий-n" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅽️ N</h2>
+<h3 id="глоссарий-n-nodejs" class="docmd-heading"><a href="#глоссарий-n-nodejs" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Node.js</h3>
+<p>Среда выполнения JavaScript. MIP написан на Node.js.</p>
+<h3 id="глоссарий-n-node-modules" class="docmd-heading"><a href="#глоссарий-n-node-modules" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Node Modules</h3>
+<p>Папка с установленными пакетами. В MIP вместо <code>node_modules</code> используются симлинки на глобальный кэш.</p>
+<h3 id="глоссарий-n-npm" class="docmd-heading"><a href="#глоссарий-n-npm" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>npm</h3>
+<p><strong>Node Package Manager</strong> — оригинальный менеджер пакетов для Node.js.</p>
+<hr>
+<h2 id="глоссарий-o" class="docmd-heading"><a href="#глоссарий-o" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅾️ O</h2>
+<h3 id="глоссарий-o-options" class="docmd-heading"><a href="#глоссарий-o-options" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Options</h3>
+<p>Опции — флаги командной строки. Например, <code>--save-dev</code>, <code>--force</code>.</p>
+<h3 id="глоссарий-o-outdated" class="docmd-heading"><a href="#глоссарий-o-outdated" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Outdated</h3>
+<p>Устаревший пакет (есть новая версия). Команда <code>mip outdated</code>.</p>
+<hr>
+<h2 id="глоссарий-p" class="docmd-heading"><a href="#глоссарий-p" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🅿️ P</h2>
+<h3 id="глоссарий-p-package" class="docmd-heading"><a href="#глоссарий-p-package" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Package</h3>
+<p>Пакет — единица распространения кода в MIP.</p>
+<h3 id="глоссарий-p-packagejson" class="docmd-heading"><a href="#глоссарий-p-packagejson" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Package.json</h3>
+<p>Файл с метаданными пакета. MIP поддерживает его для совместимости с npm.</p>
+<h3 id="глоссарий-p-parallel-download" class="docmd-heading"><a href="#глоссарий-p-parallel-download" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Parallel Download</h3>
+<p>Параллельная загрузка — скачивание нескольких пакетов одновременно.</p>
+<h3 id="глоссарий-p-path" class="docmd-heading"><a href="#глоссарий-p-path" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>PATH</h3>
+<p>Переменная окружения, в которой перечислены папки с исполняемыми файлами.</p>
+<h3 id="глоссарий-p-peer-dependency" class="docmd-heading"><a href="#глоссарий-p-peer-dependency" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Peer Dependency</h3>
+<p>Зависимость, которую пакет ожидает от родителя. В MIP: <code>PeerResolver</code>.</p>
+<h3 id="глоссарий-p-plugin" class="docmd-heading"><a href="#глоссарий-p-plugin" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Plugin</h3>
+<p>Плагин — расширение функциональности MIP.</p>
+<h3 id="глоссарий-p-plugin-manager" class="docmd-heading"><a href="#глоссарий-p-plugin-manager" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Plugin Manager</h3>
+<p>Менеджер плагинов — управляет загрузкой и регистрацией плагинов.</p>
+<hr>
+<h2 id="глоссарий-r" class="docmd-heading"><a href="#глоссарий-r" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆁️ R</h2>
+<h3 id="глоссарий-r-registry" class="docmd-heading"><a href="#глоссарий-r-registry" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Registry</h3>
+<p>Реестр пакетов — например, <code>registry.npmjs.org</code>.</p>
+<h3 id="глоссарий-r-resolved" class="docmd-heading"><a href="#глоссарий-r-resolved" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Resolved</h3>
+<p>URL tarball-архива пакета, зафиксированный в lock-файле.</p>
+<h3 id="глоссарий-r-resolver" class="docmd-heading"><a href="#глоссарий-r-resolver" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Resolver</h3>
+<p>Компонент, который разрешает версии зависимостей.</p>
+<hr>
+<h2 id="глоссарий-s" class="docmd-heading"><a href="#глоссарий-s" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆂️ S</h2>
+<h3 id="глоссарий-s-semver" class="docmd-heading"><a href="#глоссарий-s-semver" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Semver</h3>
+<p><strong>Semantic Versioning</strong> — семантическое версионирование (MAJOR.MINOR.PATCH).</p>
+<h3 id="глоссарий-s-sidebar" class="docmd-heading"><a href="#глоссарий-s-sidebar" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Sidebar</h3>
+<p>Боковая панель в документации.</p>
+<h3 id="глоссарий-s-spa" class="docmd-heading"><a href="#глоссарий-s-spa" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>SPA</h3>
+<p><strong>Single Page Application</strong> — одно страничное приложение. Документация MIP работает в SPA-режиме.</p>
+<h3 id="глоссарий-s-stream-extract" class="docmd-heading"><a href="#глоссарий-s-stream-extract" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Stream Extract</h3>
+<p>Потоковая распаковка — распаковка tarball без сохранения на диск.</p>
+<h3 id="глоссарий-s-super-cache" class="docmd-heading"><a href="#глоссарий-s-super-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Super Cache</h3>
+<p>Трёхуровневый кэш в MIP (память → диск → in-flight).</p>
+<h3 id="глоссарий-s-symlink" class="docmd-heading"><a href="#глоссарий-s-symlink" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Symlink</h3>
+<p>Символическая ссылка. MIP использует их для связи <code>node_modules/</code> с глобальным кэшем.</p>
+<hr>
+<h2 id="глоссарий-t" class="docmd-heading"><a href="#глоссарий-t" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆃️ T</h2>
+<h3 id="глоссарий-t-tarball" class="docmd-heading"><a href="#глоссарий-t-tarball" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Tarball</h3>
+<p>Архив <code>.tgz</code> с пакетом.</p>
+<h3 id="глоссарий-t-tui" class="docmd-heading"><a href="#глоссарий-t-tui" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>TUI</h3>
+<p><strong>Text User Interface</strong> — текстовый интерфейс. Например, <code>mip repo</code> в TUI-режиме.</p>
+<hr>
+<h2 id="глоссарий-u" class="docmd-heading"><a href="#глоссарий-u" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆄️ U</h2>
+<h3 id="глоссарий-u-uninstall" class="docmd-heading"><a href="#глоссарий-u-uninstall" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Uninstall</h3>
+<p>Удаление пакета. Команда <code>mip uninstall</code>.</p>
+<h3 id="глоссарий-u-update" class="docmd-heading"><a href="#глоссарий-u-update" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Update</h3>
+<p>Обновление пакетов. Команда <code>mip update</code>.</p>
+<hr>
+<h2 id="глоссарий-v" class="docmd-heading"><a href="#глоссарий-v" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆅️ V</h2>
+<h3 id="глоссарий-v-vulnerability" class="docmd-heading"><a href="#глоссарий-v-vulnerability" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Vulnerability</h3>
+<p>Уязвимость — ошибка в пакете, которая может быть использована злоумышленником.</p>
+<hr>
+<h2 id="глоссарий-w" class="docmd-heading"><a href="#глоссарий-w" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🆆️ W</h2>
+<h3 id="глоссарий-w-workspace" class="docmd-heading"><a href="#глоссарий-w-workspace" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Workspace</h3>
+<p>Воркспейс — отдельный пакет в монорепозитории. Команда <code>mip workspaces</code>.</p>
+<h3 id="глоссарий-w-why" class="docmd-heading"><a href="#глоссарий-w-why" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Why</h3>
+<p>Почему установлен пакет? Команда <code>mip why</code>.</p>
+<hr>
+<h2 id="глоссарий-вопросы" class="docmd-heading"><a href="#глоссарий-вопросы" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>❓ Вопросы?</h2>
+<p>Если встретили термин, которого нет в глоссарии — <a href="https://github.com/kiwinatra/mip/issues">сообщите</a>. Дополним! 📝</p>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../../ru/other/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Обзор
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../../ru/other/faq/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Расширенный FAQ
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-2">
+          <a href="#ы-title-глоссарий-терминов-mip-description-краткий-словарь-терминов-используемых-в-mip-и-экосистеме-пакетных-менеджеров" class="toc-link">ы—
+title: “Глоссарий терминов MIP”
+description: “Краткий словарь терминов, используемых в MIP и экосистеме пакетных менеджеров.”</a>
+        </li>
+      
+        <li class="toc-item toc-level-1">
+          <a href="#глоссарий" class="toc-link">Глоссарий 📚</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-az" class="toc-link">🔤 A–Z</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-az-api" class="toc-link">API</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-az-audit" class="toc-link">Audit</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-b" class="toc-link">🅱️ B</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-b-bin" class="toc-link">Bin</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-b-branch" class="toc-link">Branch</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-c" class="toc-link">🅲️ C</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-c-cache" class="toc-link">Cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-c-ci" class="toc-link">CI</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-c-cli" class="toc-link">CLI</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-c-cvss" class="toc-link">CVSS</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-d" class="toc-link">🅳️ D</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-d-dedupe" class="toc-link">Dedupe</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-d-dependency" class="toc-link">Dependency</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-d-dependency-tree" class="toc-link">Dependency Tree</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-d-dev-dependency" class="toc-link">Dev Dependency</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-e" class="toc-link">🅴️ E</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-e-exec" class="toc-link">Exec</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-e-exports" class="toc-link">Exports</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-f" class="toc-link">🅵️ F</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-f-fallback" class="toc-link">Fallback</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-f-frozen-lockfile" class="toc-link">Frozen Lockfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-g" class="toc-link">🅶️ G</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-g-global-install" class="toc-link">Global Install</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-g-global-store" class="toc-link">Global Store</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-g-github-api" class="toc-link">GitHub API</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-h" class="toc-link">🅷️ H</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-h-hook" class="toc-link">Hook</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-h-http2" class="toc-link">HTTP/2</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-i" class="toc-link">🅸️ I</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-i-i18n" class="toc-link">i18n</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-i-integrity" class="toc-link">Integrity</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-i-install" class="toc-link">Install</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-l" class="toc-link">🅻️ L</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-l-legacy" class="toc-link">Legacy</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-l-lockfile" class="toc-link">Lockfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-l-lru-cache" class="toc-link">LRU Cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-m" class="toc-link">🅼️ M</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-mip" class="toc-link">MIP</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-mip-cache" class="toc-link">MIP Cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-mip-lock" class="toc-link">MIP Lock</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-mip-store" class="toc-link">MIP Store</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-manifest" class="toc-link">Manifest</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-m-monorepo" class="toc-link">Monorepo</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-n" class="toc-link">🅽️ N</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-n-nodejs" class="toc-link">Node.js</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-n-node-modules" class="toc-link">Node Modules</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-n-npm" class="toc-link">npm</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-o" class="toc-link">🅾️ O</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-o-options" class="toc-link">Options</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-o-outdated" class="toc-link">Outdated</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-p" class="toc-link">🅿️ P</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-package" class="toc-link">Package</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-packagejson" class="toc-link">Package.json</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-parallel-download" class="toc-link">Parallel Download</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-path" class="toc-link">PATH</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-peer-dependency" class="toc-link">Peer Dependency</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-plugin" class="toc-link">Plugin</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-p-plugin-manager" class="toc-link">Plugin Manager</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-r" class="toc-link">🆁️ R</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-r-registry" class="toc-link">Registry</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-r-resolved" class="toc-link">Resolved</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-r-resolver" class="toc-link">Resolver</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-s" class="toc-link">🆂️ S</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-semver" class="toc-link">Semver</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-sidebar" class="toc-link">Sidebar</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-spa" class="toc-link">SPA</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-stream-extract" class="toc-link">Stream Extract</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-super-cache" class="toc-link">Super Cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-s-symlink" class="toc-link">Symlink</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-t" class="toc-link">🆃️ T</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-t-tarball" class="toc-link">Tarball</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-t-tui" class="toc-link">TUI</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-u" class="toc-link">🆄️ U</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-u-uninstall" class="toc-link">Uninstall</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-u-update" class="toc-link">Update</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-v" class="toc-link">🆅️ V</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-v-vulnerability" class="toc-link">Vulnerability</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-w" class="toc-link">🆆️ W</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-w-workspace" class="toc-link">Workspace</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#глоссарий-w-why" class="toc-link">Why</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#глоссарий-вопросы" class="toc-link">❓ Вопросы?</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

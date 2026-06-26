@@ -1,6 +1,6 @@
 {
   "name": "mip",
-  "version": "1.1.5",
+  "version": "2.0",
   "description": "just because npm sucks",
   "main": "bin/mip.js",
   "bin": {
@@ -17,25 +17,49 @@
     "build:windows": "node scripts/build-windows.js",
     "build:all": "npm run build:linux:x64 && npm run build:linux:x86 && npm run build:macos && npm run build:windows",
     "lint": "eslint bin/ lib/",
-    "format": "prettier --write \"**/*.js\""
+    "format": "prettier --write \"**/*.js\"",
+    "docs:en": "cd docs/docmd_EN && npm run dev",
+    "docs:ru": "cd docs/docmd_RU && npm run dev"
   },
   "dependencies": {
     "axios": "^1.16.1",
     "blessed": "^0.1.81",
+    "js-yaml": "^5.1.0",
     "lru-cache": "^10.1.0",
     "semver": "^7.8.0",
     "tar": "^7.5.15"
   },
   "devDependencies": {
+    "@docmd/core": "^0.8.7",
     "chai": "^6.2.2",
+    "eslint": "^8.57.0",
+    "globals": "^17.7.0",
     "mocha": "^11.7.6",
     "nock": "^14.0.15",
     "pkg": "^5.8.0",
-    "sinon": "^22.0.0"
+    "prettier": "^3.8.4",
+    "sinon": "^22.0.0",
+    "sonar-scanner": "^3.1.0",
+    "sonarjs": "^1.0.0"
   },
   "pkg": {
     "assets": [
       "lib/i18n/locales/*.json"
-    ]
+    ],
+    "scripts": [
+      "lib/**/*.js",
+      "bin/**/*.js"
+    ],
+    "public": true,
+    "public-packages": "*",
+    "targets": [
+      "node18-linux-x64",
+      "node18-linux-x86",
+      "node18-macos-x64",
+      "node18-macos-arm64",
+      "node18-win-x64",
+      "node18-win-x86"
+    ],
+    "outputPath": "dist"
   }
 }

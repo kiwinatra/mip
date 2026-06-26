@@ -1,0 +1,2225 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/ru/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "ru";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      mip outdated — проверка устаревших пакетов : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Команда outdated сравнивает установленные версии пакетов с последними версиями в реестре и показывает, какие пакеты требуют обновления.">
+<link rel="canonical" href="https://mip.fwh.is/ru/commands/outdated/">
+<meta property="og:title" content="mip outdated — проверка устаревших пакетов - MIP - Modern Package Manager">
+<meta property="og:description" content="Команда outdated сравнивает установленные версии пакетов с последними версиями в реестре и показывает, какие пакеты требуют обновления.">
+<meta property="og:url" content="https://mip.fwh.is/ru/commands/outdated/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="mip outdated — проверка устаревших пакетов - MIP - Modern Package Manager">
+<meta name="twitter:description" content="Команда outdated сравнивает установленные версии пакетов с последними версиями в реестре и показывает, какие пакеты требуют обновления.">
+
+
+
+<link rel="stylesheet" href="../../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/commands/outdated/">
+<link rel="alternate" hreflang="en" href="/commands/outdated/">
+<link rel="alternate" hreflang="x-default" href="/commands/outdated/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/ru/commands/outdated.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/commands/outdated" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/commands/outdated" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Введение
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добро пожаловать
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрые Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Команды
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../../ru/commands/outdated/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commandsn/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Настройка
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Создание проекта
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрый старт
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Конфигурация
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Для профи
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Производительность
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Разработчикам
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Главное
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Архитектурой
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добавление команд
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Тестирование
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Все о плагинах
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Хуки и плагины
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Решение проблем
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Общий список
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/installation/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Ошибки установки
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Сеть и регистры
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock-файлы
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Прочее
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Глоссарий
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Расширенный FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  mip outdated — проверка устаревших пакетов
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22mip%20outdated%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%22%0Adescription%3A%20%22%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20outdated%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D1%81%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%BC%D0%B8%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%D0%BC%D0%B8%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5%20%D0%B8%20%D0%BF%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%2C%20%D0%BA%D0%B0%D0%BA%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D1%82%D1%80%D0%B5%D0%B1%D1%83%D1%8E%D1%82%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F.%22%0A---%0A%0A%23%20mip%20outdated%0A%0A%3A%3A%3A%20callout%20info%20%22%D0%A7%D1%82%D0%BE%20%D1%8D%D1%82%D0%BE%3F%22%20icon%3Aclock%0A%60mip%20outdated%60%20%E2%80%94%20%D1%8D%D1%82%D0%BE%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B8%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D0%B2%20%D0%B2%D0%B0%D1%88%D0%B5%D0%BC%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B5.%20%D0%9E%D0%BD%D0%B0%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%2C%20%D1%83%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%B2%20%60mip.yml%60%2C%20%D1%81%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%BC%D0%B8%20%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D1%8B%D0%BC%D0%B8%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%D0%BC%D0%B8%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5%20npm.%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D0%BF%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%2C%20%D0%BA%D0%B0%D0%BA%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D0%BC%D0%BE%D0%B6%D0%BD%D0%BE%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%B8%D1%82%D1%8C%2C%20%D0%B8%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B8%D1%82%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%20%D0%B2%20%D1%83%D0%B4%D0%BE%D0%B1%D0%BD%D0%BE%D0%B9%20%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B5%20%D0%B8%D0%BB%D0%B8%20%D0%B2%20JSON%20%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8.%0A%3A%3A%3A%0A%0A%23%23%20%D0%A1%D0%B8%D0%BD%D1%82%D0%B0%D0%BA%D1%81%D0%B8%D1%81%0A%0A%60%60%60bash%0Amip%20outdated%20%5B--json%5D%0A%60%60%60%0A%0A%23%23%20%D0%9E%D0%BF%D1%86%D0%B8%D0%B8%0A%0A%7C%20%D0%A4%D0%BB%D0%B0%D0%B3%20%7C%20%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5%20%7C%0A%7C------%7C----------%7C%0A%7C%20%60--json%60%20%7C%20%D0%92%D1%8B%D0%B2%D0%BE%D0%B4%D0%B8%D1%82%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%20%D0%B2%20%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B5%20JSON%20(%D1%83%D0%B4%D0%BE%D0%B1%D0%BD%D0%BE%20%D0%B4%D0%BB%D1%8F%20CI%2FCD%20%D0%B8%20%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D0%BE%D0%B2)%20%7C%0A%0A%23%23%20%D0%9B%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B%0A%0A1.%20**%D0%A7%D1%82%D0%B5%D0%BD%D0%B8%D0%B5%20%60mip.yml%60**%20%E2%80%94%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D0%B7%D0%B0%D0%B3%D1%80%D1%83%D0%B6%D0%B0%D0%B5%D1%82%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8%20%D0%B8%D0%B7%20%60dependencies%60%20%D0%B8%20%60devDependencies%60.%0A%0A2.%20**%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%B0%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8**%20%E2%80%94%20%D0%B4%D0%BB%D1%8F%20%D0%BA%D0%B0%D0%B6%D0%B4%D0%BE%D0%B3%D0%BE%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%20%D0%B2%D1%8B%D0%BF%D0%BE%D0%BB%D0%BD%D1%8F%D0%B5%D1%82%D1%81%D1%8F%20%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%20%D0%BA%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D1%83%20npm%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B5%D0%B9%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8.%0A%0A3.%20**%D0%A1%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B9**%20%E2%80%94%20%D0%B5%D1%81%D0%BB%D0%B8%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20%D0%B8%D0%B7%20%60mip.yml%60%20%D0%BE%D1%82%D0%BB%D0%B8%D1%87%D0%B0%D0%B5%D1%82%D1%81%D1%8F%20%D0%BE%D1%82%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B5%D0%B9%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5%2C%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D1%81%D1%87%D0%B8%D1%82%D0%B0%D0%B5%D1%82%D1%81%D1%8F%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D0%BC.%0A%0A4.%20**%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BA%D1%8D%D1%88%D0%B0**%20%E2%80%94%20%D0%BF%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%2C%20%D0%B5%D1%81%D1%82%D1%8C%20%D0%BB%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%B2%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%BC%20%D0%BA%D1%8D%D1%88%D0%B5%20(%60%F0%9F%8C%8D%60)%20%D0%B8%D0%BB%D0%B8%20%D0%B5%D0%B3%D0%BE%20%D0%BD%D1%83%D0%B6%D0%BD%D0%BE%20%D1%81%D0%BA%D0%B0%D1%87%D0%B0%D1%82%D1%8C%20(%60%F0%9F%93%A1%60).%0A%0A5.%20**%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%BC%D0%B0%D0%BD%D0%B8%D1%84%D0%B5%D1%81%D1%82%D0%B0**%20%E2%80%94%20%D0%BF%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%2C%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%20%D0%BB%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%B2%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B5%20(%60%F0%9F%93%8B%60)%20%D0%B8%D0%BB%D0%B8%20%D0%BD%D0%B5%D1%82%20(%60%E2%9D%8C%60).%0A%0A6.%20**%D0%92%D1%8B%D0%B2%D0%BE%D0%B4%20%D1%80%D0%B5%D0%B7%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%82%D0%B0**%3A%0A%20%20%20-%20**%D0%9E%D0%B1%D1%8B%D1%87%D0%BD%D1%8B%D0%B9%20%D1%80%D0%B5%D0%B6%D0%B8%D0%BC**%20%E2%80%94%20%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B0%20%D1%81%20%D0%BA%D0%BE%D0%BB%D0%BE%D0%BD%D0%BA%D0%B0%D0%BC%D0%B8%3A%20%60Package%60%2C%20%60Current%60%2C%20%60Latest%60%2C%20%60Store%60%2C%20%60Manifest%60.%0A%20%20%20-%20**JSON%20%D1%80%D0%B5%D0%B6%D0%B8%D0%BC**%20(%60--json%60)%20%E2%80%94%20%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%20%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8.%0A%0A7.%20**%D0%9A%D0%BE%D0%B4%20%D0%B2%D0%BE%D0%B7%D0%B2%D1%80%D0%B0%D1%82%D0%B0**%20%E2%80%94%20%D0%B2%20JSON%20%D1%80%D0%B5%D0%B6%D0%B8%D0%BC%D0%B5%20%D0%B2%D0%BE%D0%B7%D0%B2%D1%80%D0%B0%D1%89%D0%B0%D0%B5%D1%82%20%D0%BA%D0%BE%D0%B4%20%601%60%2C%20%D0%B5%D1%81%D0%BB%D0%B8%20%D0%B5%D1%81%D1%82%D1%8C%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20(%D1%83%D0%B4%D0%BE%D0%B1%D0%BD%D0%BE%20%D0%B4%D0%BB%D1%8F%20CI).%0A%0A%23%23%20%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B%0A%0A%3A%3A%3A%20tabs%0A%3D%3D%20tab%20%22%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%22%0A%60%60%60bash%0Amip%20outdated%0A%60%60%60%0A%0A**%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0%3A**%0A%60%60%60%0A%F0%9F%94%8D%20Checking%20for%20outdated%20packages...%0A%0A%E2%94%8C%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%90%0A%E2%94%82%20Package%20%20%20%20%20%20%20%20%20%20%20%20%20%E2%94%82%20Current%20%20%20%20%20%20%E2%94%82%20Latest%20%20%20%20%20%20%20%E2%94%82%20Store%20%20%20%20%20%20%E2%94%82%20Manifest%20%20%20%E2%94%82%0A%E2%94%9C%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%A4%0A%E2%94%82%20%E2%9A%A0%EF%B8%8F%20lodash%20%20%20%20%20%20%20%20%20%20%20%E2%94%82%204.17.19%20%20%20%20%20%20%E2%94%82%204.17.21%20%20%20%20%20%20%E2%94%82%20%F0%9F%8C%8D%20%20%20%20%20%20%20%20%20%E2%94%82%20%F0%9F%93%8B%20%20%20%20%20%20%20%20%20%E2%94%82%0A%E2%94%82%20%E2%9A%A0%EF%B8%8F%20express%20%20%20%20%20%20%20%20%20%20%E2%94%82%204.17.1%20%20%20%20%20%20%20%E2%94%82%204.18.2%20%20%20%20%20%20%20%E2%94%82%20%F0%9F%93%A1%20%20%20%20%20%20%20%20%20%E2%94%82%20%E2%9D%8C%20%20%20%20%20%20%20%20%20%E2%94%82%0A%E2%94%94%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%98%0A%0A%F0%9F%93%8A%202%20package(s)%20outdated%20out%20of%203%0A%0A%F0%9F%92%A1%20Run%20%22mip%20update%22%20to%20update%20all%20packages%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22%D0%92%D1%81%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D0%B0%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%22%0A%60%60%60bash%0Amip%20outdated%0A%60%60%60%0A%0A**%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0%3A**%0A%60%60%60%0A%F0%9F%94%8D%20Checking%20for%20outdated%20packages...%0A%0A%E2%94%8C%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%AC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%90%0A%E2%94%82%20Package%20%20%20%20%20%20%20%20%20%20%20%20%20%E2%94%82%20Current%20%20%20%20%20%20%E2%94%82%20Latest%20%20%20%20%20%20%20%E2%94%82%20Store%20%20%20%20%20%20%E2%94%82%20Manifest%20%20%20%E2%94%82%0A%E2%94%9C%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%BC%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%A4%0A%E2%94%82%20%E2%9C%85%20lodash%20%20%20%20%20%20%20%20%20%20%20%E2%94%82%204.17.21%20%20%20%20%20%20%E2%94%82%204.17.21%20%20%20%20%20%20%E2%94%82%20%F0%9F%8C%8D%20%20%20%20%20%20%20%20%20%E2%94%82%20%F0%9F%93%8B%20%20%20%20%20%20%20%20%20%E2%94%82%0A%E2%94%82%20%E2%9C%85%20express%20%20%20%20%20%20%20%20%20%20%E2%94%82%204.18.2%20%20%20%20%20%20%20%E2%94%82%204.18.2%20%20%20%20%20%20%20%E2%94%82%20%F0%9F%8C%8D%20%20%20%20%20%20%20%20%20%E2%94%82%20%F0%9F%93%8B%20%20%20%20%20%20%20%20%20%E2%94%82%0A%E2%94%94%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%B4%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%98%0A%0A%F0%9F%93%8A%200%20package(s)%20outdated%20out%20of%202%0A%60%60%60%0A%3A%3A%3A%0A%3D%3D%20tab%20%22JSON%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%20%D0%B4%D0%BB%D1%8F%20CI%2FCD%22%0A%60%60%60bash%0Amip%20outdated%20--json%0A%60%60%60%0A%0A**%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0%3A**%0A%60%60%60json%0A%7B%0A%20%20%22packages%22%3A%20%5B%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22name%22%3A%20%22lodash%22%2C%0A%20%20%20%20%20%20%22current%22%3A%20%224.17.19%22%2C%0A%20%20%20%20%20%20%22latest%22%3A%20%224.17.21%22%2C%0A%20%20%20%20%20%20%22outdated%22%3A%20true%2C%0A%20%20%20%20%20%20%22cached%22%3A%20true%2C%0A%20%20%20%20%20%20%22inManifest%22%3A%20true%0A%20%20%20%20%7D%2C%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%22name%22%3A%20%22express%22%2C%0A%20%20%20%20%20%20%22current%22%3A%20%224.17.1%22%2C%0A%20%20%20%20%20%20%22latest%22%3A%20%224.18.2%22%2C%0A%20%20%20%20%20%20%22outdated%22%3A%20true%2C%0A%20%20%20%20%20%20%22cached%22%3A%20false%2C%0A%20%20%20%20%20%20%22inManifest%22%3A%20false%0A%20%20%20%20%7D%0A%20%20%5D%0A%7D%0A%60%60%60%0A%3A%3A%3A%0A%0A%23%23%20%D0%9F%D0%BE%D1%8F%D1%81%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BA%20%D0%BA%D0%BE%D0%BB%D0%BE%D0%BD%D0%BA%D0%B0%D0%BC%0A%0A%7C%20%D0%9A%D0%BE%D0%BB%D0%BE%D0%BD%D0%BA%D0%B0%20%7C%20%D0%97%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%7C%0A%7C---------%7C----------%7C%0A%7C%20%60Package%60%20%7C%20%D0%98%D0%BC%D1%8F%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%20%7C%0A%7C%20%60Current%60%20%7C%20%D0%A2%D0%B5%D0%BA%D1%83%D1%89%D0%B0%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20%D0%B2%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B5%20%7C%0A%7C%20%60Latest%60%20%7C%20%D0%9F%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D1%8F%D1%8F%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5%20%7C%0A%7C%20%60Store%60%20%7C%20%F0%9F%8C%8D%20%E2%80%94%20%D0%B5%D1%81%D1%82%D1%8C%20%D0%B2%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%BC%20%D0%BA%D1%8D%D1%88%D0%B5%2C%20%F0%9F%93%A1%20%E2%80%94%20%D0%B1%D1%83%D0%B4%D0%B5%D1%82%20%D1%81%D0%BA%D0%B0%D1%87%D0%B0%D0%BD%20%7C%0A%7C%20%60Manifest%60%20%7C%20%F0%9F%93%8B%20%E2%80%94%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%20%D0%B2%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B5%2C%20%E2%9D%8C%20%E2%80%94%20%D0%BE%D1%82%D1%81%D1%83%D1%82%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82%20%7C%0A%0A%23%23%20%D0%A2%D0%B8%D0%BF%D0%B8%D1%87%D0%BD%D1%8B%D0%B5%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%B8%0A%0A%3A%3A%3A%20callout%20warning%20%22%E2%9D%8C%20No%20mip.yml%20found%22%20icon%3Aalert-triangle%0A**%D0%9F%D1%80%D0%B8%D1%87%D0%B8%D0%BD%D0%B0%3A**%20%D0%92%D1%8B%20%D0%BD%D0%B0%D1%85%D0%BE%D0%B4%D0%B8%D1%82%D0%B5%D1%81%D1%8C%20%D0%BD%D0%B5%20%D0%B2%20%D0%BA%D0%BE%D1%80%D0%BD%D0%B5%20MIP-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0.%0A%0A**%D0%A0%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5%3A**%0A1.%20%D0%9F%D0%B5%D1%80%D0%B5%D0%B9%D0%B4%D0%B8%D1%82%D0%B5%20%D0%B2%20%D0%BF%D0%B0%D0%BF%D0%BA%D1%83%20%D1%81%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%BE%D0%BC%3A%20%60cd%20%2Fpath%2Fto%2Fproject%60%0A2.%20%D0%A3%D0%B1%D0%B5%D0%B4%D0%B8%D1%82%D0%B5%D1%81%D1%8C%2C%20%D1%87%D1%82%D0%BE%20%D1%82%D0%B0%D0%BC%20%D0%B5%D1%81%D1%82%D1%8C%20%60mip.yml%60.%0A3.%20%D0%95%D1%81%D0%BB%D0%B8%20%D0%BD%D0%B5%D1%82%20%E2%80%94%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%B9%D1%82%D0%B5%20%D0%B5%D0%B3%D0%BE%3A%20%60mip%20init%60%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20warning%20%22%E2%9D%8C%20Package%20not%20found%20in%20registry%22%20icon%3Aalert-circle%0A**%D0%9F%D1%80%D0%B8%D1%87%D0%B8%D0%BD%D0%B0%3A**%20%D0%9F%D0%B0%D0%BA%D0%B5%D1%82%20%D0%BD%D0%B5%20%D0%BD%D0%B0%D0%B9%D0%B4%D0%B5%D0%BD%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5%20npm%20(%D0%B2%D0%BE%D0%B7%D0%BC%D0%BE%D0%B6%D0%BD%D0%BE%2C%20%D0%BE%D0%BF%D0%B5%D1%87%D0%B0%D1%82%D0%BA%D0%B0%20%D0%B8%D0%BB%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D1%83%D0%B4%D0%B0%D0%BB%D1%91%D0%BD).%0A%0A**%D0%A0%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5%3A**%0A1.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8C%D1%82%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B8%D0%BC%D0%B5%D0%BD%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0%20%D0%B2%20%60mip.yml%60.%0A2.%20%D0%A3%D0%B1%D0%B5%D0%B4%D0%B8%D1%82%D0%B5%D1%81%D1%8C%2C%20%D1%87%D1%82%D0%BE%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D1%81%D1%83%D1%89%D0%B5%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82%20%D0%B2%20%D1%80%D0%B5%D0%B5%D1%81%D1%82%D1%80%D0%B5.%0A3.%20%D0%98%D1%81%D0%BF%D1%80%D0%B0%D0%B2%D1%8C%D1%82%D0%B5%20%D0%B8%D0%BC%D1%8F%20%D0%B8%20%D0%BF%D0%BE%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D1%82%D0%B5%20%D0%BF%D0%BE%D0%BF%D1%8B%D1%82%D0%BA%D1%83.%0A%3A%3A%3A%0A%0A%3A%3A%3A%20callout%20tip%20%22%F0%9F%92%A1%20%D0%A1%D0%BE%D0%B2%D0%B5%D1%82%22%20icon%3Alightbulb%0A%60mip%20outdated%60%20%E2%80%94%20%D1%8D%D1%82%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B2%D1%8B%D0%B9%20%D1%88%D0%B0%D0%B3%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%D0%BC%3A%0A1.%20%D0%97%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D0%B5%20%60mip%20outdated%60%2C%20%D1%87%D1%82%D0%BE%D0%B1%D1%8B%20%D1%83%D0%B2%D0%B8%D0%B4%D0%B5%D1%82%D1%8C%2C%20%D1%87%D1%82%D0%BE%20%D0%BD%D1%83%D0%B6%D0%BD%D0%BE%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%B8%D1%82%D1%8C.%0A2.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8C%D1%82%D0%B5%2C%20%D0%BA%D0%B0%D0%BA%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D0%B8%D0%BC%D0%B5%D1%8E%D1%82%20%D0%BA%D1%80%D0%B8%D1%82%D0%B8%D1%87%D0%BD%D1%8B%D0%B5%20%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F.%0A3.%20%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%B8%D1%82%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%3A%20%60mip%20update%60%20%D0%B8%D0%BB%D0%B8%20%60mip%20update%20%3Cpackage%3E%60.%0A%0A**%D0%92%20CI%2FCD%3A**%0A%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B9%D1%82%D0%B5%20%60mip%20outdated%20--json%60%20%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B9%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B8%20%D0%B8%20%D0%BE%D1%82%D0%BF%D1%80%D0%B0%D0%B2%D0%BA%D0%B8%20%D1%83%D0%B2%D0%B5%D0%B4%D0%BE%D0%BC%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9%20%D0%B2%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%83.%0A%3A%3A%3A%0A%0A%23%23%20%D0%A1%D0%B2%D1%8F%D0%B7%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B%0A%0A-%20%5Bmip%20update%5D(%2Fru%2Fcommands%2Fupdate)%20%E2%80%94%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%20%D0%B4%D0%BE%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D1%85%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B9.%0A-%20%5Bmip%20install%5D(%2Fru%2Fcommands%2Finstall)%20%E2%80%94%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%0A-%20%5Bmip%20audit%5D(%2Fru%2Fcommands%2Faudit)%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%0A-%20%5Bmip%20list%5D(%2Fru%2Fcommands%2Flist)%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D1%81%D0%BC%D0%BE%D1%82%D1%80%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2.%0A%0A%3A%3A%3A%20collapsible%20%22%F0%9F%A7%A0%20%D0%9A%D0%B0%D0%BA%20%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D0%B5%D1%82%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B9%3F%22%0AMIP%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%20**%D1%81%D0%B5%D0%BC%D0%B0%D0%BD%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%BE%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5**%20%D0%B4%D0%BB%D1%8F%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F%3A%0A%0A1.%20**%D0%A2%D0%BE%D1%87%D0%BD%D0%BE%D0%B5%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5**%20%E2%80%94%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D0%B2%D0%B0%D1%8E%D1%82%D1%81%D1%8F%20%D0%BA%D0%B0%D0%BA%20%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8%20(%D0%B5%D1%81%D0%BB%D0%B8%20%60current%60%20%3D%3D%3D%20%60latest%60%2C%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%B0%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D0%B5%D0%BD).%0A%0A2.%20**%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B%3A**%0A%20%20%20-%20%604.17.19%60%20vs%20%604.17.21%60%20%E2%86%92%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%BB.%0A%20%20%20-%20%604.17.21%60%20vs%20%604.17.21%60%20%E2%86%92%20%D0%B0%D0%BA%D1%82%D1%83%D0%B0%D0%BB%D0%B5%D0%BD.%0A%20%20%20-%20%60%5E4.17.0%60%20vs%20%604.18.0%60%20%E2%86%92%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%BB%20(%D0%B5%D1%81%D0%BB%D0%B8%20%D0%B4%D0%B8%D0%B0%D0%BF%D0%B0%D0%B7%D0%BE%D0%BD%20%D0%BD%D0%B5%20%D0%B2%D0%BA%D0%BB%D1%8E%D1%87%D0%B0%D0%B5%D1%82%20%D0%BD%D0%BE%D0%B2%D1%83%D1%8E%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8E).%0A%0A3.%20**%D0%92%D0%B0%D0%B6%D0%BD%D0%BE%3A**%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20**%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B5%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D0%B8**%2C%20%D0%B0%20%D0%BD%D0%B5%20%D0%B4%D0%B8%D0%B0%D0%BF%D0%B0%D0%B7%D0%BE%D0%BD%D1%8B.%20%D0%95%D1%81%D0%BB%D0%B8%20%D0%B2%20%60mip.yml%60%20%D1%83%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%20%D0%B4%D0%B8%D0%B0%D0%BF%D0%B0%D0%B7%D0%BE%D0%BD%2C%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D0%BF%D0%BE%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D1%82%20%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8E%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%B0%D1%8F%20%D1%84%D0%B0%D0%BA%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B0%20(%D0%B8%D0%B7%20lock-%D1%84%D0%B0%D0%B9%D0%BB%D0%B0%20%D0%B8%D0%BB%D0%B8%20%D0%B8%D0%B7%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BA%D1%8D%D1%88%D0%B0).%0A%0A**%D0%A4%D0%BB%D0%B0%D0%B3%20%60--json%60%3A**%0A%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B9%D1%82%D0%B5%20%D0%B4%D0%BB%D1%8F%3A%0A-%20%D0%90%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85%20%D1%83%D0%B2%D0%B5%D0%B4%D0%BE%D0%BC%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9%20%D0%B2%20%D1%87%D0%B0%D1%82%D0%B0%D1%85.%0A-%20%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D0%B8%20%D1%81%20CI%2FCD%20%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%D0%B0%D0%BC%D0%B8.%0A-%20%D0%A1%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%BE%D1%82%D1%87%D1%91%D1%82%D0%BE%D0%B2%20%D0%BE%20%D1%81%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B8%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9.%0A%3A%3A%3A%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Команды</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>outdated</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="mip-outdated" class="docmd-heading"><a href="#mip-outdated" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>mip outdated</h1>
+<div class="docmd-container callout callout-info"><div class="callout-title">
+<svg class="lucide-icon icon-clock callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+Что это?</div><div class="callout-content">
+<p><code>mip outdated</code> — это команда для проверки устаревших пакетов в вашем проекте. Она сравнивает версии пакетов, указанные в <code>mip.yml</code>, с последними доступными версиями в реестре npm. Команда показывает, какие пакеты можно обновить, и выводит результат в удобной таблице или в JSON для автоматизации.</p>
+</div></div>
+<h2 id="mip-outdated-синтаксис" class="docmd-heading"><a href="#mip-outdated-синтаксис" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Синтаксис</h2>
+<pre class="hljs"><code class="language-bash">mip outdated [<span class="hljs-punctuation">--</span>json]
+</code></pre>
+<h2 id="mip-outdated-опции" class="docmd-heading"><a href="#mip-outdated-опции" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Опции</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Флаг</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--json</code></td>
+<td>Выводит результат в формате JSON (удобно для CI/CD и скриптов)</td>
+</tr>
+</tbody>
+</table>
+</div><h2 id="mip-outdated-логика-работы" class="docmd-heading"><a href="#mip-outdated-логика-работы" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Логика работы</h2>
+<ol>
+<li><p><strong>Чтение <code>mip.yml</code></strong> — команда загружает зависимости из <code>dependencies</code> и <code>devDependencies</code>.</p>
+</li>
+<li><p><strong>Проверка актуальности</strong> — для каждого пакета выполняется запрос к реестру npm для получения последней версии.</p>
+</li>
+<li><p><strong>Сравнение версий</strong> — если версия из <code>mip.yml</code> отличается от последней в реестре, пакет считается устаревшим.</p>
+</li>
+<li><p><strong>Проверка глобального кэша</strong> — показывает, есть ли пакет в глобальном кэше (<code>🌍</code>) или его нужно скачать (<code>📡</code>).</p>
+</li>
+<li><p><strong>Проверка манифеста</strong> — показывает, установлен ли пакет в проекте (<code>📋</code>) или нет (<code>❌</code>).</p>
+</li>
+<li><p><strong>Вывод результата</strong>:</p>
+<ul>
+<li><strong>Обычный режим</strong> — таблица с колонками: <code>Package</code>, <code>Current</code>, <code>Latest</code>, <code>Store</code>, <code>Manifest</code>.</li>
+<li><strong>JSON режим</strong> (<code>--json</code>) — структурированный вывод для автоматизации.</li>
+</ul>
+</li>
+<li><p><strong>Код возврата</strong> — в JSON режиме возвращает код <code>1</code>, если есть устаревшие пакеты (удобно для CI).</p>
+</li>
+</ol>
+<h2 id="mip-outdated-примеры" class="docmd-heading"><a href="#mip-outdated-примеры" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Примеры</h2>
+<div class="docmd-tabs">
+<div class="docmd-tabs-nav"><div class="docmd-tabs-nav-item active"><span>Проверка устаревших пакетов</span></div></div><div class="docmd-tabs-content"><div class="docmd-tab-pane active"><pre class="hljs"><code class="language-bash">mip outdated
+</code></pre>
+<p><strong>Пример вывода:</strong></p>
+<pre class="hljs"><code>🔍 Checking <span class="hljs-keyword">for</span> outdated packages...
+
+┌─────────────────────┬──────────────┬──────────────┬────────────┬────────────┐
+│ Package             │ Current      │ Latest       │ Store      │ Manifest   │
+├─────────────────────┼──────────────┼──────────────┼────────────┼────────────┤
+│ ⚠️ lodash           │ <span class="hljs-number">4.17</span>.<span class="hljs-number">19</span>      │ <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>      │ 🌍         │ 📋         │
+│ ⚠️ express          │ <span class="hljs-number">4.17</span>.<span class="hljs-number">1</span>       │ <span class="hljs-number">4.18</span>.<span class="hljs-number">2</span>       │ 📡         │ ❌         │
+└─────────────────────┴──────────────┴──────────────┴────────────┴────────────┘
+
+📊 <span class="hljs-number">2</span> <span class="hljs-title function_">package</span>(s) outdated out <span class="hljs-keyword">of</span> <span class="hljs-number">3</span>
+
+💡 Run <span class="hljs-string">&quot;mip update&quot;</span> to update all packages
+</code></pre>
+</div></div></div><p>== tab “Все пакеты актуальны”</p>
+<pre class="hljs"><code class="language-bash">mip outdated
+</code></pre>
+<p><strong>Пример вывода:</strong></p>
+<pre class="hljs"><code>🔍 Checking <span class="hljs-keyword">for</span> outdated packages...
+
+┌─────────────────────┬──────────────┬──────────────┬────────────┬────────────┐
+│ Package             │ Current      │ Latest       │ Store      │ Manifest   │
+├─────────────────────┼──────────────┼──────────────┼────────────┼────────────┤
+│ ✅ lodash           │ <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>      │ <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>      │ 🌍         │ 📋         │
+│ ✅ express          │ <span class="hljs-number">4.18</span>.<span class="hljs-number">2</span>       │ <span class="hljs-number">4.18</span>.<span class="hljs-number">2</span>       │ 🌍         │ 📋         │
+└─────────────────────┴──────────────┴──────────────┴────────────┴────────────┘
+
+📊 <span class="hljs-number">0</span> <span class="hljs-title function_">package</span>(s) outdated out <span class="hljs-keyword">of</span> <span class="hljs-number">2</span>
+</code></pre>
+<p>:::<br>
+== tab “JSON вывод для CI/CD”</p>
+<pre class="hljs"><code class="language-bash">mip outdated <span class="hljs-punctuation">--</span>json
+</code></pre>
+<p><strong>Пример вывода:</strong></p>
+<pre class="hljs"><code class="language-json">{
+  <span class="hljs-string">&quot;packages&quot;</span><span class="hljs-punctuation">:</span> [
+    {
+      <span class="hljs-string">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;lodash&quot;</span>,
+      <span class="hljs-string">&quot;current&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;4.17.19&quot;</span>,
+      <span class="hljs-string">&quot;latest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;4.17.21&quot;</span>,
+      <span class="hljs-string">&quot;outdated&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span>,
+      <span class="hljs-string">&quot;cached&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span>,
+      <span class="hljs-string">&quot;inManifest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span>
+    },
+    {
+      <span class="hljs-string">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;express&quot;</span>,
+      <span class="hljs-string">&quot;current&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;4.17.1&quot;</span>,
+      <span class="hljs-string">&quot;latest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;4.18.2&quot;</span>,
+      <span class="hljs-string">&quot;outdated&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span>,
+      <span class="hljs-string">&quot;cached&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">false</span>,
+      <span class="hljs-string">&quot;inManifest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">false</span>
+    }
+  ]
+}
+</code></pre>
+<p>:::</p>
+<h2 id="mip-outdated-пояснение-к-колонкам" class="docmd-heading"><a href="#mip-outdated-пояснение-к-колонкам" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Пояснение к колонкам</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Колонка</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Package</code></td>
+<td>Имя пакета</td>
+</tr>
+<tr>
+<td><code>Current</code></td>
+<td>Текущая версия в проекте</td>
+</tr>
+<tr>
+<td><code>Latest</code></td>
+<td>Последняя версия в реестре</td>
+</tr>
+<tr>
+<td><code>Store</code></td>
+<td>🌍 — есть в глобальном кэше, 📡 — будет скачан</td>
+</tr>
+<tr>
+<td><code>Manifest</code></td>
+<td>📋 — установлен в проекте, ❌ — отсутствует</td>
+</tr>
+</tbody>
+</table>
+</div><h2 id="mip-outdated-типичные-ошибки" class="docmd-heading"><a href="#mip-outdated-типичные-ошибки" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Типичные ошибки</h2>
+<div class="docmd-container callout callout-warning"><div class="callout-title">
+<svg class="lucide-icon icon-alert-triangle callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+❌ No mip.yml found</div><div class="callout-content">
+<p><strong>Причина:</strong> Вы находитесь не в корне MIP-проекта.</p>
+<p><strong>Решение:</strong></p>
+<ol>
+<li>Перейдите в папку с проектом: <code>cd /path/to/project</code></li>
+<li>Убедитесь, что там есть <code>mip.yml</code>.</li>
+<li>Если нет — создайте его: <code>mip init</code></li>
+</ol>
+</div></div>
+<div class="docmd-container callout callout-warning"><div class="callout-title">
+<svg class="lucide-icon icon-alert-circle callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
+❌ Package not found in registry</div><div class="callout-content">
+<p><strong>Причина:</strong> Пакет не найден в реестре npm (возможно, опечатка или пакет удалён).</p>
+<p><strong>Решение:</strong></p>
+<ol>
+<li>Проверьте правильность имени пакета в <code>mip.yml</code>.</li>
+<li>Убедитесь, что пакет существует в реестре.</li>
+<li>Исправьте имя и повторите попытку.</li>
+</ol>
+</div></div>
+<div class="docmd-container callout callout-tip"><div class="callout-title">
+<svg class="lucide-icon icon-lightbulb callout-icon-heading" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-lightbulb"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+  <path d="M9 18h6" />
+  <path d="M10 22h4" />
+</svg>
+💡 Совет</div><div class="callout-content">
+<p><code>mip outdated</code> — это первый шаг перед обновлением:</p>
+<ol>
+<li>Запустите <code>mip outdated</code>, чтобы увидеть, что нужно обновить.</li>
+<li>Проверьте, какие пакеты имеют критичные изменения.</li>
+<li>Обновите пакеты: <code>mip update</code> или <code>mip update &lt;package&gt;</code>.</li>
+</ol>
+<p><strong>В CI/CD:</strong><br>
+Используйте <code>mip outdated --json</code> для автоматической проверки и отправки уведомлений в команду.</p>
+</div></div>
+<h2 id="mip-outdated-связанные-команды" class="docmd-heading"><a href="#mip-outdated-связанные-команды" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Связанные команды</h2>
+<ul>
+<li><a href="/ru/commands/update/">mip update</a> — обновление пакетов до последних версий.</li>
+<li><a href="/ru/commands/install/">mip install</a> — установка пакетов.</li>
+<li><a href="/ru/commands/audit/">mip audit</a> — проверка безопасности пакетов.</li>
+<li><a href="/ru/commands/list/">mip list</a> — просмотр установленных пакетов.</li>
+</ul>
+<details class="docmd-container collapsible">
+        <summary class="collapsible-summary">
+            <span class="collapsible-title">🧠 Как работает сравнение версий?</span>
+            <span class="collapsible-arrow"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+        </summary>
+        <div class="collapsible-content">
+<p>MIP использует <strong>семантическое версионирование</strong> для сравнения:</p>
+<ol>
+<li><p><strong>Точное сравнение</strong> — версии сравниваются как строки (если <code>current</code> === <code>latest</code>, пакет актуален).</p>
+</li>
+<li><p><strong>Примеры:</strong></p>
+<ul>
+<li><code>4.17.19</code> vs <code>4.17.21</code> → устарел.</li>
+<li><code>4.17.21</code> vs <code>4.17.21</code> → актуален.</li>
+<li><code>^4.17.0</code> vs <code>4.18.0</code> → устарел (если диапазон не включает новую версию).</li>
+</ul>
+</li>
+<li><p><strong>Важно:</strong> Команда сравнивает <strong>точные версии</strong>, а не диапазоны. Если в <code>mip.yml</code> указан диапазон, команда показывает версию, которая фактически установлена (из lock-файла или из глобального кэша).</p>
+</li>
+</ol>
+<p><strong>Флаг <code>--json</code>:</strong><br>
+Используйте для:</p>
+<ul>
+<li>Автоматических уведомлений в чатах.</li>
+<li>Интеграции с CI/CD пайплайнами.</li>
+<li>Создания отчётов о состоянии зависимостей.</li>
+</ul>
+</div></details>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../../ru/commands/oldrepo/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            oldrepo
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../../ru/commands/repo/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            repo
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#mip-outdated" class="toc-link">mip outdated</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-синтаксис" class="toc-link">Синтаксис</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-опции" class="toc-link">Опции</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-логика-работы" class="toc-link">Логика работы</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-примеры" class="toc-link">Примеры</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-пояснение-к-колонкам" class="toc-link">Пояснение к колонкам</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-типичные-ошибки" class="toc-link">Типичные ошибки</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-outdated-связанные-команды" class="toc-link">Связанные команды</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

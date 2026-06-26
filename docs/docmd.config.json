@@ -1,0 +1,65 @@
+{
+  "title": "MIP - Modern Package Manager",
+  "url": "https://mip.fwh.is",
+  "src": "docs",
+  "out": "site",
+  "engine": "js",
+
+  "i18n": {
+    "default": "en",
+    "locales": [
+      { "id": "ru", "label": "Русский" },
+      { "id": "en", "label": "English" }
+    ]
+  },
+
+  
+  "layout": {
+    "spa": true,
+    "header": {
+      "enabled": true
+    },
+    "sidebar": {
+      "collapsible": true,
+      "defaultCollapsed": false
+    },
+    "optionsMenu": {
+      "position": "sidebar-top",
+      "components": {
+        "search": true,
+        "themeSwitch": true,
+        "localeSwitch": true
+      }
+    },
+    "footer": {
+      "style": "minimal",
+      "content": "© 2026 MIP. Open-source MIT.",
+      "branding": true
+    }
+  },
+
+    "assets": {
+    "css": ["assets/css/custom.css"]
+  },
+
+  "theme": {
+    "name": " ",
+    "appearance": "system",
+    "codeHighlight": true
+  },
+
+  "minify": true,
+  "autoTitleFromH1": true,
+  "copyCode": true,
+  "pageNavigation": true,
+
+  "plugins": {
+    "git": {
+      "commitHistory": true,
+      "maxCommits": 5
+    },
+    "seo": {
+      "defaultDescription": "MIP — быстрый и современный пакетный менеджер / MIP — fast and modern package manager."
+    }
+  }
+}

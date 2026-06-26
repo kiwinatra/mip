@@ -20,8 +20,8 @@ describe('mip core: run', () => {
           dependencies: {},
           devDependencies: {},
           scripts: {
-            fail: 'node -e "process.exit(3)"'
-          }
+            fail: 'node -e "process.exit(3)"',
+          },
         });
 
         // Ensure .mip exists to avoid path probing overhead.
@@ -33,7 +33,7 @@ describe('mip core: run', () => {
         // Intercept process.exit to turn it into an assertion.
         const originalExit = process.exit;
         let exitCode;
-        process.exit = (code) => {
+        process.exit = code => {
           exitCode = code;
         };
 
@@ -41,7 +41,7 @@ describe('mip core: run', () => {
           await run('fail');
 
           // Wait a bit for spawned process close event.
-          await new Promise((r) => setTimeout(r, 300));
+          await new Promise(r => setTimeout(r, 300));
           assert.equal(exitCode, 3);
         } finally {
           process.exit = originalExit;
@@ -52,4 +52,3 @@ describe('mip core: run', () => {
     }
   });
 });
-

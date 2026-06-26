@@ -1,0 +1,12 @@
+name: example-react
+version: 1.0.0
+language: en
+dependencies:
+  react: latest
+  react-dom: latest
+  react-scripts: ^5.0.0
+devDependencies: {}
+scripts:
+  start: react-scripts start
+  build: react-scripts build
+workspaces: []

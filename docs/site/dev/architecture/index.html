@@ -1,0 +1,2272 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "en";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      MIP Architecture : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="How MIP works internally: modules, data flow, file structure, the core, and the plugin API.">
+<link rel="canonical" href="https://mip.fwh.is/dev/architecture/">
+<meta property="og:title" content="MIP Architecture - MIP - Modern Package Manager">
+<meta property="og:description" content="How MIP works internally: modules, data flow, file structure, the core, and the plugin API.">
+<meta property="og:url" content="https://mip.fwh.is/dev/architecture/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MIP Architecture - MIP - Modern Package Manager">
+<meta name="twitter:description" content="How MIP works internally: modules, data flow, file structure, the core, and the plugin API.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/dev/architecture/">
+<link rel="alternate" hreflang="en" href="/dev/architecture/">
+<link rel="alternate" hreflang="x-default" href="/dev/architecture/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/en/dev/architecture.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/dev/architecture" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/dev/architecture" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Introduction
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Welcome
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Commands
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/run/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Setup
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Creating a Project
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Pros
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Performance
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Developers
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../dev/architecture/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Adding Commands
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Testing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            All About Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Hooks &amp; Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            General List
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Network &amp; Registries
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock Files
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Other
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Extended FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  MIP Architecture
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22MIP%20Architecture%22%0Adescription%3A%20%22How%20MIP%20works%20internally%3A%20modules%2C%20data%20flow%2C%20file%20structure%2C%20the%20core%2C%20and%20the%20plugin%20API.%22%0A---%0A%0A%23%20MIP%20Architecture%0A%0AMIP%20is%20a%20minimal%20package%20manager%20with%20a%20modular%20architecture.%20Everything%20is%20designed%20for%20simplicity%20and%20extensibility.%0A%0A---%0A%0A%23%23%20%F0%9F%93%81%20Project%20structure%0A%0A%60%60%60%0Amip%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20bin%2F%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20mip.js%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Entry%20point.%20Parses%20process.argv%20and%20calls%20commands%0A%E2%94%9C%E2%94%80%E2%94%80%20lib%2F%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20api%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Plugin%20API%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20api-methods.js%20%20%20%20%20%23%20Methods%20available%20to%20plugins%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20config-handler.js%20%20%23%20Working%20with%20plugin%20configs%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20hooks.js%20%20%20%20%20%20%20%20%20%20%20%23%20Hook%20system%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20plugin-manager.js%20%20%23%20Plugin%20management%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20commands%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20All%20built-in%20commands%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20install.js%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20init.js%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20audit.js%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20...%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20core%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Main%20logic%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20resolver.js%20%20%20%20%20%20%20%20%23%20Dependency%20resolution%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20parallel-download.js%20%23%20Parallel%20download%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20super-cache.js%20%20%20%20%20%23%20Caching%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20dedupe.js%20%20%20%20%20%20%20%20%20%20%23%20Deduplication%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20peer-resolver.js%20%20%20%23%20Peer%20dependencies%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20auditor.js%20%20%20%20%20%20%20%20%20%23%20Security%20audit%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20workspace.js%20%20%20%20%20%20%20%23%20Monorepos%20%2F%20workspaces%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20...%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20i18n%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Internationalization%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20index.js%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20languages.js%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20locales%2F%20%20%20%20%20%20%20%20%20%20%20%23%20en.yml%2C%20ru.yml%2C%20...%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20ui%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20cli.js%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Progress%20bars%2C%20colored%20output%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20utils%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Helper%20utilities%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20config.js%20%20%20%20%20%20%20%20%20%20%23%20Work%20with%20mip.yml%20and%20lockfiles%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20registry.js%20%20%20%20%20%20%20%20%23%20Interactions%20with%20the%20npm%20registry%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20store.js%20%20%20%20%20%20%20%20%20%20%20%23%20Global%20cache%20(~%2F.mip%2Fstore%2F)%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20http2-agent.js%20%20%20%20%20%23%20HTTP%2F2%20client%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20stream-extract.js%20%20%23%20Tarball%20extraction%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20...%0A%E2%94%94%E2%94%80%E2%94%80%20package.json%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%84%20Data%20flow%3A%20installing%20a%20package%0A%0A%60%60%60%0A1.%20User%3A%20mip%20install%20express%0A2.%20bin%2Fmip.js%20%E2%86%92%20commands%2Finstall.js%0A3.%20install.js%20%E2%86%92%20utils%2Fregistry.js%20(get%20package%20information)%0A4.%20install.js%20%E2%86%92%20core%2Fresolver.js%20(build%20the%20dependency%20tree)%0A5.%20install.js%20%E2%86%92%20utils%2Fstore.js%20(check%20the%20global%20cache)%0A6.%20install.js%20%E2%86%92%20core%2Fparallel-download.js%20(download%20packages)%0A7.%20install.js%20%E2%86%92%20core%2Fsuper-cache.js%20(check%2Fstore%20in%20cache)%0A8.%20install.js%20%E2%86%92%20utils%2Fstream-extract.js%20(extract%20into%20~%2F.mip%2Fstore%2F)%0A9.%20install.js%20%E2%86%92%20utils%2Fconfig.js%20(update%20mip-lock.yml)%0A10.%20install.js%20%E2%86%92%20update%20.mip%2Fmanifest.json%0A11.%20install.js%20%E2%86%92%20create%20a%20symlink%20in%20node_modules%2F%0A12.%20Done!%20%E2%9C%85%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%A9%20Key%20components%0A%0A%23%23%23%20%60utils%2Fconfig.js%60%20%E2%80%94%20configuration%20handling%0A%0AA%20universal%20loader%20that%20supports%20%60mip.yml%60%2C%20%60mip.json%60%2C%20and%20%60package.json%60.%0A%0A%60%60%60javascript%0Aconst%20config%20%3D%20require(&#039;..%2Futils%2Fconfig&#039;)%3B%0A%0A%2F%2F%20Auto-detect%20format%0Aconst%20cfg%20%3D%20config.detectConfig()%3B%0Aconst%20conf%20%3D%20config.readConfig()%3B%0A%0A%2F%2F%20Save%20as%20YAML%0Aconfig.writeConfig(%7B%20name%3A%20&#039;my-project&#039;%20%7D)%3B%0A%60%60%60%0A%0A%23%23%23%20%60utils%2Fstore.js%60%20%E2%80%94%20global%20cache%0A%0AManages%20package%20storage%20in%20%60~%2F.mip%2Fstore%2F%60.%0A%0A%60%60%60javascript%0Aconst%20store%20%3D%20require(&#039;..%2Futils%2Fstore&#039;)%3B%0A%0A%2F%2F%20Check%20if%20a%20package%20exists%20in%20the%20store%0Aif%20(store.isPackageInStore(&#039;lodash&#039;%2C%20&#039;4.17.21&#039;))%20%7B%0A%20%20%2F%2F%20Use%20from%20cache%0A%7D%0A%0A%2F%2F%20Path%20to%20the%20stored%20package%0Aconst%20path%20%3D%20store.getPackageStorePath(&#039;lodash&#039;%2C%20&#039;4.17.21&#039;)%3B%0A%60%60%60%0A%0A%23%23%23%20%60core%2Fresolver.js%60%20%E2%80%94%20dependency%20resolution%0A%0ABuilds%20the%20dependency%20tree%20and%20caches%20results.%0A%0A%60%60%60javascript%0Aconst%20resolver%20%3D%20new%20DependencyResolver()%3B%0Aconst%20tree%20%3D%20await%20resolver.resolveVersion(&#039;express&#039;%2C%20&#039;latest&#039;)%3B%0A%2F%2F%20Returns%3A%20%7B%20name%2C%20version%2C%20dependencies%3A%20%7B%20...%20%7D%20%7D%0A%60%60%60%0A%0A%23%23%23%20%60core%2Fparallel-download.js%60%20%E2%80%94%20parallel%20download%0A%0ADownloads%20up%20to%2010%20packages%20at%20the%20same%20time.%20Uses%20HTTP%2F2.%0A%0A%60%60%60javascript%0Aconst%20downloader%20%3D%20new%20ParallelDownloader()%3B%0Aconst%20packages%20%3D%20await%20downloader.downloadPackages(tree)%3B%0A%60%60%60%0A%0A%23%23%23%20%60core%2Fsuper-cache.js%60%20%E2%80%94%203-level%20cache%0A%0A1.%20In-memory%20(LRU%2C%201000%20items)%0A2.%20Disk%20(%60.mip%2Fcache%2F%60)%0A3.%20In-flight%20(deduplication%20of%20parallel%20requests)%0A%0A%23%23%23%20%60core%2Fpeer-resolver.js%60%20%E2%80%94%20peer%20dependencies%0A%0ABy%20default%2C%20it%20skips%20peer%20warnings.%20With%20%60--show-peer-warnings%60%2C%20it%20shows%20warnings%20and%20asks.%0A%0A---%0A%0A%23%23%20%F0%9F%8C%8D%20Internationalization%20(i18n)%0A%0AMIP%20supports%2010%20languages%3A%20%60en%60%2C%20%60ru%60%2C%20%60es%60%2C%20%60fr%60%2C%20%60de%60%2C%20%60it%60%2C%20%60pt%60%2C%20%60zh%60%2C%20%60ja%60%2C%20%60ko%60.%0A%0A**How%20to%20use%20in%20code%3A**%0A%0A%60%60%60javascript%0Aconst%20%7B%20loadLangForCwd%2C%20getI18n%20%7D%20%3D%20require(&#039;..%2Fi18n&#039;)%3B%0A%0Aasync%20function%20myCommand()%20%7B%0A%20%20const%20%7B%20t%20%7D%20%3D%20getI18n(loadLangForCwd(process.cwd()))%3B%0A%20%20console.log(t(&#039;commands.my_command.running&#039;))%3B%0A%7D%0A%60%60%60%0A%0A**How%20to%20add%20a%20translation%3A**%0A%0AIn%20%60lib%2Fi18n%2Flocales%2Fru.yml%60%3A%0A%0A%60%60%60yaml%0Acommands%3A%0A%20%20my_command%3A%0A%20%20%20%20running%3A%20%22%F0%9F%9A%80%20Launching...%22%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%8C%20Plugins%20and%20API%0A%0A%23%23%23%20Plugin%20system%0A%0APlugins%20live%20in%20%60plugins%2F%60%20and%20are%20compiled%20into%20%60~%2F.mip_cache%2Fplugins%2F%60.%0A%0A**Plugin%20structure%3A**%0A%0A%60%60%60javascript%0Amodule.exports%20%3D%20%7B%0A%20%20name%3A%20&#039;my-plugin&#039;%2C%0A%20%20version%3A%20&#039;1.0.0&#039;%2C%0A%0A%20%20commands%3A%20%7B%0A%20%20%20%20hello%3A%20async%20(args)%20%3D%3E%20console.log(&#039;Hello!&#039;)%2C%0A%20%20%7D%2C%0A%0A%20%20hooks%3A%20%7B%0A%20%20%20%20beforeInstall%3A%20async%20(pkg)%20%3D%3E%20console.log(%60Installing%20%24%7Bpkg%7D%60)%2C%0A%20%20%7D%2C%0A%0A%20%20init%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20%20%20console.log(&#039;Plugin%20initialized&#039;)%3B%0A%20%20%7D%2C%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%20Plugin%20API%20methods%0A%0A%7C%20Method%20%7C%20Description%20%7C%0A%7C-------%7C-------------%7C%0A%7C%20%60api.registerCommand(name%2C%20plugin%2C%20handler)%60%20%7C%20Register%20a%20command%20%7C%0A%7C%20%60api.getMipJson()%60%20%7C%20Reads%20%60mip.yml%60%20%7C%0A%7C%20%60api.updateMipJson(data)%60%20%7C%20Updates%20%60mip.yml%60%20%7C%0A%7C%20%60api.getLockfile()%60%20%7C%20Reads%20%60mip-lock.yml%60%20%7C%0A%7C%20%60api.getPackageInfo(name%2C%20version)%60%20%7C%20Package%20information%20%7C%0A%7C%20%60api.getInstalledPackages()%60%20%7C%20List%20installed%20packages%20%7C%0A%7C%20%60api.log(message%2C%20level)%60%20%7C%20Logging%20%7C%0A%0A---%0A%0A%23%23%20%F0%9F%93%82%20File%20system%0A%0A%60%60%60%0A~%2F.mip%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20store%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Global%20cache%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20lodash%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%204.17.21%2F%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20package.json%0A%E2%94%82%20%20%20%E2%94%82%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20index.js%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20express%2F%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%204.18.2%2F%0A%E2%94%82%20%20%20%20%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20package.json%0A%E2%94%82%20%20%20%20%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20lib%2F%0A%E2%94%94%E2%94%80%E2%94%80%20global%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Global%20packages%0A%0Aproject%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20mip.yml%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Configuration%20(YAML)%0A%E2%94%9C%E2%94%80%E2%94%80%20mip-lock.yml%20%20%20%20%20%20%20%20%20%20%20%23%20Lockfile%20(YAML)%0A%E2%94%9C%E2%94%80%E2%94%80%20.mip%2F%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20manifest.json%20%20%20%20%20%20%23%20Manifest%20of%20installed%20packages%0A%E2%94%82%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20cache%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20Download%20cache%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%20packages%2F%20%20%20%20%20%20%20%20%20%20%23%20Local%20packages%20(if%20any)%0A%E2%94%94%E2%94%80%E2%94%80%20node_modules%2F%20%20%20%20%20%20%20%20%20%20%23%20Symlinks%20to%20the%20global%20cache%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%9B%A0%EF%B8%8F%20Utilities%20(utils%2F)%0A%0A%7C%20File%20%7C%20Purpose%20%7C%0A%7C------%7C---------%7C%0A%7C%20%60config.js%60%20%7C%20Work%20with%20%60mip.yml%60%2C%20%60mip-lock.yml%60%2C%20migrations%20%7C%0A%7C%20%60store.js%60%20%7C%20Global%20cache%20(%60~%2F.mip%2Fstore%2F%60)%20%7C%0A%7C%20%60registry.js%60%20%7C%20Requests%20to%20the%20npm%20registry%20%7C%0A%7C%20%60http2-agent.js%60%20%7C%20HTTP%2F2%20client%20%7C%0A%7C%20%60stream-extract.js%60%20%7C%20Tarball%20extraction%20%7C%0A%7C%20%60parallel.js%60%20%7C%20Parallel%20task%20execution%20%7C%0A%0A---%0A%0A%23%23%20%F0%9F%94%A7%20Commands%0A%0AEach%20command%20is%20a%20separate%20file%20in%20%60lib%2Fcommands%2F%60%20exporting%20an%20async%20function.%0A%0A**Standard%20template%3A**%0A%0A%60%60%60javascript%0Aconst%20%7B%20loadLangForCwd%2C%20getI18n%20%7D%20%3D%20require(&#039;..%2Fi18n&#039;)%3B%0Aconst%20config%20%3D%20require(&#039;..%2Futils%2Fconfig&#039;)%3B%0A%0Aasync%20function%20myCommand(options%20%3D%20%7B%7D)%20%7B%0A%20%20const%20%7B%20t%20%7D%20%3D%20getI18n(loadLangForCwd(process.cwd()))%3B%0A%20%20const%20conf%20%3D%20config.readConfig()%3B%0A%20%20console.log(t(&#039;commands.my_command.running&#039;))%3B%0A%7D%0A%0Amodule.exports%20%3D%20%7B%20myCommand%20%7D%3B%0A%60%60%60%0A%0A**Registration%20in%20%60bin%2Fmip.js%60%3A**%0A%0A%60%60%60javascript%0Acase%20&#039;my-command&#039;%3A%20%7B%0A%20%20const%20%7B%20myCommand%20%7D%20%3D%20require(&#039;..%2Flib%2Fcommands%2Fmy-command&#039;)%3B%0A%20%20await%20myCommand(%7B%0A%20%20%20%20verbose%3A%20process.argv.includes(&#039;--verbose&#039;)%2C%0A%20%20%7D)%3B%0A%20%20break%3B%0A%7D%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%AA%20How%20everything%20connects%0A%0A%60%60%60%0Abin%2Fmip.js%0A%20%20%20%20%E2%86%93%0Acommands%2F*.js%0A%20%20%20%20%E2%86%93%0Acore%2F*.js%20%20%E2%86%90%20%E2%86%92%20utils%2F*.js%0A%20%20%20%20%E2%86%93%0Ai18n%2F%20%20ui%2F%20%20api%2F%0A%60%60%60%0A%0A**Plugins**%20connect%20via%20%60api%2Fplugin-manager.js%60%20and%20can%3A%0A-%20Register%20their%20own%20commands%0A-%20Attach%20hooks%20to%20MIP%20events%0A-%20Use%20API%20methods%0A%0A---%0A%0A%23%23%20Related%20pages%0A%0A-%20%5BAdding%20commands%5D(%2Fru%2Fdev%2Fadding-commands)%20%E2%80%94%20how%20to%20create%20a%20command%0A-%20%5BHooks%20%26%20plugins%5D(%2Fru%2Fdev%2Fhooks)%20%E2%80%94%20extending%20functionality%0A%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>For Developers</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Architecture</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="mip-architecture" class="docmd-heading"><a href="#mip-architecture" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>MIP Architecture</h1>
+<p>MIP is a minimal package manager with a modular architecture. Everything is designed for simplicity and extensibility.</p>
+<hr>
+<h2 id="mip-architecture-project-structure" class="docmd-heading"><a href="#mip-architecture-project-structure" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📁 Project structure</h2>
+<pre class="hljs"><code>mip<span class="hljs-punctuation">/</span>
+├── bin<span class="hljs-punctuation">/</span>
+│   └── mip.<span class="hljs-attr">js</span>                 <span class="hljs-comment"># Entry point. Parses process.argv and calls commands</span>
+├── lib<span class="hljs-punctuation">/</span>
+│   ├── api<span class="hljs-punctuation">/</span>                   <span class="hljs-comment"># Plugin API</span>
+│   │   ├── api<span class="hljs-punctuation">-</span>methods.<span class="hljs-attr">js</span>     <span class="hljs-comment"># Methods available to plugins</span>
+│   │   ├── config<span class="hljs-punctuation">-</span>handler.<span class="hljs-attr">js</span>  <span class="hljs-comment"># Working with plugin configs</span>
+│   │   ├── hooks.<span class="hljs-attr">js</span>           <span class="hljs-comment"># Hook system</span>
+│   │   └── plugin<span class="hljs-punctuation">-</span>manager.<span class="hljs-attr">js</span>  <span class="hljs-comment"># Plugin management</span>
+│   ├── commands<span class="hljs-punctuation">/</span>              <span class="hljs-comment"># All built-in commands</span>
+│   │   ├── install.<span class="hljs-attr">js</span>
+│   │   ├── init.<span class="hljs-attr">js</span>
+│   │   ├── audit.<span class="hljs-attr">js</span>
+│   │   └── ...
+│   ├── core<span class="hljs-punctuation">/</span>                  <span class="hljs-comment"># Main logic</span>
+│   │   ├── resolver.<span class="hljs-attr">js</span>        <span class="hljs-comment"># Dependency resolution</span>
+│   │   ├── parallel<span class="hljs-punctuation">-</span>download.<span class="hljs-attr">js</span> <span class="hljs-comment"># Parallel download</span>
+│   │   ├── <span class="hljs-keyword">super</span><span class="hljs-punctuation">-</span>cache.<span class="hljs-attr">js</span>     <span class="hljs-comment"># Caching</span>
+│   │   ├── dedupe.<span class="hljs-attr">js</span>          <span class="hljs-comment"># Deduplication</span>
+│   │   ├── peer<span class="hljs-punctuation">-</span>resolver.<span class="hljs-attr">js</span>   <span class="hljs-comment"># Peer dependencies</span>
+│   │   ├── auditor.<span class="hljs-attr">js</span>         <span class="hljs-comment"># Security audit</span>
+│   │   ├── workspace.<span class="hljs-attr">js</span>       <span class="hljs-comment"># Monorepos / workspaces</span>
+│   │   └── ...
+│   ├── i18n<span class="hljs-punctuation">/</span>                  <span class="hljs-comment"># Internationalization</span>
+│   │   ├── index.<span class="hljs-attr">js</span>
+│   │   ├── languages.<span class="hljs-attr">js</span>
+│   │   └── locales<span class="hljs-punctuation">/</span>           <span class="hljs-comment"># en.yml, ru.yml, ...</span>
+│   ├── ui<span class="hljs-punctuation">/</span>
+│   │   └── cli.<span class="hljs-attr">js</span>             <span class="hljs-comment"># Progress bars, colored output</span>
+│   └── utils<span class="hljs-punctuation">/</span>                 <span class="hljs-comment"># Helper utilities</span>
+│       ├── config.<span class="hljs-attr">js</span>          <span class="hljs-comment"># Work with mip.yml and lockfiles</span>
+│       ├── registry.<span class="hljs-attr">js</span>        <span class="hljs-comment"># Interactions with the npm registry</span>
+│       ├── store.<span class="hljs-attr">js</span>           <span class="hljs-comment"># Global cache (~/.mip/store/)</span>
+│       ├── http2<span class="hljs-punctuation">-</span>agent.<span class="hljs-attr">js</span>     <span class="hljs-comment"># HTTP/2 client</span>
+│       ├── stream<span class="hljs-punctuation">-</span>extract.<span class="hljs-attr">js</span>  <span class="hljs-comment"># Tarball extraction</span>
+│       └── ...
+└── package.<span class="hljs-attr">json</span>
+</code></pre>
+<hr>
+<h2 id="mip-architecture-data-flow-installing-a-package" class="docmd-heading"><a href="#mip-architecture-data-flow-installing-a-package" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔄 Data flow: installing a package</h2>
+<pre class="hljs"><code><span class="hljs-number">1</span>. User<span class="hljs-punctuation">:</span> mip install express
+<span class="hljs-number">2</span>. bin<span class="hljs-punctuation">/</span>mip.<span class="hljs-attr">js</span> → commands<span class="hljs-punctuation">/</span>install.<span class="hljs-attr">js</span>
+<span class="hljs-number">3</span>. install.<span class="hljs-attr">js</span> → utils<span class="hljs-punctuation">/</span>registry.<span class="hljs-title function_">js</span> (get package information)
+<span class="hljs-number">4</span>. install.<span class="hljs-attr">js</span> → core<span class="hljs-punctuation">/</span>resolver.<span class="hljs-title function_">js</span> (build the dependency tree)
+<span class="hljs-number">5</span>. install.<span class="hljs-attr">js</span> → utils<span class="hljs-punctuation">/</span>store.<span class="hljs-title function_">js</span> (check the global cache)
+<span class="hljs-number">6</span>. install.<span class="hljs-attr">js</span> → core<span class="hljs-punctuation">/</span>parallel<span class="hljs-punctuation">-</span>download.<span class="hljs-title function_">js</span> (download packages)
+<span class="hljs-number">7</span>. install.<span class="hljs-attr">js</span> → core<span class="hljs-punctuation">/</span><span class="hljs-keyword">super</span><span class="hljs-punctuation">-</span>cache.<span class="hljs-title function_">js</span> (check<span class="hljs-punctuation">/</span>store <span class="hljs-keyword">in</span> cache)
+<span class="hljs-number">8</span>. install.<span class="hljs-attr">js</span> → utils<span class="hljs-punctuation">/</span>stream<span class="hljs-punctuation">-</span>extract.<span class="hljs-title function_">js</span> (extract into <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store<span class="hljs-punctuation">/</span>)
+<span class="hljs-number">9</span>. install.<span class="hljs-attr">js</span> → utils<span class="hljs-punctuation">/</span>config.<span class="hljs-title function_">js</span> (update mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span>)
+<span class="hljs-number">10</span>. install.<span class="hljs-attr">js</span> → update .<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>manifest.<span class="hljs-attr">json</span>
+<span class="hljs-number">11</span>. install.<span class="hljs-attr">js</span> → create a symlink <span class="hljs-keyword">in</span> node_modules<span class="hljs-punctuation">/</span>
+<span class="hljs-number">12</span>. Done<span class="hljs-punctuation">!</span> ✅
+</code></pre>
+<hr>
+<h2 id="mip-architecture-key-components" class="docmd-heading"><a href="#mip-architecture-key-components" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧩 Key components</h2>
+<h3 id="mip-architecture-key-components-utilsconfigjs-configuration-handling" class="docmd-heading"><a href="#mip-architecture-key-components-utilsconfigjs-configuration-handling" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>utils/config.js</code> — configuration handling</h3>
+<p>A universal loader that supports <code>mip.yml</code>, <code>mip.json</code>, and <code>package.json</code>.</p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> config <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../utils/config&#039;</span>);
+
+<span class="hljs-comment">// Auto-detect format</span>
+<span class="hljs-keyword">const</span> cfg <span class="hljs-punctuation">=</span> config.<span class="hljs-title function_">detectConfig</span>();
+<span class="hljs-keyword">const</span> conf <span class="hljs-punctuation">=</span> config.<span class="hljs-title function_">readConfig</span>();
+
+<span class="hljs-comment">// Save as YAML</span>
+config.<span class="hljs-title function_">writeConfig</span>({ name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;my-project&#039;</span> });
+</code></pre>
+<h3 id="mip-architecture-key-components-utilsstorejs-global-cache" class="docmd-heading"><a href="#mip-architecture-key-components-utilsstorejs-global-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>utils/store.js</code> — global cache</h3>
+<p>Manages package storage in <code>~/.mip/store/</code>.</p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> store <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../utils/store&#039;</span>);
+
+<span class="hljs-comment">// Check if a package exists in the store</span>
+<span class="hljs-keyword">if</span> (store.<span class="hljs-title function_">isPackageInStore</span>(<span class="hljs-string">&#039;lodash&#039;</span>, <span class="hljs-string">&#039;4.17.21&#039;</span>)) {
+  <span class="hljs-comment">// Use from cache</span>
+}
+
+<span class="hljs-comment">// Path to the stored package</span>
+<span class="hljs-keyword">const</span> path <span class="hljs-punctuation">=</span> store.<span class="hljs-title function_">getPackageStorePath</span>(<span class="hljs-string">&#039;lodash&#039;</span>, <span class="hljs-string">&#039;4.17.21&#039;</span>);
+</code></pre>
+<h3 id="mip-architecture-key-components-coreresolverjs-dependency-resolution" class="docmd-heading"><a href="#mip-architecture-key-components-coreresolverjs-dependency-resolution" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>core/resolver.js</code> — dependency resolution</h3>
+<p>Builds the dependency tree and caches results.</p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> resolver <span class="hljs-punctuation">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">DependencyResolver</span>();
+<span class="hljs-keyword">const</span> tree <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> resolver.<span class="hljs-title function_">resolveVersion</span>(<span class="hljs-string">&#039;express&#039;</span>, <span class="hljs-string">&#039;latest&#039;</span>);
+<span class="hljs-comment">// Returns: { name, version, dependencies: { ... } }</span>
+</code></pre>
+<h3 id="mip-architecture-key-components-coreparallel-downloadjs-parallel-download" class="docmd-heading"><a href="#mip-architecture-key-components-coreparallel-downloadjs-parallel-download" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>core/parallel-download.js</code> — parallel download</h3>
+<p>Downloads up to 10 packages at the same time. Uses HTTP/2.</p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> downloader <span class="hljs-punctuation">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">ParallelDownloader</span>();
+<span class="hljs-keyword">const</span> packages <span class="hljs-punctuation">=</span> <span class="hljs-keyword">await</span> downloader.<span class="hljs-title function_">downloadPackages</span>(tree);
+</code></pre>
+<h3 id="mip-architecture-key-components-coresuper-cachejs-3-level-cache" class="docmd-heading"><a href="#mip-architecture-key-components-coresuper-cachejs-3-level-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>core/super-cache.js</code> — 3-level cache</h3>
+<ol>
+<li>In-memory (LRU, 1000 items)</li>
+<li>Disk (<code>.mip/cache/</code>)</li>
+<li>In-flight (deduplication of parallel requests)</li>
+</ol>
+<h3 id="mip-architecture-key-components-corepeer-resolverjs-peer-dependencies" class="docmd-heading"><a href="#mip-architecture-key-components-corepeer-resolverjs-peer-dependencies" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>core/peer-resolver.js</code> — peer dependencies</h3>
+<p>By default, it skips peer warnings. With <code>--show-peer-warnings</code>, it shows warnings and asks.</p>
+<hr>
+<h2 id="mip-architecture-internationalization-i18n" class="docmd-heading"><a href="#mip-architecture-internationalization-i18n" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🌍 Internationalization (i18n)</h2>
+<p>MIP supports 10 languages: <code>en</code>, <code>ru</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>it</code>, <code>pt</code>, <code>zh</code>, <code>ja</code>, <code>ko</code>.</p>
+<p><strong>How to use in code:</strong></p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> { loadLangForCwd, getI18n } <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../i18n&#039;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">myCommand</span>() {
+  <span class="hljs-keyword">const</span> { t } <span class="hljs-punctuation">=</span> <span class="hljs-title function_">getI18n</span>(<span class="hljs-title function_">loadLangForCwd</span>(process.<span class="hljs-title function_">cwd</span>()));
+  console.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">t</span>(<span class="hljs-string">&#039;commands.my_command.running&#039;</span>));
+}
+</code></pre>
+<p><strong>How to add a translation:</strong></p>
+<p>In <code>lib/i18n/locales/ru.yml</code>:</p>
+<pre class="hljs"><code class="language-yaml">commands<span class="hljs-punctuation">:</span>
+  my_command<span class="hljs-punctuation">:</span>
+    running<span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;🚀 Launching...&quot;</span>
+</code></pre>
+<hr>
+<h2 id="mip-architecture-plugins-and-api" class="docmd-heading"><a href="#mip-architecture-plugins-and-api" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔌 Plugins and API</h2>
+<h3 id="mip-architecture-plugins-and-api-plugin-system" class="docmd-heading"><a href="#mip-architecture-plugins-and-api-plugin-system" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Plugin system</h3>
+<p>Plugins live in <code>plugins/</code> and are compiled into <code>~/.mip_cache/plugins/</code>.</p>
+<p><strong>Plugin structure:</strong></p>
+<pre class="hljs"><code class="language-javascript">module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> {
+  name<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;my-plugin&#039;</span>,
+  version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;1.0.0&#039;</span>,
+
+  commands<span class="hljs-punctuation">:</span> {
+    hello<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (args) <span class="hljs-punctuation">=&gt;</span> console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Hello!&#039;</span>),
+  },
+
+  hooks<span class="hljs-punctuation">:</span> {
+    beforeInstall<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> (<span class="hljs-keyword">pkg</span>) <span class="hljs-punctuation">=&gt;</span> console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Installing ${pkg}`</span>),
+  },
+
+  init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+    console.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#039;Plugin initialized&#039;</span>);
+  },
+};
+</code></pre>
+<h3 id="mip-architecture-plugins-and-api-plugin-api-methods" class="docmd-heading"><a href="#mip-architecture-plugins-and-api-plugin-api-methods" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Plugin API methods</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api.registerCommand(name, plugin, handler)</code></td>
+<td>Register a command</td>
+</tr>
+<tr>
+<td><code>api.getMipJson()</code></td>
+<td>Reads <code>mip.yml</code></td>
+</tr>
+<tr>
+<td><code>api.updateMipJson(data)</code></td>
+<td>Updates <code>mip.yml</code></td>
+</tr>
+<tr>
+<td><code>api.getLockfile()</code></td>
+<td>Reads <code>mip-lock.yml</code></td>
+</tr>
+<tr>
+<td><code>api.getPackageInfo(name, version)</code></td>
+<td>Package information</td>
+</tr>
+<tr>
+<td><code>api.getInstalledPackages()</code></td>
+<td>List installed packages</td>
+</tr>
+<tr>
+<td><code>api.log(message, level)</code></td>
+<td>Logging</td>
+</tr>
+</tbody>
+</table>
+</div><hr>
+<h2 id="mip-architecture-file-system" class="docmd-heading"><a href="#mip-architecture-file-system" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📂 File system</h2>
+<pre class="hljs"><code><span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>
+├── store<span class="hljs-punctuation">/</span>                 <span class="hljs-comment"># Global cache</span>
+│   ├── lodash<span class="hljs-punctuation">/</span>
+│   │   └── <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span><span class="hljs-punctuation">/</span>
+│   │       ├── package.<span class="hljs-attr">json</span>
+│   │       └── index.<span class="hljs-attr">js</span>
+│   └── express<span class="hljs-punctuation">/</span>
+│       └── <span class="hljs-number">4.18</span>.<span class="hljs-number">2</span><span class="hljs-punctuation">/</span>
+│           ├── package.<span class="hljs-attr">json</span>
+│           └── lib<span class="hljs-punctuation">/</span>
+└── global<span class="hljs-punctuation">/</span>                <span class="hljs-comment"># Global packages</span>
+
+project<span class="hljs-punctuation">/</span>
+├── mip.<span class="hljs-attr">yml</span>                <span class="hljs-comment"># Configuration (YAML)</span>
+├── mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span>           <span class="hljs-comment"># Lockfile (YAML)</span>
+├── .<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>
+│   ├── manifest.<span class="hljs-attr">json</span>      <span class="hljs-comment"># Manifest of installed packages</span>
+│   ├── cache<span class="hljs-punctuation">/</span>             <span class="hljs-comment"># Download cache</span>
+│   └── packages<span class="hljs-punctuation">/</span>          <span class="hljs-comment"># Local packages (if any)</span>
+└── node_modules<span class="hljs-punctuation">/</span>          <span class="hljs-comment"># Symlinks to the global cache</span>
+</code></pre>
+<hr>
+<h2 id="mip-architecture-utilities-utils" class="docmd-heading"><a href="#mip-architecture-utilities-utils" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🛠️ Utilities (utils/)</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config.js</code></td>
+<td>Work with <code>mip.yml</code>, <code>mip-lock.yml</code>, migrations</td>
+</tr>
+<tr>
+<td><code>store.js</code></td>
+<td>Global cache (<code>~/.mip/store/</code>)</td>
+</tr>
+<tr>
+<td><code>registry.js</code></td>
+<td>Requests to the npm registry</td>
+</tr>
+<tr>
+<td><code>http2-agent.js</code></td>
+<td>HTTP/2 client</td>
+</tr>
+<tr>
+<td><code>stream-extract.js</code></td>
+<td>Tarball extraction</td>
+</tr>
+<tr>
+<td><code>parallel.js</code></td>
+<td>Parallel task execution</td>
+</tr>
+</tbody>
+</table>
+</div><hr>
+<h2 id="mip-architecture-commands" class="docmd-heading"><a href="#mip-architecture-commands" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔧 Commands</h2>
+<p>Each command is a separate file in <code>lib/commands/</code> exporting an async function.</p>
+<p><strong>Standard template:</strong></p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">const</span> { loadLangForCwd, getI18n } <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../i18n&#039;</span>);
+<span class="hljs-keyword">const</span> config <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../utils/config&#039;</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">myCommand</span>(options <span class="hljs-punctuation">=</span> {}) {
+  <span class="hljs-keyword">const</span> { t } <span class="hljs-punctuation">=</span> <span class="hljs-title function_">getI18n</span>(<span class="hljs-title function_">loadLangForCwd</span>(process.<span class="hljs-title function_">cwd</span>()));
+  <span class="hljs-keyword">const</span> conf <span class="hljs-punctuation">=</span> config.<span class="hljs-title function_">readConfig</span>();
+  console.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">t</span>(<span class="hljs-string">&#039;commands.my_command.running&#039;</span>));
+}
+
+module.<span class="hljs-attr">exports</span> <span class="hljs-punctuation">=</span> { myCommand };
+</code></pre>
+<p><strong>Registration in <code>bin/mip.js</code>:</strong></p>
+<pre class="hljs"><code class="language-javascript"><span class="hljs-keyword">case</span> <span class="hljs-string">&#039;my-command&#039;</span><span class="hljs-punctuation">:</span> {
+  <span class="hljs-keyword">const</span> { myCommand } <span class="hljs-punctuation">=</span> <span class="hljs-keyword">require</span>(<span class="hljs-string">&#039;../lib/commands/my-command&#039;</span>);
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">myCommand</span>({
+    verbose<span class="hljs-punctuation">:</span> process.<span class="hljs-attr">argv</span>.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#039;--verbose&#039;</span>),
+  });
+  <span class="hljs-keyword">break</span>;
+}
+</code></pre>
+<hr>
+<h2 id="mip-architecture-how-everything-connects" class="docmd-heading"><a href="#mip-architecture-how-everything-connects" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧪 How everything connects</h2>
+<pre class="hljs"><code>bin<span class="hljs-punctuation">/</span>mip.<span class="hljs-attr">js</span>
+    ↓
+commands<span class="hljs-punctuation">/*</span>.<span class="hljs-attr">js</span>
+    ↓
+core<span class="hljs-punctuation">/*</span>.<span class="hljs-attr">js</span>  ← → utils<span class="hljs-punctuation">/*</span>.<span class="hljs-attr">js</span>
+    ↓
+i18n<span class="hljs-punctuation">/</span>  ui<span class="hljs-punctuation">/</span>  api<span class="hljs-punctuation">/</span>
+</code></pre>
+<p><strong>Plugins</strong> connect via <code>api/plugin-manager.js</code> and can:</p>
+<ul>
+<li>Register their own commands</li>
+<li>Attach hooks to MIP events</li>
+<li>Use API methods</li>
+</ul>
+<hr>
+<h2 id="mip-architecture-related-pages" class="docmd-heading"><a href="#mip-architecture-related-pages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Related pages</h2>
+<ul>
+<li><a href="/ru/dev/adding-commands/">Adding commands</a> — how to create a command</li>
+<li><a href="/ru/dev/hooks/">Hooks &amp; plugins</a> — extending functionality</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../dev/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Overview
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../dev/adding-commands/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Adding Commands
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#mip-architecture" class="toc-link">MIP Architecture</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-project-structure" class="toc-link">📁 Project structure</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-data-flow-installing-a-package" class="toc-link">🔄 Data flow: installing a package</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-key-components" class="toc-link">🧩 Key components</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-utilsconfigjs-configuration-handling" class="toc-link">utils/config.js — configuration handling</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-utilsstorejs-global-cache" class="toc-link">utils/store.js — global cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-coreresolverjs-dependency-resolution" class="toc-link">core/resolver.js — dependency resolution</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-coreparallel-downloadjs-parallel-download" class="toc-link">core/parallel-download.js — parallel download</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-coresuper-cachejs-3-level-cache" class="toc-link">core/super-cache.js — 3-level cache</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-key-components-corepeer-resolverjs-peer-dependencies" class="toc-link">core/peer-resolver.js — peer dependencies</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-internationalization-i18n" class="toc-link">🌍 Internationalization (i18n)</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-plugins-and-api" class="toc-link">🔌 Plugins and API</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-plugins-and-api-plugin-system" class="toc-link">Plugin system</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#mip-architecture-plugins-and-api-plugin-api-methods" class="toc-link">Plugin API methods</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-file-system" class="toc-link">📂 File system</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-utilities-utils" class="toc-link">🛠️ Utilities (utils/)</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-commands" class="toc-link">🔧 Commands</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-how-everything-connects" class="toc-link">🧪 How everything connects</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#mip-architecture-related-pages" class="toc-link">Related pages</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

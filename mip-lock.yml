@@ -1,0 +1,8 @@
+packages:
+  semver@7.8.5:
+    version: 7.8.5
+    resolved: https://registry.npmjs.org/semver/-/semver-7.8.5.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/semver/7.8.5
+version: '1.0'

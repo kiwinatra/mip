@@ -41,7 +41,8 @@ after(function () {
 });
 
 beforeEach(function () {
-  const testTitle = this.currentTest && this.currentTest.title ? this.currentTest.title : '(unknown test)';
+  const testTitle =
+    this.currentTest && this.currentTest.title ? this.currentTest.title : '(unknown test)';
   const full = formatPath() ? `${formatPath()} > ${testTitle}` : testTitle;
 
   testStart.set(this, nowMs());
@@ -49,7 +50,8 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-  const testTitle = this.currentTest && this.currentTest.title ? this.currentTest.title : '(unknown test)';
+  const testTitle =
+    this.currentTest && this.currentTest.title ? this.currentTest.title : '(unknown test)';
   const full = formatPath() ? `${formatPath()} > ${testTitle}` : testTitle;
 
   const start = testStart.get(this);

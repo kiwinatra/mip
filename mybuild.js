@@ -32,7 +32,7 @@ function log(msg, color = 'reset') {
     yellow: '\x1b[33m',
     red: '\x1b[31m',
     magenta: '\x1b[35m',
-    reset: '\x1b[0m'
+    reset: '\x1b[0m',
   };
   console.log(`${colors[color] ?? colors.reset}${msg}${colors.reset}`);
 }
@@ -93,7 +93,8 @@ function mapToPkgTarget(osName, bitness) {
 function outputBinaryName(osName, bitness) {
   if (osName === 'linux') return bitness === 'x64' ? 'mip-linux-x64' : 'mip-linux-x86';
   if (osName === 'macos') return 'mip-macos-x64';
-  if (osName === 'windows') return bitness === 'x64' ? 'mip-windows-x64.exe' : 'mip-windows-x86.exe';
+  if (osName === 'windows')
+    return bitness === 'x64' ? 'mip-windows-x64.exe' : 'mip-windows-x86.exe';
   throw new Error(`Unsupported OS for binary name: ${osName}`);
 }
 
@@ -122,7 +123,9 @@ function zipBinary(binPath, outZipPath) {
   }
 
   // Fallback: use node to create a zip? (not implemented) => fail clearly
-  throw new Error('zip utility is not available on this system. Install zip or ensure it is in PATH.');
+  throw new Error(
+    'zip utility is not available on this system. Install zip or ensure it is in PATH.'
+  );
 }
 
 function getHome() {
@@ -154,7 +157,10 @@ function addToPathInteractive() {
   const add = async () => {
     const osName = detectOS();
     if (osName === 'windows') {
-      log('Auto-adding to PATH on Windows is implemented only for wrapper scripts placed into AppData.', 'yellow');
+      log(
+        'Auto-adding to PATH on Windows is implemented only for wrapper scripts placed into AppData.',
+        'yellow'
+      );
       const installDir = path.join(home, 'AppData', 'Local', 'mip');
       fs.mkdirSync(installDir, { recursive: true });
       return { kind: 'skip', message: `Install a wrapper manually from ${installDir}` };
@@ -206,7 +212,7 @@ async function main() {
     { osName: 'linux', bitness: 'x32', label: 'linux x32' },
     { osName: 'macos', bitness: 'x64', label: 'macos x64' },
     { osName: 'windows', bitness: 'x64', label: 'windows x64' },
-    { osName: 'windows', bitness: 'x32', label: 'windows x32' }
+    { osName: 'windows', bitness: 'x32', label: 'windows x32' },
   ];
 
   log(`Detected: ${detectedOS} ${detectedBitness}`, 'blue');
@@ -253,10 +259,14 @@ async function main() {
 
   // Build
   // Note: pkg --output writes file path when single target; project scripts do same.
-  const res = spawnSync('npx', ['pkg', mipScript, '--targets', pkgTarget, '--output', outBinaryPath], {
-    stdio: 'inherit',
-    shell: false
-  });
+  const res = spawnSync(
+    'npx',
+    ['pkg', mipScript, '--targets', pkgTarget, '--output', outBinaryPath],
+    {
+      stdio: 'inherit',
+      shell: false,
+    }
+  );
   if (res.status !== 0) throw new Error('pkg build failed');
 
   // Zip
@@ -268,7 +278,10 @@ async function main() {
   log(`Binary: ${outBinaryPath}`, 'blue');
   log(`Archive: ${outZipPath}`, 'green');
 
-  const doInstall = await askYesNo('\nInstall executable and optionally add to PATH using this built binary?', 'N');
+  const doInstall = await askYesNo(
+    '\nInstall executable and optionally add to PATH using this built binary?',
+    'N'
+  );
   if (!doInstall) {
     rl.close();
     return;
@@ -321,4 +334,3 @@ main().catch(err => {
   rl.close();
   process.exit(1);
 });
-

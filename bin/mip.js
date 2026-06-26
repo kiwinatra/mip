@@ -1,41 +1,143 @@
 #!/usr/bin/env node
 /*
  * ┌─────────────────────────────────────────────────────────────────────┐
- * │                                                                     │
- * │   ███╗   ███╗██╗██████╗                                             │
- * │   ████╗ ████║██║██╔══██╗                                            │
- * │   ██╔████╔██║██║██████╔╝                                            │
- * │   ██║╚██╔╝██║██║██╔═══╝                                             │
- * │   ██║ ╚═╝ ██║██║██║                                                 │
- * │   ╚═╝     ╚═╝╚═╝╚═╝                                                 │
- * │                                                                     │
  * │   MInimal Package Manager                                          │
  * │   https://github.com/kiwinatra/mip                                 │
- * │                                                                     │
  * │   MIT License · Copyright (c) 2026 kiwinatra                        │
- * │                                                                     │
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
 // Hey! Im doing refactor of code, so if anything looks bad open up an issue!
 
-
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+const { getApiMethods } = require('../lib/api/api-methods');
+const loader = require('../lib/loader');
+const config = require('../lib/utils/config');
+const i18n = require('../lib/i18n');
+
+// ОДИН ЭКЗЕМПЛЯР API НА ВЕСЬ ПРОЦЕСС
+const api = getApiMethods();
 
 // getting super install mode
 const isSuperFast = process.argv.includes('--super') || process.argv.includes('-s');
 const command = process.argv[2];
 const arg = process.argv[3];
 
+const pkg = require('../package.json');
+const currentVersion = pkg.version;
+const VERSION_CHECK_URL = 'https://kiwinatra.github.io/ver';
+let versionChecked = false;
+
+// ==========================================
+// ПРОВЕРЯЕМ И СОЗДАЁМ ГЛОБАЛЬНЫЙ ЛОАДЕР
+// ==========================================
+function ensureGlobalLoader() {
+  const loaderPath = path.join(os.homedir(), '.mip', 'loader.js');
+  
+  if (fs.existsSync(loaderPath)) {
+    return loaderPath;
+  }
+  
+  fs.mkdirSync(path.dirname(loaderPath), { recursive: true });
+  
+  const loaderContent = `// ~/.mip/loader.js — глобальный лоадер для MIP
+const fs = require('fs');
+const path = require('path');
+const Module = require('module');
+
+function findManifest(startDir) {
+  let currentDir = startDir;
+  const root = path.parse(currentDir).root;
+  while (currentDir !== root) {
+    const manifestPath = path.join(currentDir, '.mip', 'manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      return manifestPath;
+    }
+    currentDir = path.dirname(currentDir);
+  }
+  return null;
+}
+
+const manifestPath = findManifest(process.cwd());
+
+if (manifestPath) {
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const originalRequire = Module.prototype.require;
+    
+    Module.prototype.require = function(id) {
+      if (manifest[id]) {
+        const pkgPath = manifest[id].path;
+        if (fs.existsSync(pkgPath)) {
+          try {
+            return originalRequire.call(this, pkgPath);
+          } catch (err) {
+            // fallback
+          }
+        }
+      }
+      return originalRequire.call(this, id);
+    };
+  } catch (err) {
+    // Молча игнорируем ошибки
+  }
+}`;
+  
+  fs.writeFileSync(loaderPath, loaderContent);
+  
+  // Показываем только если DEBUG
+  if (process.env.DEBUG) {
+    console.log(`✅ Created global loader at ${loaderPath}`);
+  }
+  
+  return loaderPath;
+}
+
 async function main() {
+  // ==========================================
+  // АВТОМАТИЧЕСКАЯ МИГРАЦИЯ СТАРЫХ ПРОЕКТОВ
+  // ==========================================
+  const migrated = config.migrateToYaml(process.cwd());
+  if (migrated && process.env.DEBUG) {
+    console.log(`[DEBUG] Yml server finished: file already migrated`);
+  }
+  
+  const lockMigrated = config.migrateLockfile(process.cwd());
+  if (lockMigrated && process.env.DEBUG) {
+    console.log(`[DEBUG] Yml server finished: lockfile already migrated`);
+  }
+
+  // ==========================================
+  // ЗАГРУЖАЕМ КАСТОМНЫЕ ЯЗЫКИ ИЗ ПЛАГИНОВ
+  // ==========================================
+  i18n.loadCustomLocales(process.cwd());
+
+  // ==========================================
+  // СОЗДАЁМ ГЛОБАЛЬНЫЙ ЛОАДЕР (ЕСЛИ НЕТ)
+  // ==========================================
+  ensureGlobalLoader();
+
+  // ==========================================
+  // ВКЛЮЧАЕМ ХУК ДЛЯ require() СРАЗУ
+  // ==========================================
+  loader.setupLoader();
+
   const { loadLangForCwd, getI18n } = require('../lib/i18n');
-  const pkg = require('../package.json');
-  const { t } = getI18n(loadLangForCwd(process.cwd()));
+  const getT = () => getI18n(loadLangForCwd(process.cwd())).t;
+
+  // ==========================================
+  // ПРОВЕРКА ВЕРСИИ В САМОМ НАЧАЛЕ
+  // ==========================================
+  if (!versionChecked) {
+    versionChecked = true;
+    await checkForUpdates(currentVersion, getT());
+  }
 
   // fast
   if ((command === 'install' || command === 'i') && isSuperFast) {
-    await superInstall(arg);
+    await superInstall(arg, getT());
     return;
   }
 
@@ -46,18 +148,24 @@ async function main() {
       break;
 
     case 'language':
-      // mip language <lang>
       await require('../lib/commands/language').language(arg);
       break;
 
     case 'install':
-    case 'i':
-      await install(arg, {
+    case 'i': {
+      const args = process.argv.slice(3);
+      const options = {
         saveDev: process.argv.includes('--save-dev') || process.argv.includes('-D'),
         global: process.argv.includes('-g') || process.argv.includes('--global'),
-        force: process.argv.includes('--force') || process.argv.includes('-f')
-      });
+        force: process.argv.includes('--force') || process.argv.includes('-f'),
+        noSave: process.argv.includes('--no-save'),
+      };
+      
+      const packageNames = args.filter(a => !a.startsWith('-'));
+      
+      await install(packageNames.length > 0 ? packageNames : undefined, options);
       break;
+    }
 
     case 'uninstall':
     case 'rm':
@@ -86,24 +194,27 @@ async function main() {
       await outdated();
       break;
 
-    case 'audit':
-  const { audit } = require('../lib/commands/audit');
-  await audit({
-    fix: process.argv.includes('--fix')
-  });
-  break;
+    case 'audit': {
+      const { audit } = require('../lib/commands/audit');
+      await audit({
+        fix: process.argv.includes('--fix'),
+      });
+      break;
+    }
 
-  case 'legacy':
-  const { legacy } = require('../lib/commands/legacy');
-  await legacy(arg, arg2);
-  break;
+    case 'legacy': {
+      const { legacy } = require('../lib/commands/legacy');
+      await legacy(arg, process.argv[4]);
+      break;
+    }
 
-    case 'ci':
-  const { ci } = require('../lib/commands/ci');
-  await ci({
-    frozenLockfile: process.argv.includes('--frozen-lockfile')
-  });
-  break;
+    case 'ci': {
+      const { ci } = require('../lib/commands/ci');
+      await ci({
+        frozenLockfile: process.argv.includes('--frozen-lockfile'),
+      });
+      break;
+    }
 
     case 'run':
       await runScript(arg);
@@ -113,9 +224,14 @@ async function main() {
       await createProject(arg, process.argv[4]);
       break;
 
-    case 'cache':
-      await cacheCommand(arg);
+    case 'cache': {
+      const args = process.argv.slice(3);
+      const options = {
+        global: args.includes('--global') || args.includes('-g'),
+      };
+      await cacheCommand(arg, options);
       break;
+    }
 
     case 'doctor':
       await doctor();
@@ -135,125 +251,145 @@ async function main() {
 
     case 'repo': {
       const { repo } = require('../lib/commands/repo');
-
-      // mip repo <username>/<repository> --branch <main> --path <dir>
       const branchIndex = process.argv.indexOf('--branch');
       const branch = branchIndex !== -1 ? process.argv[branchIndex + 1] : 'main';
-
       const pathIndex = process.argv.indexOf('--path');
       const downloadPath = pathIndex !== -1 ? process.argv[pathIndex + 1] : 'download';
-
-      // bin passes only argv[3] as `arg`, so use arg as repoRef and allow flags via process.argv
       await repo(arg, {
         branch: branch || 'main',
-        downloadPath: downloadPath || 'download'
+        downloadPath: downloadPath || 'download',
       });
       break;
     }
-    // Old repo command variation.
+
     case 'oldrepo': {
       const { repo } = require('../lib/commands/oldrepo');
-
-      // mip repo <username>/<repository> --branch <main> --path <dir>
       const branchIndex = process.argv.indexOf('--branch');
       const branch = branchIndex !== -1 ? process.argv[branchIndex + 1] : 'main';
-
       const pathIndex = process.argv.indexOf('--path');
       const downloadPath = pathIndex !== -1 ? process.argv[pathIndex + 1] : 'download';
-
-      // bin passes only argv[3] as `arg`, so use arg as repoRef and allow flags via process.argv
       await repo(arg, {
         branch: branch || 'main',
-        downloadPath: downloadPath || 'download'
+        downloadPath: downloadPath || 'download',
       });
       break;
     }
 
     case '--help':
     case '-h':
-      showHelp(t, pkg.version);
+      showHelp(getT(), pkg.version);
       break;
 
     case '--version':
     case '-v':
-      console.log(t('cli.version', { version: pkg.version }));
+      console.log(getT()('cli.version', { version: pkg.version }));
       break;
-    
-    case 'dedupe':
+
+    case 'dedupe': {
       const { dedupe } = require('../lib/commands/dedupe');
       await dedupe({
-      full: process.argv.includes('--full') || process.argv.includes('-f')
-  });
-  break;
+        full: process.argv.includes('--full') || process.argv.includes('-f'),
+      });
+      break;
+    }
 
-  case 'genlock':
-  const { genlock } = require('../lib/commands/genlock');
-  await genlock();
-  break;
+    case 'plugin': {
+      const { plugin } = require('../lib/commands/plugin');
+      const action = process.argv[3];
+      const name = process.argv[4];
+      await plugin(action, name);
+      break;
+    }
 
-  case 'exports':
-  const { exports } = require('../lib/commands/exports');
-  await exports(arg);
-  break;
+    case 'pe': {
+      const { pe } = require('../lib/commands/pe');
+      const pluginName = process.argv[3];
+      const commandName = process.argv[4];
+      const args = process.argv.slice(5);
+      await pe(pluginName, commandName, args);
+      break;
+    }
 
-    default:
+    case 'genlock': {
+      const { genlock } = require('../lib/commands/genlock');
+      await genlock();
+      break;
+    }
+
+    case 'exports': {
+      const { exports } = require('../lib/commands/exports');
+      await exports(arg);
+      break;
+    }
+
+    default: {
+      // Проверяем команды плагинов через ЕДИНЫЙ экземпляр api
+      const registeredCommands = api.getRegisteredCommands();
+      
+      if (registeredCommands && registeredCommands.has(command)) {
+        const args = process.argv.slice(3);
+        try {
+          await api.runRegisteredCommand(command, args);
+          break;
+        } catch (err) {
+          console.error(err.message);
+          break;
+        }
+      }
+
+      const t = getT();
       console.log(t('cli.unknown_command', { command }));
       console.log(t('cli.try_help'));
+      break;
+    }
   }
 }
 
-// fast install RIGH
-async function superInstall(packageName) {
+// ==========================================
+// fast install
+// ==========================================
+async function superInstall(packageName, t) {
   console.log(t('super.mode_start'));
-  
+
   const startTime = Date.now();
   const { getPackageInfo } = require('../lib/utils/registry');
-  const { execSync } = require('child_process');
   const axios = require('axios');
-  
-  // fast download speed
+
   async function fastDownload(name, version) {
     const info = await getPackageInfo(name, version);
     const url = info.tarball;
-    
+
     console.log(t('super.downloading', { name, version: info.version }));
     const response = await axios.get(url, { responseType: 'arraybuffer' });
-    
+
     const cacheDir = path.join(process.cwd(), '.mip', name, info.version);
     fs.mkdirSync(cacheDir, { recursive: true });
-    
-    // extract while downloading
-    execSync(`tar -xzf - -C "${cacheDir}" --strip-components=1`, {
-      input: response.data,
-      stdio: 'pipe'
-    });
-    
-    // symlink
+
+    const { StreamExtractor } = require('../lib/utils/stream-extract');
+    await StreamExtractor.extractToDir(response.data, cacheDir);
+
     const installPath = path.join(process.cwd(), 'node_modules', name);
     if (fs.existsSync(installPath)) fs.rmSync(installPath, { recursive: true, force: true });
     fs.symlinkSync(cacheDir, installPath, 'junction');
-    
+
     return info;
   }
-  
+
   if (!packageName) {
-    // install all from mip.json
     const config = JSON.parse(fs.readFileSync('mip.json', 'utf8'));
     const deps = { ...config.dependencies, ...config.devDependencies };
     const packages = Object.entries(deps);
-    
+
     console.log(t('super.installing_all', { count: packages.length }));
-    
-    // parralel loading
+
     const promises = packages.map(([name, version]) => fastDownload(name, version));
     await Promise.all(promises);
-    
   } else {
-    // install only one package per 1
-    const [name, version] = packageName.includes('@') ? packageName.split('@') : [packageName, 'latest'];
+    const [name, version] = packageName.includes('@')
+      ? packageName.split('@')
+      : [packageName, 'latest'];
     await fastDownload(name, version);
-    
-    // update mip json
+
     const pkgPath = 'mip.json';
     if (fs.existsSync(pkgPath)) {
       const config = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
@@ -263,38 +399,103 @@ async function superInstall(packageName) {
       fs.writeFileSync(pkgPath, JSON.stringify(config, null, 2));
     }
   }
-  
+
   const totalTime = Date.now() - startTime;
   console.log(t('super.done', { ms: totalTime }));
 }
 
-// other comands
-async function init() { return require('../lib/commands/init').init(); }
-async function install(pkg, opts) { return require('../lib/commands/install').install(pkg, opts); }
-async function uninstall(pkg) { return require('../lib/commands/uninstall').uninstall(pkg); }
-async function list() { return require('../lib/commands/list').list(); }
-async function update() { return require('../lib/commands/update').update(); }
-async function search(q) { return require('../lib/commands/search').search(q); }
-async function info(pkg) { return require('../lib/commands/info').info(pkg); }
-async function outdated() { return require('../lib/commands/outdated').outdated(); }
-async function audit() { return require('../lib/commands/audit').audit(); }
-async function ci() { return require('../lib/commands/ci').ci(); }
-async function runScript(s) { return require('../lib/commands/run').run(s); }
-async function createProject(t, n) { return require('../lib/commands/create').create(t, n); }
-async function cacheCommand(a) { return require('../lib/commands/cache').cache(a); }
-async function doctor() { return require('../lib/commands/doctor').doctor(); }
-async function why(pkg) { return require('../lib/commands/why').why(pkg); }
-async function execCommand(cmd) { return require('../lib/commands/exec').exec(cmd); }
-async function workspacesCommand(a, b) { return require('../lib/commands/workspaces').workspaces(a, b); }
+// ==========================================
+// Команды
+// ==========================================
+async function init() {
+  return require('../lib/commands/init').init();
+}
+async function install(pkg, opts) {
+  return require('../lib/commands/install').install(pkg, opts);
+}
+async function uninstall(pkg) {
+  return require('../lib/commands/uninstall').uninstall(pkg);
+}
+async function list() {
+  return require('../lib/commands/list').list();
+}
+async function update() {
+  return require('../lib/commands/update').update();
+}
+async function search(q) {
+  return require('../lib/commands/search').search(q);
+}
+async function info(pkg) {
+  return require('../lib/commands/info').info(pkg);
+}
+async function outdated() {
+  return require('../lib/commands/outdated').outdated();
+}
+async function runScript(s) {
+  return require('../lib/commands/run').run(s);
+}
+async function createProject(t, n) {
+  return require('../lib/commands/create').create(t, n);
+}
+async function cacheCommand(a, opts) {
+  return require('../lib/commands/cache').cache(a, opts);
+}
+async function doctor() {
+  return require('../lib/commands/doctor').doctor();
+}
+async function why(pkg) {
+  return require('../lib/commands/why').why(pkg);
+}
+async function execCommand(cmd) {
+  return require('../lib/commands/exec').exec(cmd);
+}
+async function workspacesCommand(a, b) {
+  return require('../lib/commands/workspaces').workspaces(a, b);
+}
 
 function showHelp(t, version) {
   console.log(t('cli.help.full', { version }));
 }
 
+// ==========================================
+// Проверка обновлений
+// ==========================================
+async function checkForUpdates(currentVersion, t) {
+  try {
+    const axios = require('axios');
+    const response = await axios.get(VERSION_CHECK_URL, {
+      timeout: 2000,
+      transformResponse: [data => data]
+    });
+
+    const lines = response.data.split('\n');
+    let latestVersion = null;
+
+    for (const line of lines) {
+      if (line.startsWith('MIP_LATEST=')) {
+        latestVersion = line.split('=')[1].trim();
+        break;
+      }
+    }
+
+    if (latestVersion && latestVersion !== currentVersion) {
+      console.log('\n' + t('cli.update_available', {
+        current: currentVersion,
+        latest: latestVersion
+      }));
+    }
+  } catch (err) {
+    // Молча игнорируем ошибки сети
+  }
+}
+
+// ==========================================
+// Запуск
+// ==========================================
 main().catch(err => {
   const { loadLangForCwd, getI18n } = require('../lib/i18n');
   const pkg = require('../package.json');
-  const { t } = getI18n(loadLangForCwd(process.cwd()));
+  const t = getI18n(loadLangForCwd(process.cwd())).t;
   console.error(t('cli.error', { message: err.message, version: pkg.version }));
   if (process.env.DEBUG) console.error(err);
   process.exit(1);

@@ -1,0 +1,11 @@
+name: example-express
+version: 1.0.0
+language: en
+dependencies:
+  express: latest
+devDependencies:
+  nodemon: ^3.0.0
+scripts:
+  start: node app.js
+  dev: nodemon app.js
+workspaces: []

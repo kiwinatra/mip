@@ -17,16 +17,13 @@
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
-
-
-
 const { UnixBuilder } = require('./build-unix.js');
 const readline = require('readline');
 const os = require('os');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 const builder = new UnixBuilder();
@@ -40,7 +37,7 @@ function question(query) {
 async function main() {
   const arch = os.arch();
   const isArm64 = arch === 'arm64';
-  
+
   console.log('');
   builder.log('╔═══════════════════════════════════════════════════════════╗', 'green');
   builder.log(`║         🍎 MIP Builder for macOS (${arch}) 🍎               ║`, 'green');
@@ -48,7 +45,7 @@ async function main() {
   console.log('');
 
   let target, outputName;
-  
+
   if (isArm64) {
     target = 'node18-macos-arm64';
     outputName = 'mip-macos-arm64';
@@ -60,7 +57,7 @@ async function main() {
   }
 
   const binary = builder.buildBinary(target, outputName);
-  
+
   if (!binary) {
     builder.log('❌ Build failed', 'red');
     process.exit(1);

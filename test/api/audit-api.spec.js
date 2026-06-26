@@ -7,7 +7,9 @@ describe('audit: external API mocking', () => {
   });
 
   it('auditor API resolves vulnerabilities deterministically (mocked)', async () => {
-    const dir = require('fs').mkdtempSync(require('path').join(require('os').tmpdir(), 'mip-test-audit-api-'));
+    const dir = require('fs').mkdtempSync(
+      require('path').join(require('os').tmpdir(), 'mip-test-audit-api-')
+    );
     try {
       const fs = require('fs');
       const path = require('path');
@@ -31,9 +33,9 @@ describe('audit: external API mocking', () => {
               'leftpad@1.3.0': {
                 version: '1.3.0',
                 dependencies: {},
-                peerDependencies: {}
-              }
-            }
+                peerDependencies: {},
+              },
+            },
           },
           null,
           2
@@ -42,7 +44,7 @@ describe('audit: external API mocking', () => {
 
       const scope = nock('https://registry.npmjs.org')
         .get('/-/npm/v1/security/advisories')
-        .query((q) => q && q.package === 'leftpad')
+        .query(q => q && q.package === 'leftpad')
         .reply(200, {
           objects: [
             {
@@ -53,9 +55,9 @@ describe('audit: external API mocking', () => {
               cvss: { score: 5.0 },
               vulnerable_versions: '<=1.3.0',
               patched_versions: '1.3.1',
-              recommendation: 'Upgrade'
-            }
-          ]
+              recommendation: 'Upgrade',
+            },
+          ],
         });
 
       await withCwd(dir, async () => {
@@ -64,7 +66,7 @@ describe('audit: external API mocking', () => {
         const originalLog = console.log;
 
         console.log = (...args) => {
-          output += args.map((a) => String(a)).join(' ') + '\n';
+          output += args.map(a => String(a)).join(' ') + '\n';
         };
 
         try {
@@ -90,4 +92,3 @@ describe('audit: external API mocking', () => {
     }
   });
 });
-

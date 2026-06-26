@@ -1,0 +1,2355 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/ru/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "ru";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      CI/CD с MIP : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Как использовать MIP в CI/CD пайплайнах: установка, аудит, деплой, GitHub Actions.">
+<link rel="canonical" href="https://mip.fwh.is/ru/pro-users/ci-cd/">
+<meta property="og:title" content="CI/CD с MIP - MIP - Modern Package Manager">
+<meta property="og:description" content="Как использовать MIP в CI/CD пайплайнах: установка, аудит, деплой, GitHub Actions.">
+<meta property="og:url" content="https://mip.fwh.is/ru/pro-users/ci-cd/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CI/CD с MIP - MIP - Modern Package Manager">
+<meta name="twitter:description" content="Как использовать MIP в CI/CD пайплайнах: установка, аудит, деплой, GitHub Actions.">
+
+
+
+<link rel="stylesheet" href="../../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/pro-users/ci-cd/">
+<link rel="alternate" hreflang="en" href="/pro-users/ci-cd/">
+<link rel="alternate" hreflang="x-default" href="/pro-users/ci-cd/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/ru/pro-users/ci-cd.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/pro-users/ci-cd" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/pro-users/ci-cd" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Введение
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добро пожаловать
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрые Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Команды
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commandsn/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Настройка
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Создание проекта
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Быстрый старт
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Конфигурация
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Для профи
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Производительность
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../../ru/pro-users/ci-cd/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Разработчикам
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Главное
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Архитектурой
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Добавление команд
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Тестирование
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Все о плагинах
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Хуки и плагины
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Решение проблем
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Общий список
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/installation/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Ошибки установки
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Сеть и регистры
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock-файлы
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Прочее
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../../ru/other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Обзор
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Глоссарий
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../../ru/other/faq/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Расширенный FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  CI/CD с MIP
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22CI%2FCD%20%D1%81%20MIP%22%0Adescription%3A%20%22%D0%9A%D0%B0%D0%BA%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20MIP%20%D0%B2%20CI%2FCD%20%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%D0%B0%D1%85%3A%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%2C%20%D0%B0%D1%83%D0%B4%D0%B8%D1%82%2C%20%D0%B4%D0%B5%D0%BF%D0%BB%D0%BE%D0%B9%2C%20GitHub%20Actions.%22%0A---%0A%0A%23%20CI%2FCD%20%D1%81%20MIP%20%F0%9F%9A%80%0A%0AMIP%20%D0%BE%D1%82%D0%BB%D0%B8%D1%87%D0%BD%D0%BE%20%D0%BF%D0%BE%D0%B4%D1%85%D0%BE%D0%B4%D0%B8%D1%82%20%D0%B4%D0%BB%D1%8F%20CI%2FCD%20%D0%B1%D0%BB%D0%B0%D0%B3%D0%BE%D0%B4%D0%B0%D1%80%D1%8F%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B5%20%60mip%20ci%60%2C%20%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D0%B0%D1%8F%20%D0%BE%D0%BF%D1%82%D0%B8%D0%BC%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0%20%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85%20%D1%81%D1%80%D0%B5%D0%B4.%0A%0A---%0A%0A%23%23%20%F0%9F%93%A6%20%D0%9E%D1%81%D0%BD%D0%BE%D0%B2%D1%8B%0A%0A%23%23%23%20%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%60mip%20ci%60%0A%0A%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%B0%D0%B2%D0%BB%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B8%20%D1%81%D1%82%D1%80%D0%BE%D0%B3%D0%BE%20%D0%BF%D0%BE%20%60mip-lock.yml%60.%0A%0A%60%60%60bash%0Amip%20ci%0A%60%60%60%0A%0A**%D0%A7%D1%82%D0%BE%20%D0%B4%D0%B5%D0%BB%D0%B0%D0%B5%D1%82%3A**%0A1.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8F%D0%B5%D1%82%20%D0%BD%D0%B0%D0%BB%D0%B8%D1%87%D0%B8%D0%B5%20%60mip-lock.yml%60%0A2.%20%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%B0%D0%B2%D0%BB%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%20%D0%B8%D0%B7%20lock-%D1%84%D0%B0%D0%B9%D0%BB%D0%B0%0A3.%20%D0%92%D0%B5%D1%80%D0%B8%D1%84%D0%B8%D1%86%D0%B8%D1%80%D1%83%D0%B5%D1%82%20%D1%86%D0%B5%D0%BB%D0%BE%D1%81%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%0A4.%20%D0%9D%D0%B5%20%D0%BE%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D1%8F%D0%B5%D1%82%20lock-%D1%84%D0%B0%D0%B9%D0%BB%0A%0A%23%23%23%20%60--frozen-lockfile%60%0A%0A%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8F%D0%B5%D1%82%2C%20%D1%87%D1%82%D0%BE%20lock-%D1%84%D0%B0%D0%B9%D0%BB%20%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%20%D1%81%20%60mip.yml%60.%0A%0A%60%60%60bash%0Amip%20ci%20--frozen-lockfile%0A%60%60%60%0A%0A%D0%95%D1%81%D0%BB%D0%B8%20%D0%B5%D1%81%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D1%85%D0%BE%D0%B6%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%20%E2%80%94%20%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0%20%D0%B7%D0%B0%D0%B2%D0%B5%D1%80%D1%88%D0%B0%D0%B5%D1%82%D1%81%D1%8F%20%D1%81%20%D0%BE%D1%88%D0%B8%D0%B1%D0%BA%D0%BE%D0%B9.%0A%0A---%0A%0A%23%23%20%F0%9F%90%99%20GitHub%20Actions%0A%0A%23%23%23%20%D0%9C%D0%B8%D0%BD%D0%B8%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20workflow%0A%0A%60%60%60yaml%0A%23%20.github%2Fworkflows%2Fci.yml%0Aname%3A%20CI%0A%0Aon%3A%0A%20%20push%3A%0A%20%20%20%20branches%3A%20%5B%20main%20%5D%0A%20%20pull_request%3A%0A%20%20%20%20branches%3A%20%5B%20main%20%5D%0A%0Ajobs%3A%0A%20%20test%3A%0A%20%20%20%20runs-on%3A%20ubuntu-latest%0A%0A%20%20%20%20steps%3A%0A%20%20%20%20%20%20-%20uses%3A%20actions%2Fcheckout%40v4%0A%0A%20%20%20%20%20%20-%20name%3A%20Setup%20Node.js%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fsetup-node%40v4%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20node-version%3A%20&#039;18&#039;%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20MIP%0A%20%20%20%20%20%20%20%20run%3A%20npm%20install%20-g%20mip%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20dependencies%0A%20%20%20%20%20%20%20%20run%3A%20mip%20ci%20--frozen-lockfile%0A%0A%20%20%20%20%20%20-%20name%3A%20Run%20tests%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20test%0A%60%60%60%0A%0A%23%23%23%20%D0%A1%20%D0%BA%D1%8D%D1%88%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%D0%BC%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE%20%D1%81%D1%82%D0%BE%D1%80%D0%B0%0A%0A%60%60%60yaml%0Aname%3A%20CI%20with%20cache%0A%0Aon%3A%20push%0A%0Ajobs%3A%0A%20%20test%3A%0A%20%20%20%20runs-on%3A%20ubuntu-latest%0A%0A%20%20%20%20steps%3A%0A%20%20%20%20%20%20-%20uses%3A%20actions%2Fcheckout%40v4%0A%0A%20%20%20%20%20%20-%20name%3A%20Setup%20Node.js%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fsetup-node%40v4%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20node-version%3A%20&#039;18&#039;%0A%0A%20%20%20%20%20%20-%20name%3A%20Cache%20MIP%20store%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fcache%40v3%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20path%3A%20~%2F.mip%2Fstore%0A%20%20%20%20%20%20%20%20%20%20key%3A%20%24%7B%7B%20runner.os%20%7D%7D-mip-%24%7B%7B%20hashFiles(&#039;mip-lock.yml&#039;)%20%7D%7D%0A%20%20%20%20%20%20%20%20%20%20restore-keys%3A%20%7C%0A%20%20%20%20%20%20%20%20%20%20%20%20%24%7B%7B%20runner.os%20%7D%7D-mip-%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20MIP%0A%20%20%20%20%20%20%20%20run%3A%20npm%20install%20-g%20mip%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20dependencies%0A%20%20%20%20%20%20%20%20run%3A%20mip%20ci%20--frozen-lockfile%0A%0A%20%20%20%20%20%20-%20name%3A%20Run%20tests%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20test%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%92%20%D0%91%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D1%8C%0A%0A%23%23%23%20%D0%90%D1%83%D0%B4%D0%B8%D1%82%20%D0%B2%20CI%0A%0A%60%60%60yaml%0A-%20name%3A%20Security%20audit%0A%20%20run%3A%20mip%20audit%20--json%0A%0A-%20name%3A%20Check%20for%20vulnerabilities%0A%20%20run%3A%20%7C%0A%20%20%20%20VULNS%3D%24(mip%20audit%20--json%20%7C%20jq%20&#039;.vulnerabilities%20%7C%20length&#039;)%0A%20%20%20%20if%20%5B%20%22%24VULNS%22%20-gt%200%20%5D%3B%20then%0A%20%20%20%20%20%20echo%20%22%E2%9A%A0%EF%B8%8F%20Found%20%24VULNS%20vulnerabilities!%22%0A%20%20%20%20%20%20exit%201%0A%20%20%20%20fi%0A%60%60%60%0A%0A%23%23%23%20%D0%90%D0%B2%D1%82%D0%BE%D1%84%D0%B8%D0%BA%D1%81%20%D1%83%D1%8F%D0%B7%D0%B2%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9%0A%0A%60%60%60yaml%0A-%20name%3A%20Fix%20vulnerabilities%0A%20%20run%3A%20mip%20audit%20--fix%0A%0A-%20name%3A%20Commit%20fixes%0A%20%20run%3A%20%7C%0A%20%20%20%20git%20config%20user.name%20%22GitHub%20Actions%22%0A%20%20%20%20git%20config%20user.email%20%22actions%40github.com%22%0A%20%20%20%20git%20add%20mip-lock.yml%20mip.yml%0A%20%20%20%20git%20commit%20-m%20%22chore%3A%20auto-fix%20vulnerabilities%22%20%7C%7C%20exit%200%0A%20%20%20%20git%20push%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%8F%97%EF%B8%8F%20%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%20%D0%B8%20%D0%B4%D0%B5%D0%BF%D0%BB%D0%BE%D0%B9%0A%0A%23%23%23%20%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%20%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0%0A%0A%60%60%60yaml%0A-%20name%3A%20Build%20project%0A%20%20run%3A%20mip%20run%20build%0A%0A-%20name%3A%20Upload%20artifacts%0A%20%20uses%3A%20actions%2Fupload-artifact%40v4%0A%20%20with%3A%0A%20%20%20%20name%3A%20dist%0A%20%20%20%20path%3A%20dist%2F%0A%60%60%60%0A%0A%23%23%23%20%D0%94%D0%B5%D0%BF%D0%BB%D0%BE%D0%B9%20%D0%BD%D0%B0%20GitHub%20Pages%0A%0A%60%60%60yaml%0A%23%20.github%2Fworkflows%2Fdeploy.yml%0Aname%3A%20Deploy%20docs%0A%0Aon%3A%0A%20%20push%3A%0A%20%20%20%20branches%3A%20%5B%20main%20%5D%0A%0Ajobs%3A%0A%20%20deploy%3A%0A%20%20%20%20runs-on%3A%20ubuntu-latest%0A%0A%20%20%20%20steps%3A%0A%20%20%20%20%20%20-%20uses%3A%20actions%2Fcheckout%40v4%0A%0A%20%20%20%20%20%20-%20name%3A%20Setup%20Node.js%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fsetup-node%40v4%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20node-version%3A%20&#039;18&#039;%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20MIP%0A%20%20%20%20%20%20%20%20run%3A%20npm%20install%20-g%20mip%0A%0A%20%20%20%20%20%20-%20name%3A%20Build%20docs%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20docs%3Abuild%0A%0A%20%20%20%20%20%20-%20name%3A%20Deploy%20to%20GitHub%20Pages%0A%20%20%20%20%20%20%20%20uses%3A%20peaceiris%2Factions-gh-pages%40v3%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20github_token%3A%20%24%7B%7B%20secrets.GITHUB_TOKEN%20%7D%7D%0A%20%20%20%20%20%20%20%20%20%20publish_dir%3A%20.%2Fsite%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%90%B3%20Docker%0A%0A%23%23%23%20Dockerfile%0A%0A%60%60%60dockerfile%0AFROM%20node%3A18-alpine%0A%0A%23%20%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%B0%D0%B2%D0%BB%D0%B8%D0%B2%D0%B0%D0%B5%D0%BC%20MIP%0ARUN%20npm%20install%20-g%20mip%0A%0AWORKDIR%20%2Fapp%0A%0ACOPY%20mip.yml%20mip-lock.yml%20.%2F%0ARUN%20mip%20ci%20--frozen-lockfile%0A%0ACOPY%20.%20.%0ARUN%20mip%20run%20build%0A%0ACMD%20%5B%22mip%22%2C%20%22run%22%2C%20%22start%22%5D%0A%60%60%60%0A%0A%23%23%23%20%D0%A1%D0%B1%D0%BE%D1%80%D0%BA%D0%B0%20%D0%B8%20%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%0A%0A%60%60%60bash%0Adocker%20build%20-t%20my-app%20.%0Adocker%20run%20-p%203000%3A3000%20my-app%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%A7%20GitLab%20CI%0A%0A%60%60%60yaml%0A%23%20.gitlab-ci.yml%0Aimage%3A%20node%3A18%0A%0Astages%3A%0A%20%20-%20install%0A%20%20-%20test%0A%20%20-%20build%0A%0Acache%3A%0A%20%20paths%3A%0A%20%20%20%20-%20~%2F.mip%2Fstore%0A%0Ainstall%3A%0A%20%20stage%3A%20install%0A%20%20script%3A%0A%20%20%20%20-%20npm%20install%20-g%20mip%0A%20%20%20%20-%20mip%20ci%20--frozen-lockfile%0A%20%20artifacts%3A%0A%20%20%20%20paths%3A%0A%20%20%20%20%20%20-%20node_modules%2F%0A%0Atest%3A%0A%20%20stage%3A%20test%0A%20%20script%3A%0A%20%20%20%20-%20mip%20run%20test%0A%20%20%20%20-%20mip%20audit%0A%0Abuild%3A%0A%20%20stage%3A%20build%0A%20%20script%3A%0A%20%20%20%20-%20mip%20run%20build%0A%20%20artifacts%3A%0A%20%20%20%20paths%3A%0A%20%20%20%20%20%20-%20dist%2F%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%84%20CircleCI%0A%0A%60%60%60yaml%0A%23%20.circleci%2Fconfig.yml%0Aversion%3A%202.1%0A%0Ajobs%3A%0A%20%20build%3A%0A%20%20%20%20docker%3A%0A%20%20%20%20%20%20-%20image%3A%20cimg%2Fnode%3A18.0%0A%20%20%20%20steps%3A%0A%20%20%20%20%20%20-%20checkout%0A%20%20%20%20%20%20-%20run%3A%0A%20%20%20%20%20%20%20%20%20%20name%3A%20Install%20MIP%0A%20%20%20%20%20%20%20%20%20%20command%3A%20npm%20install%20-g%20mip%0A%20%20%20%20%20%20-%20run%3A%0A%20%20%20%20%20%20%20%20%20%20name%3A%20Install%20dependencies%0A%20%20%20%20%20%20%20%20%20%20command%3A%20mip%20ci%20--frozen-lockfile%0A%20%20%20%20%20%20-%20run%3A%0A%20%20%20%20%20%20%20%20%20%20name%3A%20Run%20tests%0A%20%20%20%20%20%20%20%20%20%20command%3A%20mip%20run%20test%0A%20%20%20%20%20%20-%20run%3A%0A%20%20%20%20%20%20%20%20%20%20name%3A%20Build%0A%20%20%20%20%20%20%20%20%20%20command%3A%20mip%20run%20build%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%AA%20%D0%9B%D1%83%D1%87%D1%88%D0%B8%D0%B5%20%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B8%0A%0A%23%23%23%201.%20%D0%92%D1%81%D0%B5%D0%B3%D0%B4%D0%B0%20%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B9%20%60--frozen-lockfile%60%0A%0A%60%60%60bash%0Amip%20ci%20--frozen-lockfile%0A%60%60%60%0A%0A%D0%AD%D1%82%D0%BE%20%D0%B3%D0%B0%D1%80%D0%B0%D0%BD%D1%82%D0%B8%D1%80%D1%83%D0%B5%D1%82%2C%20%D1%87%D1%82%D0%BE%20lock-%D1%84%D0%B0%D0%B9%D0%BB%20%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD.%0A%0A%23%23%23%202.%20%D0%9A%D1%8D%D1%88%D0%B8%D1%80%D1%83%D0%B9%20%D0%B3%D0%BB%D0%BE%D0%B1%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9%20%D1%81%D1%82%D0%BE%D1%80%0A%0A%60%60%60yaml%0A-%20name%3A%20Cache%20MIP%20store%0A%20%20uses%3A%20actions%2Fcache%40v3%0A%20%20with%3A%0A%20%20%20%20path%3A%20~%2F.mip%2Fstore%0A%20%20%20%20key%3A%20%24%7B%7B%20runner.os%20%7D%7D-mip-%24%7B%7B%20hashFiles(&#039;mip-lock.yml&#039;)%20%7D%7D%0A%60%60%60%0A%0A%23%23%23%203.%20%D0%97%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0%D0%B9%20%D0%B0%D1%83%D0%B4%D0%B8%D1%82%20%D0%B2%20CI%0A%0A%60%60%60bash%0Amip%20audit%20--json%0A%60%60%60%0A%0A%23%23%23%204.%20%D0%98%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B9%20%60mip%20doctor%60%20%D0%B4%D0%BB%D1%8F%20%D0%B4%D0%B8%D0%B0%D0%B3%D0%BD%D0%BE%D1%81%D1%82%D0%B8%D0%BA%D0%B8%0A%0A%60%60%60yaml%0A-%20name%3A%20Check%20environment%0A%20%20run%3A%20mip%20doctor%0A%60%60%60%0A%0A%23%23%23%205.%20%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D1%8F%D0%B9%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D0%B5%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D1%8B%0A%0A%60%60%60yaml%0A-%20name%3A%20Check%20outdated%20packages%0A%20%20run%3A%20mip%20outdated%20--json%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%93%8A%20%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%20%D0%BF%D0%BE%D0%BB%D0%BD%D0%BE%D0%B3%D0%BE%20CI%20%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD%D0%B0%0A%0A%60%60%60yaml%0Aname%3A%20Full%20CI%0A%0Aon%3A%0A%20%20push%3A%0A%20%20%20%20branches%3A%20%5B%20main%20%5D%0A%20%20pull_request%3A%0A%20%20%20%20branches%3A%20%5B%20main%20%5D%0A%0Ajobs%3A%0A%20%20test%3A%0A%20%20%20%20runs-on%3A%20ubuntu-latest%0A%20%20%20%20steps%3A%0A%20%20%20%20%20%20-%20uses%3A%20actions%2Fcheckout%40v4%0A%0A%20%20%20%20%20%20-%20name%3A%20Setup%20Node.js%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fsetup-node%40v4%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20node-version%3A%20&#039;18&#039;%0A%0A%20%20%20%20%20%20-%20name%3A%20Cache%20MIP%20store%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fcache%40v3%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20path%3A%20~%2F.mip%2Fstore%0A%20%20%20%20%20%20%20%20%20%20key%3A%20%24%7B%7B%20runner.os%20%7D%7D-mip-%24%7B%7B%20hashFiles(&#039;mip-lock.yml&#039;)%20%7D%7D%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20MIP%0A%20%20%20%20%20%20%20%20run%3A%20npm%20install%20-g%20mip%0A%0A%20%20%20%20%20%20-%20name%3A%20Install%20dependencies%0A%20%20%20%20%20%20%20%20run%3A%20mip%20ci%20--frozen-lockfile%0A%0A%20%20%20%20%20%20-%20name%3A%20Run%20linter%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20lint%0A%0A%20%20%20%20%20%20-%20name%3A%20Run%20tests%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20test%0A%0A%20%20%20%20%20%20-%20name%3A%20Security%20audit%0A%20%20%20%20%20%20%20%20run%3A%20mip%20audit%20--json%0A%0A%20%20%20%20%20%20-%20name%3A%20Build%0A%20%20%20%20%20%20%20%20run%3A%20mip%20run%20build%0A%0A%20%20%20%20%20%20-%20name%3A%20Upload%20artifacts%0A%20%20%20%20%20%20%20%20uses%3A%20actions%2Fupload-artifact%40v4%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20name%3A%20dist%0A%20%20%20%20%20%20%20%20%20%20path%3A%20dist%2F%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%97%20%D0%A1%D0%B2%D1%8F%D0%B7%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5%20%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D1%8B%0A%0A-%20%5Bmip%20ci%5D(%2Fru%2Fcommands%2Fci)%20%E2%80%94%20%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0%20%D0%B2%20CI%0A-%20%5Bmip%20audit%5D(%2Fru%2Fcommands%2Faudit)%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D0%B8%0A-%20%5Bmip%20outdated%5D(%2Fru%2Fcommands%2Foutdated)%20%E2%80%94%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0%20%D1%83%D1%81%D1%82%D0%B0%D1%80%D0%B5%D0%B2%D1%88%D0%B8%D1%85%20%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%BE%D0%B2%0A-%20%5Bmip%20doctor%5D(%2Fru%2Fcommands%2Fdoctor)%20%E2%80%94%20%D0%B4%D0%B8%D0%B0%D0%B3%D0%BD%D0%BE%D1%81%D1%82%D0%B8%D0%BA%D0%B0%20%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Для профи</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>CI/CD</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="cicd-с-mip" class="docmd-heading"><a href="#cicd-с-mip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>CI/CD с MIP 🚀</h1>
+<p>MIP отлично подходит для CI/CD благодаря команде <code>mip ci</code>, которая оптимизирована для автоматических сред.</p>
+<hr>
+<h2 id="cicd-с-mip-основы" class="docmd-heading"><a href="#cicd-с-mip-основы" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📦 Основы</h2>
+<h3 id="cicd-с-mip-основы-команда-mip-ci" class="docmd-heading"><a href="#cicd-с-mip-основы-команда-mip-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Команда <code>mip ci</code></h3>
+<p>Устанавливает зависимости строго по <code>mip-lock.yml</code>.</p>
+<pre class="hljs"><code class="language-bash">mip ci
+</code></pre>
+<p><strong>Что делает:</strong></p>
+<ol>
+<li>Проверяет наличие <code>mip-lock.yml</code></li>
+<li>Устанавливает пакеты из lock-файла</li>
+<li>Верифицирует целостность</li>
+<li>Не обновляет lock-файл</li>
+</ol>
+<h3 id="cicd-с-mip-основы-frozen-lockfile" class="docmd-heading"><a href="#cicd-с-mip-основы-frozen-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>--frozen-lockfile</code></h3>
+<p>Проверяет, что lock-файл синхронизирован с <code>mip.yml</code>.</p>
+<pre class="hljs"><code class="language-bash">mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+</code></pre>
+<p>Если есть расхождения — команда завершается с ошибкой.</p>
+<hr>
+<h2 id="cicd-с-mip-github-actions" class="docmd-heading"><a href="#cicd-с-mip-github-actions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🐙 GitHub Actions</h2>
+<h3 id="cicd-с-mip-github-actions-минимальный-workflow" class="docmd-heading"><a href="#cicd-с-mip-github-actions-минимальный-workflow" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Минимальный workflow</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-comment"># .github/workflows/ci.yml</span>
+name<span class="hljs-punctuation">:</span> CI
+
+on<span class="hljs-punctuation">:</span>
+  push<span class="hljs-punctuation">:</span>
+    branches<span class="hljs-punctuation">:</span> [ main ]
+  pull_request<span class="hljs-punctuation">:</span>
+    branches<span class="hljs-punctuation">:</span> [ main ]
+
+jobs<span class="hljs-punctuation">:</span>
+  test<span class="hljs-punctuation">:</span>
+    runs<span class="hljs-punctuation">-</span>on<span class="hljs-punctuation">:</span> ubuntu<span class="hljs-punctuation">-</span>latest
+
+    steps<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>checkout@v4
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Setup Node.<span class="hljs-attr">js</span>
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>setup<span class="hljs-punctuation">-</span><span class="hljs-keyword">node</span>@v4
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          <span class="hljs-keyword">node</span><span class="hljs-punctuation">-</span>version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;18&#039;</span>
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install MIP
+        run<span class="hljs-punctuation">:</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install dependencies
+        run<span class="hljs-punctuation">:</span> mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Run tests
+        run<span class="hljs-punctuation">:</span> mip run test
+</code></pre>
+<h3 id="cicd-с-mip-github-actions-с-кэшированием-глобального-стора" class="docmd-heading"><a href="#cicd-с-mip-github-actions-с-кэшированием-глобального-стора" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>С кэшированием глобального стора</h3>
+<pre class="hljs"><code class="language-yaml">name<span class="hljs-punctuation">:</span> CI <span class="hljs-keyword">with</span> cache
+
+on<span class="hljs-punctuation">:</span> push
+
+jobs<span class="hljs-punctuation">:</span>
+  test<span class="hljs-punctuation">:</span>
+    runs<span class="hljs-punctuation">-</span>on<span class="hljs-punctuation">:</span> ubuntu<span class="hljs-punctuation">-</span>latest
+
+    steps<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>checkout@v4
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Setup Node.<span class="hljs-attr">js</span>
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>setup<span class="hljs-punctuation">-</span><span class="hljs-keyword">node</span>@v4
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          <span class="hljs-keyword">node</span><span class="hljs-punctuation">-</span>version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;18&#039;</span>
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Cache MIP store
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>cache@v3
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          path<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store
+          key<span class="hljs-punctuation">:</span> ${{ runner.<span class="hljs-attr">os</span> }}<span class="hljs-punctuation">-</span>mip<span class="hljs-punctuation">-</span>${{ <span class="hljs-title function_">hashFiles</span>(<span class="hljs-string">&#039;mip-lock.yml&#039;</span>) }}
+          restore<span class="hljs-punctuation">-</span>keys<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">|</span>
+            ${{ runner.<span class="hljs-attr">os</span> }}<span class="hljs-punctuation">-</span>mip<span class="hljs-punctuation">-</span>
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install MIP
+        run<span class="hljs-punctuation">:</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install dependencies
+        run<span class="hljs-punctuation">:</span> mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Run tests
+        run<span class="hljs-punctuation">:</span> mip run test
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-безопасность" class="docmd-heading"><a href="#cicd-с-mip-безопасность" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔒 Безопасность</h2>
+<h3 id="cicd-с-mip-безопасность-аудит-в-ci" class="docmd-heading"><a href="#cicd-с-mip-безопасность-аудит-в-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Аудит в CI</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Security audit
+  run<span class="hljs-punctuation">:</span> mip audit <span class="hljs-punctuation">--</span>json
+
+<span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Check <span class="hljs-keyword">for</span> vulnerabilities
+  run<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">|</span>
+    VULNS<span class="hljs-punctuation">=</span><span class="hljs-title function_">$</span>(mip audit <span class="hljs-punctuation">--</span>json <span class="hljs-punctuation">|</span> jq <span class="hljs-string">&#039;.vulnerabilities | length&#039;</span>)
+    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;$VULNS&quot;</span> <span class="hljs-punctuation">-</span>gt <span class="hljs-number">0</span> ]; then
+      <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;⚠️ Found $VULNS vulnerabilities!&quot;</span>
+      exit <span class="hljs-number">1</span>
+    fi
+</code></pre>
+<h3 id="cicd-с-mip-безопасность-автофикс-уязвимостей" class="docmd-heading"><a href="#cicd-с-mip-безопасность-автофикс-уязвимостей" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Автофикс уязвимостей</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Fix vulnerabilities
+  run<span class="hljs-punctuation">:</span> mip audit <span class="hljs-punctuation">--</span>fix
+
+<span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Commit fixes
+  run<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">|</span>
+    <span class="hljs-keyword">git</span> config user.<span class="hljs-attr">name</span> <span class="hljs-string">&quot;GitHub Actions&quot;</span>
+    <span class="hljs-keyword">git</span> config user.<span class="hljs-attr">email</span> <span class="hljs-string">&quot;actions@github.com&quot;</span>
+    <span class="hljs-keyword">git</span> add mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span> mip.<span class="hljs-attr">yml</span>
+    <span class="hljs-keyword">git</span> commit <span class="hljs-punctuation">-</span>m <span class="hljs-string">&quot;chore: auto-fix vulnerabilities&quot;</span> <span class="hljs-punctuation">||</span> exit <span class="hljs-number">0</span>
+    <span class="hljs-keyword">git</span> push
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-сборка-и-деплой" class="docmd-heading"><a href="#cicd-с-mip-сборка-и-деплой" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🏗️ Сборка и деплой</h2>
+<h3 id="cicd-с-mip-сборка-и-деплой-сборка-проекта" class="docmd-heading"><a href="#cicd-с-mip-сборка-и-деплой-сборка-проекта" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Сборка проекта</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Build project
+  run<span class="hljs-punctuation">:</span> mip run build
+
+<span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Upload artifacts
+  uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>upload<span class="hljs-punctuation">-</span>artifact@v4
+  <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+    name<span class="hljs-punctuation">:</span> dist
+    path<span class="hljs-punctuation">:</span> dist<span class="hljs-punctuation">/</span>
+</code></pre>
+<h3 id="cicd-с-mip-сборка-и-деплой-деплой-на-github-pages" class="docmd-heading"><a href="#cicd-с-mip-сборка-и-деплой-деплой-на-github-pages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Деплой на GitHub Pages</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-comment"># .github/workflows/deploy.yml</span>
+name<span class="hljs-punctuation">:</span> Deploy docs
+
+on<span class="hljs-punctuation">:</span>
+  push<span class="hljs-punctuation">:</span>
+    branches<span class="hljs-punctuation">:</span> [ main ]
+
+jobs<span class="hljs-punctuation">:</span>
+  deploy<span class="hljs-punctuation">:</span>
+    runs<span class="hljs-punctuation">-</span>on<span class="hljs-punctuation">:</span> ubuntu<span class="hljs-punctuation">-</span>latest
+
+    steps<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>checkout@v4
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Setup Node.<span class="hljs-attr">js</span>
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>setup<span class="hljs-punctuation">-</span><span class="hljs-keyword">node</span>@v4
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          <span class="hljs-keyword">node</span><span class="hljs-punctuation">-</span>version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;18&#039;</span>
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install MIP
+        run<span class="hljs-punctuation">:</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Build docs
+        run<span class="hljs-punctuation">:</span> mip run docs<span class="hljs-punctuation">:</span>build
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Deploy to GitHub Pages
+        uses<span class="hljs-punctuation">:</span> peaceiris<span class="hljs-punctuation">/</span>actions<span class="hljs-punctuation">-</span>gh<span class="hljs-punctuation">-</span>pages@v3
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          github_token<span class="hljs-punctuation">:</span> ${{ secrets.<span class="hljs-attr">GITHUB_TOKEN</span> }}
+          publish_dir<span class="hljs-punctuation">:</span> .<span class="hljs-punctuation">/</span>site
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-docker" class="docmd-heading"><a href="#cicd-с-mip-docker" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🐳 Docker</h2>
+<h3 id="cicd-с-mip-docker-dockerfile" class="docmd-heading"><a href="#cicd-с-mip-docker-dockerfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Dockerfile</h3>
+<pre class="hljs"><code class="language-dockerfile">FROM <span class="hljs-keyword">node</span><span class="hljs-punctuation">:</span><span class="hljs-number">18</span><span class="hljs-punctuation">-</span>alpine
+
+<span class="hljs-comment"># Устанавливаем MIP</span>
+RUN <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+
+WORKDIR <span class="hljs-punctuation">/</span>app
+
+COPY mip.<span class="hljs-attr">yml</span> mip<span class="hljs-punctuation">-</span>lock.<span class="hljs-attr">yml</span> .<span class="hljs-punctuation">/</span>
+RUN mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+
+COPY . .
+RUN mip run build
+
+CMD [<span class="hljs-string">&quot;mip&quot;</span>, <span class="hljs-string">&quot;run&quot;</span>, <span class="hljs-string">&quot;start&quot;</span>]
+</code></pre>
+<h3 id="cicd-с-mip-docker-сборка-и-запуск" class="docmd-heading"><a href="#cicd-с-mip-docker-сборка-и-запуск" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Сборка и запуск</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-keyword">docker</span> build <span class="hljs-punctuation">-</span>t my<span class="hljs-punctuation">-</span>app .
+<span class="hljs-keyword">docker</span> run <span class="hljs-punctuation">-</span>p <span class="hljs-number">3000</span><span class="hljs-punctuation">:</span><span class="hljs-number">3000</span> my<span class="hljs-punctuation">-</span>app
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-gitlab-ci" class="docmd-heading"><a href="#cicd-с-mip-gitlab-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔧 GitLab CI</h2>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-comment"># .gitlab-ci.yml</span>
+image<span class="hljs-punctuation">:</span> <span class="hljs-keyword">node</span><span class="hljs-punctuation">:</span><span class="hljs-number">18</span>
+
+stages<span class="hljs-punctuation">:</span>
+  <span class="hljs-punctuation">-</span> install
+  <span class="hljs-punctuation">-</span> test
+  <span class="hljs-punctuation">-</span> build
+
+cache<span class="hljs-punctuation">:</span>
+  paths<span class="hljs-punctuation">:</span>
+    <span class="hljs-punctuation">-</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store
+
+install<span class="hljs-punctuation">:</span>
+  stage<span class="hljs-punctuation">:</span> install
+  script<span class="hljs-punctuation">:</span>
+    <span class="hljs-punctuation">-</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+    <span class="hljs-punctuation">-</span> mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+  artifacts<span class="hljs-punctuation">:</span>
+    paths<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> node_modules<span class="hljs-punctuation">/</span>
+
+test<span class="hljs-punctuation">:</span>
+  stage<span class="hljs-punctuation">:</span> test
+  script<span class="hljs-punctuation">:</span>
+    <span class="hljs-punctuation">-</span> mip run test
+    <span class="hljs-punctuation">-</span> mip audit
+
+build<span class="hljs-punctuation">:</span>
+  stage<span class="hljs-punctuation">:</span> build
+  script<span class="hljs-punctuation">:</span>
+    <span class="hljs-punctuation">-</span> mip run build
+  artifacts<span class="hljs-punctuation">:</span>
+    paths<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> dist<span class="hljs-punctuation">/</span>
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-circleci" class="docmd-heading"><a href="#cicd-с-mip-circleci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔄 CircleCI</h2>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-comment"># .circleci/config.yml</span>
+version<span class="hljs-punctuation">:</span> <span class="hljs-number">2.1</span>
+
+jobs<span class="hljs-punctuation">:</span>
+  build<span class="hljs-punctuation">:</span>
+    <span class="hljs-keyword">docker</span><span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> image<span class="hljs-punctuation">:</span> cimg<span class="hljs-punctuation">/</span><span class="hljs-keyword">node</span><span class="hljs-punctuation">:</span><span class="hljs-number">18.0</span>
+    steps<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> checkout
+      <span class="hljs-punctuation">-</span> run<span class="hljs-punctuation">:</span>
+          name<span class="hljs-punctuation">:</span> Install MIP
+          command<span class="hljs-punctuation">:</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+      <span class="hljs-punctuation">-</span> run<span class="hljs-punctuation">:</span>
+          name<span class="hljs-punctuation">:</span> Install dependencies
+          command<span class="hljs-punctuation">:</span> mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+      <span class="hljs-punctuation">-</span> run<span class="hljs-punctuation">:</span>
+          name<span class="hljs-punctuation">:</span> Run tests
+          command<span class="hljs-punctuation">:</span> mip run test
+      <span class="hljs-punctuation">-</span> run<span class="hljs-punctuation">:</span>
+          name<span class="hljs-punctuation">:</span> Build
+          command<span class="hljs-punctuation">:</span> mip run build
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-лучшие-практики" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧪 Лучшие практики</h2>
+<h3 id="cicd-с-mip-лучшие-практики-1-всегда-используй-frozen-lockfile" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики-1-всегда-используй-frozen-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>1. Всегда используй <code>--frozen-lockfile</code></h3>
+<pre class="hljs"><code class="language-bash">mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+</code></pre>
+<p>Это гарантирует, что lock-файл синхронизирован.</p>
+<h3 id="cicd-с-mip-лучшие-практики-2-кэшируй-глобальный-стор" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики-2-кэшируй-глобальный-стор" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>2. Кэшируй глобальный стор</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Cache MIP store
+  uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>cache@v3
+  <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+    path<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store
+    key<span class="hljs-punctuation">:</span> ${{ runner.<span class="hljs-attr">os</span> }}<span class="hljs-punctuation">-</span>mip<span class="hljs-punctuation">-</span>${{ <span class="hljs-title function_">hashFiles</span>(<span class="hljs-string">&#039;mip-lock.yml&#039;</span>) }}
+</code></pre>
+<h3 id="cicd-с-mip-лучшие-практики-3-запускай-аудит-в-ci" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики-3-запускай-аудит-в-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>3. Запускай аудит в CI</h3>
+<pre class="hljs"><code class="language-bash">mip audit <span class="hljs-punctuation">--</span>json
+</code></pre>
+<h3 id="cicd-с-mip-лучшие-практики-4-используй-mip-doctor-для-диагностики" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики-4-используй-mip-doctor-для-диагностики" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>4. Используй <code>mip doctor</code> для диагностики</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Check environment
+  run<span class="hljs-punctuation">:</span> mip doctor
+</code></pre>
+<h3 id="cicd-с-mip-лучшие-практики-5-проверяй-устаревшие-пакеты" class="docmd-heading"><a href="#cicd-с-mip-лучшие-практики-5-проверяй-устаревшие-пакеты" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>5. Проверяй устаревшие пакеты</h3>
+<pre class="hljs"><code class="language-yaml"><span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Check outdated packages
+  run<span class="hljs-punctuation">:</span> mip outdated <span class="hljs-punctuation">--</span>json
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-пример-полного-ci-пайплайна" class="docmd-heading"><a href="#cicd-с-mip-пример-полного-ci-пайплайна" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📊 Пример полного CI пайплайна</h2>
+<pre class="hljs"><code class="language-yaml">name<span class="hljs-punctuation">:</span> Full CI
+
+on<span class="hljs-punctuation">:</span>
+  push<span class="hljs-punctuation">:</span>
+    branches<span class="hljs-punctuation">:</span> [ main ]
+  pull_request<span class="hljs-punctuation">:</span>
+    branches<span class="hljs-punctuation">:</span> [ main ]
+
+jobs<span class="hljs-punctuation">:</span>
+  test<span class="hljs-punctuation">:</span>
+    runs<span class="hljs-punctuation">-</span>on<span class="hljs-punctuation">:</span> ubuntu<span class="hljs-punctuation">-</span>latest
+    steps<span class="hljs-punctuation">:</span>
+      <span class="hljs-punctuation">-</span> uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>checkout@v4
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Setup Node.<span class="hljs-attr">js</span>
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>setup<span class="hljs-punctuation">-</span><span class="hljs-keyword">node</span>@v4
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          <span class="hljs-keyword">node</span><span class="hljs-punctuation">-</span>version<span class="hljs-punctuation">:</span> <span class="hljs-string">&#039;18&#039;</span>
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Cache MIP store
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>cache@v3
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          path<span class="hljs-punctuation">:</span> <span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store
+          key<span class="hljs-punctuation">:</span> ${{ runner.<span class="hljs-attr">os</span> }}<span class="hljs-punctuation">-</span>mip<span class="hljs-punctuation">-</span>${{ <span class="hljs-title function_">hashFiles</span>(<span class="hljs-string">&#039;mip-lock.yml&#039;</span>) }}
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install MIP
+        run<span class="hljs-punctuation">:</span> <span class="hljs-keyword">npm</span> install <span class="hljs-punctuation">-</span>g mip
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Install dependencies
+        run<span class="hljs-punctuation">:</span> mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Run linter
+        run<span class="hljs-punctuation">:</span> mip run lint
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Run tests
+        run<span class="hljs-punctuation">:</span> mip run test
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Security audit
+        run<span class="hljs-punctuation">:</span> mip audit <span class="hljs-punctuation">--</span>json
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Build
+        run<span class="hljs-punctuation">:</span> mip run build
+
+      <span class="hljs-punctuation">-</span> name<span class="hljs-punctuation">:</span> Upload artifacts
+        uses<span class="hljs-punctuation">:</span> actions<span class="hljs-punctuation">/</span>upload<span class="hljs-punctuation">-</span>artifact@v4
+        <span class="hljs-keyword">with</span><span class="hljs-punctuation">:</span>
+          name<span class="hljs-punctuation">:</span> dist
+          path<span class="hljs-punctuation">:</span> dist<span class="hljs-punctuation">/</span>
+</code></pre>
+<hr>
+<h2 id="cicd-с-mip-связанные-страницы" class="docmd-heading"><a href="#cicd-с-mip-связанные-страницы" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔗 Связанные страницы</h2>
+<ul>
+<li><a href="/ru/commands/ci/">mip ci</a> — установка в CI</li>
+<li><a href="/ru/commands/audit/">mip audit</a> — проверка безопасности</li>
+<li><a href="/ru/commands/outdated/">mip outdated</a> — проверка устаревших пакетов</li>
+<li><a href="/ru/commands/doctor/">mip doctor</a> — диагностика окружения</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../../ru/pro-users/performance/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Производительность
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../../ru/dev/" class="next-page">
+                        <span><small>next</small>
+                          <strong>
+                            Главное
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#cicd-с-mip" class="toc-link">CI/CD с MIP 🚀</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-основы" class="toc-link">📦 Основы</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-основы-команда-mip-ci" class="toc-link">Команда mip ci</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-основы-frozen-lockfile" class="toc-link">--frozen-lockfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-github-actions" class="toc-link">🐙 GitHub Actions</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-github-actions-минимальный-workflow" class="toc-link">Минимальный workflow</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-github-actions-с-кэшированием-глобального-стора" class="toc-link">С кэшированием глобального стора</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-безопасность" class="toc-link">🔒 Безопасность</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-безопасность-аудит-в-ci" class="toc-link">Аудит в CI</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-безопасность-автофикс-уязвимостей" class="toc-link">Автофикс уязвимостей</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-сборка-и-деплой" class="toc-link">🏗️ Сборка и деплой</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-сборка-и-деплой-сборка-проекта" class="toc-link">Сборка проекта</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-сборка-и-деплой-деплой-на-github-pages" class="toc-link">Деплой на GitHub Pages</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-docker" class="toc-link">🐳 Docker</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-docker-dockerfile" class="toc-link">Dockerfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-docker-сборка-и-запуск" class="toc-link">Сборка и запуск</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-gitlab-ci" class="toc-link">🔧 GitLab CI</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-circleci" class="toc-link">🔄 CircleCI</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-лучшие-практики" class="toc-link">🧪 Лучшие практики</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-лучшие-практики-1-всегда-используй-frozen-lockfile" class="toc-link">1. Всегда используй --frozen-lockfile</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-лучшие-практики-2-кэшируй-глобальный-стор" class="toc-link">2. Кэшируй глобальный стор</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-лучшие-практики-3-запускай-аудит-в-ci" class="toc-link">3. Запускай аудит в CI</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-лучшие-практики-4-используй-mip-doctor-для-диагностики" class="toc-link">4. Используй mip doctor для диагностики</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#cicd-с-mip-лучшие-практики-5-проверяй-устаревшие-пакеты" class="toc-link">5. Проверяй устаревшие пакеты</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-пример-полного-ci-пайплайна" class="toc-link">📊 Пример полного CI пайплайна</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#cicd-с-mip-связанные-страницы" class="toc-link">🔗 Связанные страницы</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

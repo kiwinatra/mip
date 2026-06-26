@@ -19,4 +19,3 @@ async function withCwd(cwd, fn) {
 }
 
 module.exports = { withCwd };
-

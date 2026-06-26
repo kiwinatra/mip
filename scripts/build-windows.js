@@ -1,24 +1,11 @@
 #!/usr/bin/env node
 /*
  * ┌─────────────────────────────────────────────────────────────────────┐
- * │                                                                     │
- * │   ███╗   ███╗██╗██████╗                                             │
- * │   ████╗ ████║██║██╔══██╗                                            │
- * │   ██╔████╔██║██║██████╔╝                                            │
- * │   ██║╚██╔╝██║██║██╔═══╝                                             │
- * │   ██║ ╚═╝ ██║██║██║                                                 │
- * │   ╚═╝     ╚═╝╚═╝╚═╝                                                 │
- * │                                                                     │
  * │   MInimal Package Manager                                          │
  * │   https://github.com/kiwinatra/mip                                 │
- * │                                                                     │
  * │   MIT License · Copyright (c) 2026 kiwinatra                        │
- * │                                                                     │
  * └─────────────────────────────────────────────────────────────────────┘
  */
-
-
-
 
 const fs = require('fs');
 const path = require('path');
@@ -28,7 +15,7 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 function log(msg, color = 'reset') {
@@ -37,7 +24,7 @@ function log(msg, color = 'reset') {
     blue: '\x1b[36m',
     yellow: '\x1b[33m',
     red: '\x1b[31m',
-    reset: '\x1b[0m'
+    reset: '\x1b[0m',
   };
   console.log(`${colors[color]}${msg}${colors.reset}`);
 }
@@ -57,19 +44,22 @@ class WindowsBuilder {
 
   buildBinary(target, outputName) {
     log(`\n📦 Building for Windows ${target.includes('x86') ? '32-bit' : '64-bit'}...`, 'blue');
-    
+
     try {
       if (!fs.existsSync('dist')) fs.mkdirSync('dist');
-      
+
       const outputPath = path.join(this.currentDir, 'dist', outputName);
-      
+
       execSync(`npx pkg ${this.mipScript} --targets ${target} --output ${outputPath}`, {
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
-      
+
       const stats = fs.statSync(outputPath);
-      log(`✅ Binary created: ${outputPath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`, 'green');
-      
+      log(
+        `✅ Binary created: ${outputPath} (${(stats.size / 1024 / 1024).toFixed(2)} MB)`,
+        'green'
+      );
+
       return outputPath;
     } catch (err) {
       log(`❌ Build failed: ${err.message}`, 'red');
@@ -79,14 +69,20 @@ class WindowsBuilder {
 
   addToPathWindows(userBin) {
     try {
-      const currentPath = execSync('powershell -Command "[Environment]::GetEnvironmentVariable(\'Path\', \'User\')"', { 
-        encoding: 'utf8' 
-      }).trim();
-      
+      const currentPath = execSync(
+        "powershell -Command \"[Environment]::GetEnvironmentVariable('Path', 'User')\"",
+        {
+          encoding: 'utf8',
+        }
+      ).trim();
+
       if (!currentPath.includes(userBin)) {
-        execSync(`powershell -Command "[Environment]::SetEnvironmentVariable('Path', '${userBin};' + [Environment]::GetEnvironmentVariable('Path', 'User'), 'User')"`, { 
-          stdio: 'pipe' 
-        });
+        execSync(
+          `powershell -Command "[Environment]::SetEnvironmentVariable('Path', '${userBin};' + [Environment]::GetEnvironmentVariable('Path', 'User'), 'User')"`,
+          {
+            stdio: 'pipe',
+          }
+        );
         log(`✅ Added ${userBin} to User PATH`, 'green');
         log('🔄 Please restart your terminal for changes to take effect', 'yellow');
         return true;
@@ -114,13 +110,13 @@ class WindowsBuilder {
   async installToUserBin(binaryPath) {
     const installDir = path.join(this.homeDir, 'AppData', 'Local', 'mip');
     fs.mkdirSync(installDir, { recursive: true });
-    
+
     const targetPath = path.join(installDir, 'mip.exe');
     fs.copyFileSync(binaryPath, targetPath);
-    
+
     this.createWrapperScript(targetPath, installDir);
     this.addToPathWindows(installDir);
-    
+
     log(`✅ Installed to ${installDir}`, 'green');
     return true;
   }
@@ -139,14 +135,14 @@ async function main() {
   console.log('');
 
   const archChoice = await question('Choose (1-2): ');
-  
+
   let target, outputName;
-  
+
   if (archChoice === '1') {
-    target = 'node20-win-x64';
+    target = 'node18-win-x64';
     outputName = 'mip-windows-x64.exe';
   } else if (archChoice === '2') {
-    target = 'node20-win-x86';
+    target = 'node18-win-x86';
     outputName = 'mip-windows-x86.exe';
   } else {
     log('❌ Invalid choice', 'red');
@@ -154,7 +150,7 @@ async function main() {
   }
 
   const binary = await new WindowsBuilder().buildBinary(target, outputName);
-  
+
   if (!binary) {
     log('❌ Build failed', 'red');
     process.exit(1);
@@ -173,7 +169,7 @@ async function main() {
   console.log('');
 
   const builder2 = new WindowsBuilder();
-  
+
   if (installChoice === '1') {
     await builder2.installToUserBin(binary);
   } else {

@@ -17,16 +17,13 @@
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
-
-
-
 const { UnixBuilder } = require('./build-unix.js');
 const readline = require('readline');
 const path = require('path');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 const builder = new UnixBuilder();
@@ -45,7 +42,7 @@ async function main() {
   console.log('');
 
   const binary = builder.buildBinary('node18-linux-x64', 'mip-linux-x64');
-  
+
   if (!binary) {
     builder.log('❌ Build failed', 'red');
     process.exit(1);

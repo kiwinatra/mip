@@ -23,6 +23,5 @@ module.exports = {
   createTmpDir,
   writeJson,
   ensureDir,
-  cleanupDir
+  cleanupDir,
 };
-

@@ -1,0 +1,2282 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.7">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      var siteRoot = "../../";
+      if (siteRoot && !siteRoot.endsWith('/')) siteRoot += '/';
+      if (siteRoot === '') siteRoot = './';
+      window.DOCMD_SITE_ROOT = siteRoot;
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/";
+      window.DOCMD_LOCALE = "en";
+      window.DOCMD_DEFAULT_LOCALE = "en";
+    </script>
+    <title>
+      Extended FAQ : MIP - Modern Package Manager
+    </title>
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mquv0kiw">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mquv0kiw" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mquv0kiw" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Answers to complex questions about MIP — architecture, plugins, debugging, performance.">
+<link rel="canonical" href="https://mip.fwh.is/other/faq/">
+<meta property="og:title" content="Extended FAQ - MIP - Modern Package Manager">
+<meta property="og:description" content="Answers to complex questions about MIP — architecture, plugins, debugging, performance.">
+<meta property="og:url" content="https://mip.fwh.is/other/faq/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Extended FAQ - MIP - Modern Package Manager">
+<meta name="twitter:description" content="Answers to complex questions about MIP — architecture, plugins, debugging, performance.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mquv0kiw" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mquv0kiw" >
+<link rel="alternate" hreflang="ru" href="/ru/other/faq/">
+<link rel="alternate" hreflang="en" href="/other/faq/">
+<link rel="alternate" hreflang="x-default" href="/other/faq/">
+    
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/en/other/faq.md">
+
+    <a href="#main-content" class="skip-link">skipToContent</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../../">
+                MIP - Modern Package Manager
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+            <div class="sidebar-options-wrapper">
+              
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+    <div class="options-menu-language">
+        
+
+
+<div class="docmd-language-switcher language-compact">
+  <button class="language-switcher-toggle" aria-expanded="false" aria-label="selectLanguage">
+    
+<svg class="lucide-icon icon-globe language-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-globe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+  <path d="M2 12h20" />
+</svg>
+
+    
+  </button>
+  <ul class="language-switcher-menu">
+    
+    <li>
+      <a href="/ru/other/faq" 
+        class="language-switcher-item " 
+        data-spa-ignore
+        data-locale-id="ru"
+        lang="ru"
+        dir="ltr"
+        >
+        Русский
+        
+        
+      </a>
+    </li>
+    
+    <li>
+      <a href="/other/faq" 
+        class="language-switcher-item active" 
+        data-spa-ignore
+        data-locale-id="en"
+        lang="en"
+        dir="ltr"
+        >
+        English
+        
+          
+<svg class="lucide-icon icon-check language-check" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-check"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 6 9 17l-5-5" />
+</svg>
+
+        
+        
+      </a>
+    </li>
+    
+  </ul>
+</div>
+
+    </div>
+    
+
+    
+    <button class="theme-toggle-button" aria-label="toggleTheme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+            </div>
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="mainNavigation">
+  <ul>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Introduction
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Welcome
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../qna/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Q&amp;A
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Commands
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../commands/audit/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            audit
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/cache/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            cache
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/ci/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            ci
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/create/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            create
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/dedupe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            dedupe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/doctor/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            doctor
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exec/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exec
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/exports/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            exports
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/genlock/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            genlock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/global/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            global
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/info/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            info
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/init/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            init
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/language/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            language
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/legacy/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            legacy
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/link/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            link
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/list/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            list
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/oldrepo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            oldrepo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/outdated/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            outdated
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/repo/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            repo
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/run/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            run
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/search/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            search
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/super-install/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            super-install
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/uninstall/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            uninstall
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/update/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            update
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/why/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            why
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/workspaces/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            workspaces
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/pe/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            pe
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../commands/plugin/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            plugin
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-cog " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cog"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 10.27 7 3.34" />
+  <path d="m11 13.73-4 6.93" />
+  <path d="M12 22v-2" />
+  <path d="M12 2v2" />
+  <path d="M14 12h8" />
+  <path d="m17 20.66-1-1.73" />
+  <path d="m17 3.34-1 1.73" />
+  <path d="M2 12h2" />
+  <path d="m20.66 17-1.73-1" />
+  <path d="m20.66 7-1.73 1" />
+  <path d="m3.34 17 1.73-1" />
+  <path d="m3.34 7 1.73 1" />
+  <circle cx="12" cy="12" r="2" />
+  <circle cx="12" cy="12" r="8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Setup
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../setup/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Creating a Project
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/quick-start/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Quick Start
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../setup/configuration/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-star " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-star"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Pros
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../pro-users/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/performance/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Performance
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../pro-users/ci-cd/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            CI/CD
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            For Developers
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../dev/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/architecture/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Architecture
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/adding-commands/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Adding Commands
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/testing/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Testing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/all-plugins/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            All About Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../dev/hooks/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Hooks &amp; Plugins
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-bug " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-bug"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v-9" />
+  <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" />
+  <path d="M14.12 3.88 16 2" />
+  <path d="M21 21a4 4 0 0 0-3.81-4" />
+  <path d="M21 5a4 4 0 0 1-3.55 3.97" />
+  <path d="M22 13h-4" />
+  <path d="M3 21a4 4 0 0 1 3.81-4" />
+  <path d="M3 5a4 4 0 0 0 3.55 3.97" />
+  <path d="M6 13H2" />
+  <path d="m8 2 1.88 1.88" />
+  <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            General List
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/network/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Network &amp; Registries
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/lockfile/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Lock Files
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-archive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-archive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="5" x="2" y="3" rx="1" />
+  <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+  <path d="M10 12h4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Other
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../other/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../other/glossary/" class=" "
+          >
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../other/faq/" class="active "
+          >
+          
+          <span class="nav-item-title">
+            Extended FAQ
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="toggleSidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Extended FAQ
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Extended%20FAQ%22%0Adescription%3A%20%22Answers%20to%20complex%20questions%20about%20MIP%20%E2%80%94%20architecture%2C%20plugins%2C%20debugging%2C%20performance.%22%0A---%0A%0A%23%20Extended%20FAQ%20%E2%9D%93%0A%0AAnswers%20to%20questions%20that%20come%20up%20for%20experienced%20users%20and%20developers.%0A%0A---%0A%0A%23%23%20%F0%9F%93%A6%20General%20questions%0A%0A%23%23%23%20How%20is%20MIP%20different%20from%20npm%3F%0AMIP%20does%20not%20duplicate%20packages%20in%20%60node_modules%60.%20Instead%2C%20all%20packages%20are%20stored%20in%20the%20global%20cache%20%60~%2F.mip%2Fstore%2F%60.%20This%20saves%20space%20and%20speeds%20up%20installation.%0A%0A**Comparison%3A**%0A%7C%20Feature%20%7C%20npm%20%7C%20MIP%20%7C%0A%7C---------%7C-----%7C-----%7C%0A%7C%20Package%20duplication%20%7C%20%E2%9C%85%20Yes%20%7C%20%E2%9D%8C%20No%20%7C%0A%7C%20Global%20cache%20%7C%20%E2%9D%8C%20No%20%7C%20%E2%9C%85%20Yes%20%7C%0A%7C%20Offline%20mode%20%7C%20%E2%9D%8C%20No%20%7C%20%E2%9C%85%20Yes%20(after%20first%20install)%20%7C%0A%7C%20Plugins%20%7C%20%E2%9D%8C%20No%20%7C%20%E2%9C%85%20Yes%20%7C%0A%7C%20YAML%20configs%20%7C%20%E2%9D%8C%20No%20%7C%20%E2%9C%85%20Yes%20%7C%0A%0A%23%23%23%20Where%20are%20packages%20stored%3F%0AIn%20the%20global%20cache%20%60~%2F.mip%2Fstore%2F%60%3A%0A%0A%60%60%60%0A~%2F.mip%2Fstore%2F%0A%E2%94%9C%E2%94%80%E2%94%80%20lodash%2F%0A%E2%94%82%20%20%20%E2%94%94%E2%94%80%E2%94%80%204.17.21%2F%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20package.json%0A%E2%94%82%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20index.js%0A%E2%94%94%E2%94%80%E2%94%80%20express%2F%0A%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%204.18.2%2F%0A%20%20%20%20%20%20%20%20%E2%94%9C%E2%94%80%E2%94%80%20package.json%0A%20%20%20%20%20%20%20%20%E2%94%94%E2%94%80%E2%94%80%20lib%2F%0A%60%60%60%0A%0AThe%20project%20only%20has%20symlinks%20in%20%60node_modules%2F%60.%0A%0A%23%23%23%20Can%20I%20delete%20%60~%2F.mip%2F%60%3F%0AYes%2C%20but%20then%20you&#039;ll%20have%20to%20reinstall%20all%20packages.%0A%0A---%0A%0A%23%23%20%F0%9F%94%8C%20Plugins%0A%0A%23%23%23%20How%20do%20I%20create%20a%20plugin%3F%0A%0A%60%60%60bash%0Amip%20plugin%20create%20my-plugin%0A%60%60%60%0A%0AThe%20plugin%20will%20appear%20in%20%60plugins%2Fmy-plugin%2F%60.%0A%0A%23%23%23%20Where%20are%20compiled%20plugins%20stored%3F%0AIn%20%60~%2F.mip_cache%2Fplugins%2F%60.%0A%0A%23%23%23%20How%20do%20I%20run%20a%20plugin%20command%3F%0A%0A%60%60%60bash%0Amip%20pe%20my-plugin%20my-command%0A%60%60%60%0A%0A%23%23%23%20Can%20I%20pass%20arguments%20to%20a%20plugin%20command%3F%0AYes%3A%0A%0A%60%60%60bash%0Amip%20pe%20my-plugin%20my-command%20arg1%20arg2%0A%60%60%60%0A%0A%23%23%23%20What%20hooks%20are%20available%20in%20plugins%3F%0AAll%20hooks%20are%20described%20in%20the%20%5BHooks%20and%20plugins%5D(%2Fdev%2Fhooks)%20section.%20Main%20ones%3A%0A%0A%7C%20Hook%20%7C%20When%20called%20%7C%0A%7C------%7C-------------%7C%0A%7C%20%60beforeInstall%60%20%7C%20Before%20installation%20%7C%0A%7C%20%60afterInstall%60%20%7C%20After%20installation%20%7C%0A%7C%20%60onError%60%20%7C%20On%20error%20%7C%0A%0A%23%23%23%20Can%20I%20use%20the%20MIP%20API%20in%20plugins%3F%0AYes.%20In%20%60init()%60%2C%20the%20plugin%20receives%20an%20%60api%60%20object%3A%0A%0A%60%60%60javascript%0Ainit%3A%20async%20(%7B%20api%20%7D)%20%3D%3E%20%7B%0A%20%20const%20config%20%3D%20api.getMipJson()%3B%0A%20%20const%20version%20%3D%20api.getVersion()%3B%0A%20%20console.log(%60MIP%20v%24%7Bversion%7D%60)%3B%0A%7D%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%90%9B%20Debugging%20and%20errors%0A%0A%23%23%23%20How%20do%20I%20enable%20debug%20mode%3F%0A%0A%60%60%60bash%0ADEBUG%3D1%20mip%20install%20lodash%0A%60%60%60%0A%0A%23%23%23%20Where%20can%20I%20see%20logs%3F%0ALogs%20are%20printed%20to%20the%20console.%20For%20logger%20plugins%2C%20you%20can%20write%20to%20a%20file.%0A%0A%23%23%23%20A%20command%20is%20stuck.%20What%20should%20I%20do%3F%0APress%20%60Ctrl%2BC%60.%20If%20stuck%20on%20%60npm%20install%60%20in%20a%20plugin%20%E2%80%94%20check%20the%20plugin&#039;s%20%60package.json%60.%0A%0A%23%23%23%20Why%20doesn&#039;t%20%60mip%20pe%60%20see%20my%20command%3F%0A1.%20Check%20that%20the%20plugin%20is%20activated%3A%20%60mip%20plugin%20list%60%0A2.%20Check%20that%20the%20command%20is%20registered%20in%20%60commands%3A%20%7B%7D%60%0A3.%20Recompile%20the%20plugin%3A%20%60mip%20plugin%20compile%20my-plugin%60%0A%0A---%0A%0A%23%23%20%F0%9F%9A%80%20Performance%0A%0A%23%23%23%20Why%20is%20MIP%20faster%20than%20npm%3F%0A-%20Parallel%20downloading%20(up%20to%2010%20packages%20at%20once)%0A-%20Three-level%20caching%20(SuperCache)%0A-%20HTTP%2F2%0A-%20Global%20cache%20(no%20need%20to%20re-download)%0A%0A**Benchmarks%3A**%0A%60%60%60%0Anpm%3A%20%204.2s%20%20(cold%20cache)%0Apnpm%3A%203.1s%0Amip%3A%20%202.8s%20%20(cold%20cache)%0Amip%3A%20%200.4s%20%20(warm%20cache)%20%E2%86%90%2010x%20faster%20than%20npm%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20clear%20the%20cache%3F%0A%0A%60%60%60bash%0A%23%20Local%20cache%0Amip%20cache%20clean%0A%0A%23%20Global%20cache%0Amip%20cache%20clean%20--global%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20check%20cache%20size%3F%0A%0A%60%60%60bash%0Amip%20cache%20size%0Amip%20cache%20size%20--global%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%94%A7%20Configuration%0A%0A%23%23%23%20Where%20is%20the%20MIP%20config%20located%3F%0AIn%20%60mip.yml%60%20in%20the%20project%20root.%0A%0A%23%23%23%20How%20do%20I%20change%20the%20language%3F%0A%0A%60%60%60bash%0Amip%20language%20ru%0A%60%60%60%0A%0A%23%23%23%20What%20languages%20are%20supported%3F%0A%60en%60%2C%20%60ru%60%2C%20%60es%60%2C%20%60fr%60%2C%20%60de%60%2C%20%60it%60%2C%20%60pt%60%2C%20%60zh%60%2C%20%60ja%60%2C%20%60ko%60.%0A%0A%23%23%23%20How%20do%20I%20migrate%20from%20old%20%60mip.json%60%3F%0AOn%20first%20run%2C%20MIP%20automatically%20migrates%3A%0A-%20%60mip.json%60%20%E2%86%92%20%60mip.yml%60%20(with%20backup)%0A-%20%60mip-lock.json%60%20%E2%86%92%20%60mip-lock.yml%60%20(with%20backup)%0A%0A---%0A%0A%23%23%20%F0%9F%A7%AA%20CI%2FCD%0A%0A%23%23%23%20How%20do%20I%20use%20MIP%20in%20CI%3F%0A%0A%60%60%60bash%0Amip%20ci%0A%60%60%60%0A%0A%23%23%23%20What%20does%20%60mip%20ci%60%20do%3F%0AInstalls%20packages%20strictly%20from%20%60mip-lock.yml%60%2C%20ignoring%20%60mip.yml%60.%0A%0A%23%23%23%20What%20is%20%60frozen-lockfile%60%3F%0A%0A%60%60%60bash%0Amip%20ci%20--frozen-lockfile%0A%60%60%60%0A%0AChecks%20that%20the%20lockfile%20is%20synced%20with%20%60mip.yml%60.%20If%20there%20are%20mismatches%20%E2%80%94%20exits%20with%20an%20error.%0A%0A%23%23%23%20How%20do%20I%20check%20security%20in%20CI%3F%0A%0A%60%60%60bash%0Amip%20audit%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%A7%A9%20Working%20with%20packages%0A%0A%23%23%23%20How%20do%20I%20install%20a%20package%20without%20saving%20to%20%60mip.yml%60%3F%0A%0A%60%60%60bash%0Amip%20install%20lodash%20--no-save%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20install%20a%20specific%20version%3F%0A%0A%60%60%60bash%0Amip%20install%20lodash%404.17.21%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20update%20all%20packages%3F%0A%0A%60%60%60bash%0Amip%20update%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20remove%20a%20package%3F%0A%0A%60%60%60bash%0Amip%20uninstall%20lodash%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20view%20installed%20packages%3F%0A%0A%60%60%60bash%0Amip%20list%0A%60%60%60%0A%0A%23%23%23%20How%20do%20I%20find%20out%20why%20a%20package%20is%20installed%3F%0A%0A%60%60%60bash%0Amip%20why%20lodash%0A%60%60%60%0A%0A---%0A%0A%23%23%20%F0%9F%9B%A0%EF%B8%8F%20Development%0A%0A%23%23%23%20How%20do%20I%20add%20my%20own%20command%20to%20MIP%3F%0ATwo%20ways%3A%0A%0A1.%20**Built-in%20command%20(fork)%3A**%20modify%20%60bin%2Fmip.js%60%0A2.%20**Plugin%3A**%20via%20%60api.registerCommand()%60%0A%0ASee%3A%20%5BAdding%20commands%5D(%2Fdev%2Fadding-commands).%0A%0A%23%23%23%20How%20do%20I%20test%20a%20plugin%3F%0A%0A%60%60%60bash%0Amip%20plugin%20compile%20my-plugin%0Amip%20plugin%20activate%20my-plugin%0Amip%20pe%20my-plugin%20my-command%0A%60%60%60%0A%0A---%0A%0A%23%23%20%E2%9D%93%20If%20you%20didn&#039;t%20find%20an%20answer%0A%0AOpen%20an%20issue%20on%20GitHub%3A%20%5Bhttps%3A%2F%2Fgithub.com%2Fkiwinatra%2Fmip%2Fissues%5D(https%3A%2F%2Fgithub.com%2Fkiwinatra%2Fmip%2Fissues)%0A%0A---%0A%0A%23%23%20Related%20pages%0A%0A-%20%5BMIP%20Architecture%5D(%2Fdev%2Farchitecture)%20%E2%80%94%20project%20structure%0A-%20%5BHooks%20and%20plugins%5D(%2Fdev%2Fhooks)%20%E2%80%94%20extending%20functionality%0A-%20%5Bmip%20plugin%5D(%2Fcommands%2Fplugin)%20%E2%80%94%20manage%20plugins%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Other</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Extended FAQ</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="copiedToClipboard" title="copyMarkdown" aria-label="copyMarkdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="copiedToClipboard" title="copyContext">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">copyContext</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="extended-faq" class="docmd-heading"><a href="#extended-faq" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Extended FAQ ❓</h1>
+<p>Answers to questions that come up for experienced users and developers.</p>
+<hr>
+<h2 id="extended-faq-general-questions" class="docmd-heading"><a href="#extended-faq-general-questions" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>📦 General questions</h2>
+<h3 id="extended-faq-general-questions-how-is-mip-different-from-npm" class="docmd-heading"><a href="#extended-faq-general-questions-how-is-mip-different-from-npm" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How is MIP different from npm?</h3>
+<p>MIP does not duplicate packages in <code>node_modules</code>. Instead, all packages are stored in the global cache <code>~/.mip/store/</code>. This saves space and speeds up installation.</p>
+<p><strong>Comparison:</strong></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>npm</th>
+<th>MIP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Package duplication</td>
+<td>✅ Yes</td>
+<td>❌ No</td>
+</tr>
+<tr>
+<td>Global cache</td>
+<td>❌ No</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>Offline mode</td>
+<td>❌ No</td>
+<td>✅ Yes (after first install)</td>
+</tr>
+<tr>
+<td>Plugins</td>
+<td>❌ No</td>
+<td>✅ Yes</td>
+</tr>
+<tr>
+<td>YAML configs</td>
+<td>❌ No</td>
+<td>✅ Yes</td>
+</tr>
+</tbody>
+</table>
+</div><h3 id="extended-faq-general-questions-where-are-packages-stored" class="docmd-heading"><a href="#extended-faq-general-questions-where-are-packages-stored" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Where are packages stored?</h3>
+<p>In the global cache <code>~/.mip/store/</code>:</p>
+<pre class="hljs"><code><span class="hljs-punctuation">~/</span>.<span class="hljs-attr">mip</span><span class="hljs-punctuation">/</span>store<span class="hljs-punctuation">/</span>
+├── lodash<span class="hljs-punctuation">/</span>
+│   └── <span class="hljs-number">4.17</span>.<span class="hljs-number">21</span><span class="hljs-punctuation">/</span>
+│       ├── package.<span class="hljs-attr">json</span>
+│       └── index.<span class="hljs-attr">js</span>
+└── express<span class="hljs-punctuation">/</span>
+    └── <span class="hljs-number">4.18</span>.<span class="hljs-number">2</span><span class="hljs-punctuation">/</span>
+        ├── package.<span class="hljs-attr">json</span>
+        └── lib<span class="hljs-punctuation">/</span>
+</code></pre>
+<p>The project only has symlinks in <code>node_modules/</code>.</p>
+<h3 id="extended-faq-general-questions-can-i-delete-mip" class="docmd-heading"><a href="#extended-faq-general-questions-can-i-delete-mip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Can I delete <code>~/.mip/</code>?</h3>
+<p>Yes, but then you’ll have to reinstall all packages.</p>
+<hr>
+<h2 id="extended-faq-plugins" class="docmd-heading"><a href="#extended-faq-plugins" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔌 Plugins</h2>
+<h3 id="extended-faq-plugins-how-do-i-create-a-plugin" class="docmd-heading"><a href="#extended-faq-plugins-how-do-i-create-a-plugin" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I create a plugin?</h3>
+<pre class="hljs"><code class="language-bash">mip plugin create my<span class="hljs-punctuation">-</span>plugin
+</code></pre>
+<p>The plugin will appear in <code>plugins/my-plugin/</code>.</p>
+<h3 id="extended-faq-plugins-where-are-compiled-plugins-stored" class="docmd-heading"><a href="#extended-faq-plugins-where-are-compiled-plugins-stored" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Where are compiled plugins stored?</h3>
+<p>In <code>~/.mip_cache/plugins/</code>.</p>
+<h3 id="extended-faq-plugins-how-do-i-run-a-plugin-command" class="docmd-heading"><a href="#extended-faq-plugins-how-do-i-run-a-plugin-command" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I run a plugin command?</h3>
+<pre class="hljs"><code class="language-bash">mip pe my<span class="hljs-punctuation">-</span>plugin my<span class="hljs-punctuation">-</span>command
+</code></pre>
+<h3 id="extended-faq-plugins-can-i-pass-arguments-to-a-plugin-command" class="docmd-heading"><a href="#extended-faq-plugins-can-i-pass-arguments-to-a-plugin-command" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Can I pass arguments to a plugin command?</h3>
+<p>Yes:</p>
+<pre class="hljs"><code class="language-bash">mip pe my<span class="hljs-punctuation">-</span>plugin my<span class="hljs-punctuation">-</span>command arg1 arg2
+</code></pre>
+<h3 id="extended-faq-plugins-what-hooks-are-available-in-plugins" class="docmd-heading"><a href="#extended-faq-plugins-what-hooks-are-available-in-plugins" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What hooks are available in plugins?</h3>
+<p>All hooks are described in the <a href="/dev/hooks/">Hooks and plugins</a> section. Main ones:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>When called</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>beforeInstall</code></td>
+<td>Before installation</td>
+</tr>
+<tr>
+<td><code>afterInstall</code></td>
+<td>After installation</td>
+</tr>
+<tr>
+<td><code>onError</code></td>
+<td>On error</td>
+</tr>
+</tbody>
+</table>
+</div><h3 id="extended-faq-plugins-can-i-use-the-mip-api-in-plugins" class="docmd-heading"><a href="#extended-faq-plugins-can-i-use-the-mip-api-in-plugins" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Can I use the MIP API in plugins?</h3>
+<p>Yes. In <code>init()</code>, the plugin receives an <code>api</code> object:</p>
+<pre class="hljs"><code class="language-javascript">init<span class="hljs-punctuation">:</span> <span class="hljs-keyword">async</span> ({ api }) <span class="hljs-punctuation">=&gt;</span> {
+  <span class="hljs-keyword">const</span> config <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getMipJson</span>();
+  <span class="hljs-keyword">const</span> version <span class="hljs-punctuation">=</span> api.<span class="hljs-title function_">getVersion</span>();
+  console.<span class="hljs-title function_">log</span>(<span class="hljs-string">`MIP v${version}`</span>);
+}
+</code></pre>
+<hr>
+<h2 id="extended-faq-debugging-and-errors" class="docmd-heading"><a href="#extended-faq-debugging-and-errors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🐛 Debugging and errors</h2>
+<h3 id="extended-faq-debugging-and-errors-how-do-i-enable-debug-mode" class="docmd-heading"><a href="#extended-faq-debugging-and-errors-how-do-i-enable-debug-mode" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I enable debug mode?</h3>
+<pre class="hljs"><code class="language-bash">DEBUG<span class="hljs-punctuation">=</span><span class="hljs-number">1</span> mip install lodash
+</code></pre>
+<h3 id="extended-faq-debugging-and-errors-where-can-i-see-logs" class="docmd-heading"><a href="#extended-faq-debugging-and-errors-where-can-i-see-logs" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Where can I see logs?</h3>
+<p>Logs are printed to the console. For logger plugins, you can write to a file.</p>
+<h3 id="extended-faq-debugging-and-errors-a-command-is-stuck-what-should-i-do" class="docmd-heading"><a href="#extended-faq-debugging-and-errors-a-command-is-stuck-what-should-i-do" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>A command is stuck. What should I do?</h3>
+<p>Press <code>Ctrl+C</code>. If stuck on <code>npm install</code> in a plugin — check the plugin’s <code>package.json</code>.</p>
+<h3 id="extended-faq-debugging-and-errors-why-doesnt-mip-pe-see-my-command" class="docmd-heading"><a href="#extended-faq-debugging-and-errors-why-doesnt-mip-pe-see-my-command" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Why doesn’t <code>mip pe</code> see my command?</h3>
+<ol>
+<li>Check that the plugin is activated: <code>mip plugin list</code></li>
+<li>Check that the command is registered in <code>commands: {}</code></li>
+<li>Recompile the plugin: <code>mip plugin compile my-plugin</code></li>
+</ol>
+<hr>
+<h2 id="extended-faq-performance" class="docmd-heading"><a href="#extended-faq-performance" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🚀 Performance</h2>
+<h3 id="extended-faq-performance-why-is-mip-faster-than-npm" class="docmd-heading"><a href="#extended-faq-performance-why-is-mip-faster-than-npm" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Why is MIP faster than npm?</h3>
+<ul>
+<li>Parallel downloading (up to 10 packages at once)</li>
+<li>Three-level caching (SuperCache)</li>
+<li>HTTP/2</li>
+<li>Global cache (no need to re-download)</li>
+</ul>
+<p><strong>Benchmarks:</strong></p>
+<pre class="hljs"><code><span class="hljs-keyword">npm</span><span class="hljs-punctuation">:</span>  <span class="hljs-number">4</span>.2<span class="hljs-title function_">s</span>  (cold cache)
+<span class="hljs-keyword">pnpm</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span>.1s
+mip<span class="hljs-punctuation">:</span>  <span class="hljs-number">2</span>.8<span class="hljs-title function_">s</span>  (cold cache)
+mip<span class="hljs-punctuation">:</span>  <span class="hljs-number">0</span>.4<span class="hljs-title function_">s</span>  (warm cache) ← 10x faster than <span class="hljs-keyword">npm</span>
+</code></pre>
+<h3 id="extended-faq-performance-how-do-i-clear-the-cache" class="docmd-heading"><a href="#extended-faq-performance-how-do-i-clear-the-cache" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I clear the cache?</h3>
+<pre class="hljs"><code class="language-bash"><span class="hljs-comment"># Local cache</span>
+mip cache clean
+
+<span class="hljs-comment"># Global cache</span>
+mip cache clean <span class="hljs-punctuation">--</span>global
+</code></pre>
+<h3 id="extended-faq-performance-how-do-i-check-cache-size" class="docmd-heading"><a href="#extended-faq-performance-how-do-i-check-cache-size" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I check cache size?</h3>
+<pre class="hljs"><code class="language-bash">mip cache size
+mip cache size <span class="hljs-punctuation">--</span>global
+</code></pre>
+<hr>
+<h2 id="extended-faq-configuration" class="docmd-heading"><a href="#extended-faq-configuration" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🔧 Configuration</h2>
+<h3 id="extended-faq-configuration-where-is-the-mip-config-located" class="docmd-heading"><a href="#extended-faq-configuration-where-is-the-mip-config-located" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Where is the MIP config located?</h3>
+<p>In <code>mip.yml</code> in the project root.</p>
+<h3 id="extended-faq-configuration-how-do-i-change-the-language" class="docmd-heading"><a href="#extended-faq-configuration-how-do-i-change-the-language" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I change the language?</h3>
+<pre class="hljs"><code class="language-bash">mip language ru
+</code></pre>
+<h3 id="extended-faq-configuration-what-languages-are-supported" class="docmd-heading"><a href="#extended-faq-configuration-what-languages-are-supported" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What languages are supported?</h3>
+<p><code>en</code>, <code>ru</code>, <code>es</code>, <code>fr</code>, <code>de</code>, <code>it</code>, <code>pt</code>, <code>zh</code>, <code>ja</code>, <code>ko</code>.</p>
+<h3 id="extended-faq-configuration-how-do-i-migrate-from-old-mipjson" class="docmd-heading"><a href="#extended-faq-configuration-how-do-i-migrate-from-old-mipjson" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I migrate from old <code>mip.json</code>?</h3>
+<p>On first run, MIP automatically migrates:</p>
+<ul>
+<li><code>mip.json</code> → <code>mip.yml</code> (with backup)</li>
+<li><code>mip-lock.json</code> → <code>mip-lock.yml</code> (with backup)</li>
+</ul>
+<hr>
+<h2 id="extended-faq-cicd" class="docmd-heading"><a href="#extended-faq-cicd" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧪 CI/CD</h2>
+<h3 id="extended-faq-cicd-how-do-i-use-mip-in-ci" class="docmd-heading"><a href="#extended-faq-cicd-how-do-i-use-mip-in-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I use MIP in CI?</h3>
+<pre class="hljs"><code class="language-bash">mip ci
+</code></pre>
+<h3 id="extended-faq-cicd-what-does-mip-ci-do" class="docmd-heading"><a href="#extended-faq-cicd-what-does-mip-ci-do" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What does <code>mip ci</code> do?</h3>
+<p>Installs packages strictly from <code>mip-lock.yml</code>, ignoring <code>mip.yml</code>.</p>
+<h3 id="extended-faq-cicd-what-is-frozen-lockfile" class="docmd-heading"><a href="#extended-faq-cicd-what-is-frozen-lockfile" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What is <code>frozen-lockfile</code>?</h3>
+<pre class="hljs"><code class="language-bash">mip ci <span class="hljs-punctuation">--</span>frozen<span class="hljs-punctuation">-</span>lockfile
+</code></pre>
+<p>Checks that the lockfile is synced with <code>mip.yml</code>. If there are mismatches — exits with an error.</p>
+<h3 id="extended-faq-cicd-how-do-i-check-security-in-ci" class="docmd-heading"><a href="#extended-faq-cicd-how-do-i-check-security-in-ci" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I check security in CI?</h3>
+<pre class="hljs"><code class="language-bash">mip audit
+</code></pre>
+<hr>
+<h2 id="extended-faq-working-with-packages" class="docmd-heading"><a href="#extended-faq-working-with-packages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🧩 Working with packages</h2>
+<h3 id="extended-faq-working-with-packages-how-do-i-install-a-package-without-saving-to-mipyml" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-install-a-package-without-saving-to-mipyml" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I install a package without saving to <code>mip.yml</code>?</h3>
+<pre class="hljs"><code class="language-bash">mip install lodash <span class="hljs-punctuation">--</span>no<span class="hljs-punctuation">-</span>save
+</code></pre>
+<h3 id="extended-faq-working-with-packages-how-do-i-install-a-specific-version" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-install-a-specific-version" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I install a specific version?</h3>
+<pre class="hljs"><code class="language-bash">mip install lodash@<span class="hljs-number">4.17</span>.<span class="hljs-number">21</span>
+</code></pre>
+<h3 id="extended-faq-working-with-packages-how-do-i-update-all-packages" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-update-all-packages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I update all packages?</h3>
+<pre class="hljs"><code class="language-bash">mip update
+</code></pre>
+<h3 id="extended-faq-working-with-packages-how-do-i-remove-a-package" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-remove-a-package" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I remove a package?</h3>
+<pre class="hljs"><code class="language-bash">mip uninstall lodash
+</code></pre>
+<h3 id="extended-faq-working-with-packages-how-do-i-view-installed-packages" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-view-installed-packages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I view installed packages?</h3>
+<pre class="hljs"><code class="language-bash">mip list
+</code></pre>
+<h3 id="extended-faq-working-with-packages-how-do-i-find-out-why-a-package-is-installed" class="docmd-heading"><a href="#extended-faq-working-with-packages-how-do-i-find-out-why-a-package-is-installed" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I find out why a package is installed?</h3>
+<pre class="hljs"><code class="language-bash">mip why lodash
+</code></pre>
+<hr>
+<h2 id="extended-faq-development" class="docmd-heading"><a href="#extended-faq-development" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>🛠️ Development</h2>
+<h3 id="extended-faq-development-how-do-i-add-my-own-command-to-mip" class="docmd-heading"><a href="#extended-faq-development-how-do-i-add-my-own-command-to-mip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I add my own command to MIP?</h3>
+<p>Two ways:</p>
+<ol>
+<li><strong>Built-in command (fork):</strong> modify <code>bin/mip.js</code></li>
+<li><strong>Plugin:</strong> via <code>api.registerCommand()</code></li>
+</ol>
+<p>See: <a href="/dev/adding-commands/">Adding commands</a>.</p>
+<h3 id="extended-faq-development-how-do-i-test-a-plugin" class="docmd-heading"><a href="#extended-faq-development-how-do-i-test-a-plugin" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How do I test a plugin?</h3>
+<pre class="hljs"><code class="language-bash">mip plugin compile my<span class="hljs-punctuation">-</span>plugin
+mip plugin activate my<span class="hljs-punctuation">-</span>plugin
+mip pe my<span class="hljs-punctuation">-</span>plugin my<span class="hljs-punctuation">-</span>command
+</code></pre>
+<hr>
+<h2 id="extended-faq-if-you-didnt-find-an-answer" class="docmd-heading"><a href="#extended-faq-if-you-didnt-find-an-answer" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>❓ If you didn’t find an answer</h2>
+<p>Open an issue on GitHub: <a href="https://github.com/kiwinatra/mip/issues">https://github.com/kiwinatra/mip/issues</a></p>
+<hr>
+<h2 id="extended-faq-related-pages" class="docmd-heading"><a href="#extended-faq-related-pages" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Related pages</h2>
+<ul>
+<li><a href="/dev/architecture/">MIP Architecture</a> — project structure</li>
+<li><a href="/dev/hooks/">Hooks and plugins</a> — extending functionality</li>
+<li><a href="/commands/plugin/">mip plugin</a> — manage plugins</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../other/glossary/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>previous</small><strong>
+                            Glossary
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <div class="next-page-placeholder">
+                      </div>
+                    
+                  </div>
+                
+              </div>
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">onThisPage<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#extended-faq" class="toc-link">Extended FAQ ❓</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-general-questions" class="toc-link">📦 General questions</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-general-questions-how-is-mip-different-from-npm" class="toc-link">How is MIP different from npm?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-general-questions-where-are-packages-stored" class="toc-link">Where are packages stored?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-general-questions-can-i-delete-mip" class="toc-link">Can I delete ~/.mip/?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-plugins" class="toc-link">🔌 Plugins</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-how-do-i-create-a-plugin" class="toc-link">How do I create a plugin?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-where-are-compiled-plugins-stored" class="toc-link">Where are compiled plugins stored?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-how-do-i-run-a-plugin-command" class="toc-link">How do I run a plugin command?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-can-i-pass-arguments-to-a-plugin-command" class="toc-link">Can I pass arguments to a plugin command?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-what-hooks-are-available-in-plugins" class="toc-link">What hooks are available in plugins?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-plugins-can-i-use-the-mip-api-in-plugins" class="toc-link">Can I use the MIP API in plugins?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-debugging-and-errors" class="toc-link">🐛 Debugging and errors</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-debugging-and-errors-how-do-i-enable-debug-mode" class="toc-link">How do I enable debug mode?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-debugging-and-errors-where-can-i-see-logs" class="toc-link">Where can I see logs?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-debugging-and-errors-a-command-is-stuck-what-should-i-do" class="toc-link">A command is stuck. What should I do?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-debugging-and-errors-why-doesnt-mip-pe-see-my-command" class="toc-link">Why doesn’t mip pe see my command?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-performance" class="toc-link">🚀 Performance</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-performance-why-is-mip-faster-than-npm" class="toc-link">Why is MIP faster than npm?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-performance-how-do-i-clear-the-cache" class="toc-link">How do I clear the cache?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-performance-how-do-i-check-cache-size" class="toc-link">How do I check cache size?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-configuration" class="toc-link">🔧 Configuration</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-configuration-where-is-the-mip-config-located" class="toc-link">Where is the MIP config located?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-configuration-how-do-i-change-the-language" class="toc-link">How do I change the language?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-configuration-what-languages-are-supported" class="toc-link">What languages are supported?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-configuration-how-do-i-migrate-from-old-mipjson" class="toc-link">How do I migrate from old mip.json?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-cicd" class="toc-link">🧪 CI/CD</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-cicd-how-do-i-use-mip-in-ci" class="toc-link">How do I use MIP in CI?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-cicd-what-does-mip-ci-do" class="toc-link">What does mip ci do?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-cicd-what-is-frozen-lockfile" class="toc-link">What is frozen-lockfile?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-cicd-how-do-i-check-security-in-ci" class="toc-link">How do I check security in CI?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-working-with-packages" class="toc-link">🧩 Working with packages</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-install-a-package-without-saving-to-mipyml" class="toc-link">How do I install a package without saving to mip.yml?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-install-a-specific-version" class="toc-link">How do I install a specific version?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-update-all-packages" class="toc-link">How do I update all packages?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-remove-a-package" class="toc-link">How do I remove a package?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-view-installed-packages" class="toc-link">How do I view installed packages?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-working-with-packages-how-do-i-find-out-why-a-package-is-installed" class="toc-link">How do I find out why a package is installed?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-development" class="toc-link">🛠️ Development</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-development-how-do-i-add-my-own-command-to-mip" class="toc-link">How do I add my own command to MIP?</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#extended-faq-development-how-do-i-test-a-plugin" class="toc-link">How do I test a plugin?</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-if-you-didnt-find-an-answer" class="toc-link">❓ If you didn’t find an answer</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#extended-faq-related-pages" class="toc-link">Related pages</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+            </div>
+            <div class="page-footer-actions">
+              
+              
+              <span class="git-spacer"></span>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="page-footer">
+  <div class="footer-content">
+    <div class="user-footer">© 2026 MIP. Open-source MIT.</div>
+    
+      <div class="branding-footer">
+        builtWith <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+      </div>
+    
+  </div>
+</footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-i18n-manifest.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-main.js?v=mquv0kiw"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mquv0kiw"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mquv0kiw" ></script>
+<script src="https://cdn.jsdelivr.net/npm/minisearch@7.2.0/dist/umd/index.min.js" ></script>
+<script src="../../assets/js/docmd-search.js?v=mquv0kiw" ></script>
+<script src="../../assets/js/docmd-git.js?v=mquv0kiw" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":null,"branch":"main","editLink":false,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

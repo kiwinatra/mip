@@ -1,0 +1,427 @@
+packages:
+  '@docmd/core@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/core/-/core-0.8.8.tgz
+    dependencies:
+      '@docmd/api': ^0.8.8
+      '@docmd/deployer': ^0.8.8
+      '@docmd/live': ^0.8.8
+      '@docmd/parser': ^0.8.8
+      '@docmd/plugin-analytics': ^0.8.8
+      '@docmd/plugin-git': ^0.8.8
+      '@docmd/plugin-installer': ^0.8.8
+      '@docmd/plugin-llms': ^0.8.8
+      '@docmd/plugin-mermaid': ^0.8.8
+      '@docmd/plugin-okf': ^0.8.8
+      '@docmd/plugin-openapi': ^0.8.8
+      '@docmd/plugin-pwa': ^0.8.8
+      '@docmd/plugin-search': ^0.8.8
+      '@docmd/plugin-seo': ^0.8.8
+      '@docmd/plugin-sitemap': ^0.8.8
+      '@docmd/themes': ^0.8.8
+      '@docmd/tui': ^0.8.8
+      '@docmd/ui': ^0.8.8
+      '@docmd/utils': ^0.8.8
+      esbuild: ^0.28.1
+      ws: ^8.21.0
+    peerDependencies: {}
+    installPath: .mip/@docmd/core/0.8.8
+  ws@8.21.0:
+    version: 8.21.0
+    resolved: https://registry.npmjs.org/ws/-/ws-8.21.0.tgz
+    dependencies: {}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    installPath: .mip/ws/8.21.0
+  esbuild@0.28.1:
+    version: 0.28.1
+    resolved: https://registry.npmjs.org/esbuild/-/esbuild-0.28.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/esbuild/0.28.1
+  '@docmd/api@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/api/-/api-0.8.8.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.8
+      '@docmd/tui': ^0.8.8
+      '@docmd/utils': ^0.8.8
+    peerDependencies: {}
+    installPath: .mip/@docmd/api/0.8.8
+  '@docmd/utils@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/utils/-/utils-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/utils/0.8.8
+  '@docmd/plugin-git@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-git/-/plugin-git-0.8.8.tgz
+    dependencies: {}
+    peerDependencies:
+      '@docmd/api': ^0.8.8
+    installPath: .mip/@docmd/plugin-git/0.8.8
+  '@docmd/plugin-llms@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-llms/-/plugin-llms-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-llms/0.8.8
+  '@docmd/tui@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/tui/-/tui-0.8.8.tgz
+    dependencies:
+      chalk: ^4.1.2
+    peerDependencies: {}
+    installPath: .mip/@docmd/tui/0.8.8
+  '@docmd/plugin-pwa@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-pwa/-/plugin-pwa-0.8.8.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.8
+    peerDependencies:
+      '@docmd/api': ^0.8.8
+    installPath: .mip/@docmd/plugin-pwa/0.8.8
+  '@docmd/plugin-openapi@0.8.8':
+    version: 0.8.8
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-openapi/-/plugin-openapi-0.8.8.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.8
+    peerDependencies:
+      '@docmd/api': ^0.8.8
+    installPath: .mip/@docmd/plugin-openapi/0.8.8
+  '@docmd/plugin-mermaid@0.8.8':
+    version: 0.8.8
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-mermaid/-/plugin-mermaid-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-mermaid/0.8.8
+  '@docmd/plugin-installer@0.8.8':
+    version: 0.8.8
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-installer/-/plugin-installer-0.8.8.tgz
+    dependencies:
+      '@docmd/api': ^0.8.8
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-installer/0.8.8
+  '@docmd/plugin-analytics@0.8.8':
+    version: 0.8.8
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-analytics/-/plugin-analytics-0.8.8.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.8
+    peerDependencies:
+      '@docmd/api': ^0.8.8
+    installPath: .mip/@docmd/plugin-analytics/0.8.8
+  '@docmd/plugin-seo@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-seo/-/plugin-seo-0.8.8.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.8
+    peerDependencies:
+      '@docmd/api': ^0.8.8
+    installPath: .mip/@docmd/plugin-seo/0.8.8
+  '@docmd/plugin-sitemap@0.8.8':
+    version: 0.8.8
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-sitemap/-/plugin-sitemap-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-sitemap/0.8.8
+  '@docmd/themes@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/themes/-/themes-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/themes/0.8.8
+  chalk@4.1.2:
+    version: 4.1.2
+    resolved: https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz
+    dependencies:
+      ansi-styles: ^4.1.0
+      supports-color: ^7.1.0
+    peerDependencies: {}
+    installPath: .mip/chalk/4.1.2
+  '@docmd/plugin-okf@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-okf/-/plugin-okf-0.8.8.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-okf/0.8.8
+  '@docmd/plugin-search@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-search/-/plugin-search-0.8.8.tgz
+    dependencies:
+      markdown-it: ^14.2.0
+      minisearch: ^7.2.0
+    peerDependencies:
+      docmd-search: '>=0.1.0-alpha.1'
+    installPath: .mip/@docmd/plugin-search/0.8.8
+  ansi-styles@4.3.0:
+    version: 4.3.0
+    resolved: https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz
+    dependencies:
+      color-convert: ^2.0.1
+    peerDependencies: {}
+    installPath: .mip/ansi-styles/4.3.0
+  '@docmd/deployer@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/deployer/-/deployer-0.8.8.tgz
+    dependencies:
+      '@docmd/api': ^0.8.8
+    peerDependencies: {}
+    installPath: .mip/@docmd/deployer/0.8.8
+  supports-color@7.2.0:
+    version: 7.2.0
+    resolved: https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz
+    dependencies:
+      has-flag: ^4.0.0
+    peerDependencies: {}
+    installPath: .mip/supports-color/7.2.0
+  color-convert@2.0.1:
+    version: 2.0.1
+    resolved: https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz
+    dependencies:
+      color-name: ~1.1.4
+    peerDependencies: {}
+    installPath: .mip/color-convert/2.0.1
+  has-flag@4.0.0:
+    version: 4.0.0
+    resolved: https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/has-flag/4.0.0
+  color-name@1.1.4:
+    version: 1.1.4
+    resolved: https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/color-name/1.1.4
+  '@docmd/ui@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/ui/-/ui-0.8.8.tgz
+    dependencies:
+      '@docmd/api': ^0.8.8
+      '@docmd/tui': ^0.8.8
+    peerDependencies: {}
+    installPath: .mip/@docmd/ui/0.8.8
+  '@docmd/parser@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/parser/-/parser-0.8.8.tgz
+    dependencies:
+      '@docmd/tui': ^0.8.8
+      '@docmd/utils': ^0.8.8
+      embed-lite: ^0.1.4
+      lite-hl: ^0.1.2
+      lite-matter: ^0.1.1
+      lite-template: ^0.1.2
+      lucide-static: ^0.577.0
+      markdown-it: ^14.2.0
+      markdown-it-abbr: ^1.0.4
+      markdown-it-attrs: ^4.5.0
+      markdown-it-deflist: ^2.1.0
+      markdown-it-emoji: ^2.0.2
+      markdown-it-footnote: ^3.0.3
+      markdown-it-task-lists: ^2.1.1
+    peerDependencies: {}
+    installPath: .mip/@docmd/parser/0.8.8
+  '@docmd/live@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/live/-/live-0.8.8.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.8
+      '@docmd/plugin-math': ^0.8.8
+      '@docmd/plugin-mermaid': ^0.8.8
+      '@docmd/themes': ^0.8.8
+      '@docmd/tui': ^0.8.8
+      '@docmd/ui': ^0.8.8
+      buffer: ^6.0.3
+      esbuild: ^0.28.1
+      katex: ^0.17.0
+      markdown-it-texmath: ^1.0.0
+    peerDependencies: {}
+    installPath: .mip/@docmd/live/0.8.8
+  markdown-it-abbr@1.0.4:
+    version: 1.0.4
+    resolved: https://registry.npmjs.org/markdown-it-abbr/-/markdown-it-abbr-1.0.4.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-abbr/1.0.4
+  markdown-it-footnote@3.0.3:
+    version: 3.0.3
+    resolved: >-
+      https://registry.npmjs.org/markdown-it-footnote/-/markdown-it-footnote-3.0.3.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-footnote/3.0.3
+  markdown-it-deflist@2.1.0:
+    version: 2.1.0
+    resolved: >-
+      https://registry.npmjs.org/markdown-it-deflist/-/markdown-it-deflist-2.1.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-deflist/2.1.0
+  markdown-it-attrs@4.5.0:
+    version: 4.5.0
+    resolved: https://registry.npmjs.org/markdown-it-attrs/-/markdown-it-attrs-4.5.0.tgz
+    dependencies: {}
+    peerDependencies:
+      markdown-it: '>= 9.0.0'
+    installPath: .mip/markdown-it-attrs/4.5.0
+  buffer@6.0.3:
+    version: 6.0.3
+    resolved: https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz
+    dependencies:
+      base64-js: ^1.3.1
+      ieee754: ^1.2.1
+    peerDependencies: {}
+    installPath: .mip/buffer/6.0.3
+  ieee754@1.2.1:
+    version: 1.2.1
+    resolved: https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/ieee754/1.2.1
+  lite-matter@0.1.1:
+    version: 0.1.1
+    resolved: https://registry.npmjs.org/lite-matter/-/lite-matter-0.1.1.tgz
+    dependencies:
+      yaml: ^2.4.2
+    peerDependencies: {}
+    installPath: .mip/lite-matter/0.1.1
+  base64-js@1.5.1:
+    version: 1.5.1
+    resolved: https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/base64-js/1.5.1
+  lite-template@0.1.2:
+    version: 0.1.2
+    resolved: https://registry.npmjs.org/lite-template/-/lite-template-0.1.2.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/lite-template/0.1.2
+  lite-hl@0.1.2:
+    version: 0.1.2
+    resolved: https://registry.npmjs.org/lite-hl/-/lite-hl-0.1.2.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/lite-hl/0.1.2
+  markdown-it-emoji@2.0.2:
+    version: 2.0.2
+    resolved: https://registry.npmjs.org/markdown-it-emoji/-/markdown-it-emoji-2.0.2.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-emoji/2.0.2
+  markdown-it-task-lists@2.1.1:
+    version: 2.1.1
+    resolved: >-
+      https://registry.npmjs.org/markdown-it-task-lists/-/markdown-it-task-lists-2.1.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-task-lists/2.1.1
+  markdown-it-texmath@1.0.0:
+    version: 1.0.0
+    resolved: >-
+      https://registry.npmjs.org/markdown-it-texmath/-/markdown-it-texmath-1.0.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/markdown-it-texmath/1.0.0
+  '@docmd/plugin-math@0.8.8':
+    version: 0.8.8
+    resolved: https://registry.npmjs.org/@docmd/plugin-math/-/plugin-math-0.8.8.tgz
+    dependencies:
+      katex: ^0.17.0
+      markdown-it-texmath: ^1.0.0
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-math/0.8.8
+  minisearch@7.2.0:
+    version: 7.2.0
+    resolved: https://registry.npmjs.org/minisearch/-/minisearch-7.2.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/minisearch/7.2.0
+  embed-lite@0.1.4:
+    version: 0.1.4
+    resolved: https://registry.npmjs.org/embed-lite/-/embed-lite-0.1.4.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/embed-lite/0.1.4
+  markdown-it@14.2.0:
+    version: 14.2.0
+    resolved: https://registry.npmjs.org/markdown-it/-/markdown-it-14.2.0.tgz
+    dependencies:
+      argparse: ^2.0.1
+      entities: ^4.4.0
+      linkify-it: ^5.0.1
+      mdurl: ^2.0.0
+      punycode.js: ^2.3.1
+      uc.micro: ^2.1.0
+    peerDependencies: {}
+    installPath: .mip/markdown-it/14.2.0
+  argparse@2.0.1:
+    version: 2.0.1
+    resolved: https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/argparse/2.0.1
+  uc.micro@2.1.0:
+    version: 2.1.0
+    resolved: https://registry.npmjs.org/uc.micro/-/uc.micro-2.1.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/uc.micro/2.1.0
+  punycode.js@2.3.1:
+    version: 2.3.1
+    resolved: https://registry.npmjs.org/punycode.js/-/punycode.js-2.3.1.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/punycode.js/2.3.1
+  mdurl@2.0.0:
+    version: 2.0.0
+    resolved: https://registry.npmjs.org/mdurl/-/mdurl-2.0.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/mdurl/2.0.0
+  linkify-it@5.0.1:
+    version: 5.0.1
+    resolved: https://registry.npmjs.org/linkify-it/-/linkify-it-5.0.1.tgz
+    dependencies:
+      uc.micro: ^2.0.0
+    peerDependencies: {}
+    installPath: .mip/linkify-it/5.0.1
+  entities@4.5.0:
+    version: 4.5.0
+    resolved: https://registry.npmjs.org/entities/-/entities-4.5.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/entities/4.5.0
+  katex@0.17.0:
+    version: 0.17.0
+    resolved: https://registry.npmjs.org/katex/-/katex-0.17.0.tgz
+    dependencies:
+      commander: ^8.3.0
+    peerDependencies: {}
+    installPath: .mip/katex/0.17.0
+  yaml@2.9.0:
+    version: 2.9.0
+    resolved: https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/yaml/2.9.0
+  commander@8.3.0:
+    version: 8.3.0
+    resolved: https://registry.npmjs.org/commander/-/commander-8.3.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/commander/8.3.0
+  lucide-static@0.577.0:
+    version: 0.577.0
+    resolved: https://registry.npmjs.org/lucide-static/-/lucide-static-0.577.0.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/lucide-static/0.577.0
+version: '1.0'

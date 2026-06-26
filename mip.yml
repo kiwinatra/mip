@@ -1,0 +1,39 @@
+name: mip
+version: '2.0'
+language: en
+dependencies:
+  axios: ^1.16.1
+  blessed: ^0.1.81
+  js-yaml: ^5.1.0
+  lru-cache: ^10.1.0
+  semver: ^7.8.0
+  tar: ^7.5.15
+devDependencies:
+  '@docmd/core': ^0.8.7
+  chai: ^6.2.2
+  eslint: ^8.57.0
+  globals: ^17.7.0
+  mocha: ^11.7.6
+  nock: ^14.0.15
+  pkg: ^5.8.0
+  prettier: ^3.8.4
+  sinon: ^22.0.0
+  sonar-scanner: ^3.1.0
+  sonarjs: ^1.0.0
+scripts:
+  build: node build.js
+  dev: node bin/mip.js
+  test: npm run test:all
+  test:all: mocha "test/**/*.spec.js" --exit
+  build:linux:x64: node scripts/build-linux-x64.js
+  build:linux:x86: node scripts/build-linux-x86.js
+  build:macos: node scripts/build-macos.js
+  build:windows: node scripts/build-windows.js
+  build:all: >-
+    npm run build:linux:x64 && npm run build:linux:x86 && npm run build:macos &&
+    npm run build:windows
+  lint: eslint bin/ lib/
+  format: prettier --write "**/*.js"
+  docs:en: cd docs/docmd_EN && npm run dev
+  docs:ru: cd docs/docmd_RU && npm run dev
+workspaces: []

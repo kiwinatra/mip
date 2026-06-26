@@ -1,0 +1,606 @@
+{
+  "title": "MIP - Modern Package Manager",
+  "description": "",
+  "pages": [
+    {
+      "title": "mip audit — dependency security check",
+      "url": "https://mip.fwh.is/commands/audit/",
+      "description": "The audit command analyzes the dependency tree for known vulnerabilities, reports issues, and suggests automatic fixes.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip cache — Manage package cache",
+      "url": "https://mip.fwh.is/commands/cache/",
+      "description": "The cache command lets you view the size and clear the local and global MIP cache, freeing disk space.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip ci — install for CI/CD environments",
+      "url": "https://mip.fwh.is/commands/ci/",
+      "description": "The ci command is designed for fast and reliable dependency installation in CI/CD environments using a lockfile and verifying its integrity.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip create — create a new project from a template",
+      "url": "https://mip.fwh.is/commands/create/",
+      "description": "The create command generates a project structure based on ready-made templates (Node.js, React, CLI, Express) with automatic dependency installation.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip dedupe — remove duplicate dependencies",
+      "url": "https://mip.fwh.is/commands/dedupe/",
+      "description": "The dedupe command analyzes the dependency tree and removes duplicate packages to optimize structure and reduce the project size.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip doctor — diagnose the environment and the project",
+      "url": "https://mip.fwh.is/commands/doctor/",
+      "description": "The doctor command checks your environment: Node.js and MIP versions, Git availability, access to the registry, write permissions, and PATH correctness.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip exec — execute binaries from dependencies",
+      "url": "https://mip.fwh.is/commands/exec/",
+      "description": "The exec command runs executables from installed packages, without installing them globally. It looks up binaries in the manifest and inserts the correct path automatically.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip exports — view package export paths",
+      "url": "https://mip.fwh.is/commands/exports/",
+      "description": "The exports command shows all public export paths of a package that can be imported via require or import.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip genlock — generate lockfile",
+      "url": "https://mip.fwh.is/commands/genlock/",
+      "description": "The genlock command creates a mip-lock.yml file based on dependencies from mip.yml, pinning exact versions and URLs for reproducible installs.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip global — manage global packages",
+      "url": "https://mip.fwh.is/commands/global/",
+      "description": "The global command allows you to install, remove, and list packages installed globally for use anywhere in the system.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip info — get package information",
+      "url": "https://mip.fwh.is/commands/info/",
+      "description": "The info command shows detailed information about a package from the registry: description, author, versions, homepage, repository, and publication date.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip init — initialize a new project",
+      "url": "https://mip.fwh.is/commands/init/",
+      "description": "The init command creates the structure of a new MIP project: mip.yml, the .mip folder with subdirectories, and README.md with instructions.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip install — install dependencies",
+      "url": "https://mip.fwh.is/commands/install/",
+      "description": "The install command installs packages from the npm registry into your project, saves them to mip.yml, and creates a lockfile with pinned versions.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip language — manage interface language",
+      "url": "https://mip.fwh.is/commands/language/",
+      "description": "The language command allows you to view and change the language of MIP messages in the current project.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip legacy — work with legacy packages",
+      "url": "https://mip.fwh.is/commands/legacy/",
+      "description": "The legacy command helps identify and handle legacy packages that have not been updated for a long time or use outdated formats.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip link — local package linking for development",
+      "url": "https://mip.fwh.is/commands/link/",
+      "description": "The link command allows you to create a global link to a local package and use it in other projects, simplifying the development of interconnected packages without publishing to the registry.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip list — list installed packages",
+      "url": "https://mip.fwh.is/commands/list/",
+      "description": "The list command shows all packages installed in the current project with their versions, source (global cache or local), and status.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip repo — interactive GitHub repository browser",
+      "url": "https://mip.fwh.is/commands/oldrepo/",
+      "description": "The repo command allows you to browse GitHub repositories directly from the terminal, navigate folders, read READMEs, and download files.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip outdated — check for outdated packages",
+      "url": "https://mip.fwh.is/commands/outdated/",
+      "description": "The outdated command compares installed package versions with the latest versions in the registry and shows which packages need updating.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip pe — execute plugin commands",
+      "url": "https://mip.fwh.is/commands/pe/",
+      "description": "The pe (plugin-execute) command executes commands registered in MIP plugins.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip plugin — manage plugins",
+      "url": "https://mip.fwh.is/commands/plugin/",
+      "description": "Plugin management in MIP: creation, compilation, activation, command execution.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip repo — interactive TUI for GitHub repositories",
+      "url": "https://mip.fwh.is/commands/repo/",
+      "description": "The repo command opens a TUI file manager for browsing GitHub repositories, viewing contents, and downloading files.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip run — run custom scripts",
+      "url": "https://mip.fwh.is/commands/run/",
+      "description": "The run command executes scripts defined in the scripts section of mip.yml, with support for all installed packages in PATH.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip search — search for packages in the registry",
+      "url": "https://mip.fwh.is/commands/search/",
+      "description": "The search command searches the npm registry for packages matching a keyword, showing the name, version, and description.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip super-install — super-fast package installation",
+      "url": "https://mip.fwh.is/commands/super-install/",
+      "description": "The super-install command uses multi-threaded downloading, HTTP/2, parallel extraction, and super-cache for the fastest possible dependency installation.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip uninstall — remove packages",
+      "url": "https://mip.fwh.is/commands/uninstall/",
+      "description": "The uninstall command removes packages from your project, cleaning them from the global cache, manifest, mip-lock.yml, and mip.yml.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip update — update packages to the latest versions",
+      "url": "https://mip.fwh.is/commands/update/",
+      "description": "The update command checks for updates for all dependencies and installs them after user confirmation.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip why",
+      "url": "https://mip.fwh.is/commands/why/",
+      "description": "",
+      "priority": "medium"
+    },
+    {
+      "title": "mip workspaces — manage monorepositories",
+      "url": "https://mip.fwh.is/commands/workspaces/",
+      "description": "The workspaces command allows you to manage multiple packages in a single repository, executing commands across all workspaces simultaneously.",
+      "priority": "medium"
+    },
+    {
+      "title": "Adding commands to MIP",
+      "url": "https://mip.fwh.is/dev/adding-commands/",
+      "description": "How to create and register a new command in MIP — two ways: built-in command (fork) and plugin.",
+      "priority": "medium"
+    },
+    {
+      "title": "All about plugins in MIP",
+      "url": "https://mip.fwh.is/dev/all-plugins/",
+      "description": "Complete guide to plugins: structure, hooks, API, commands, examples and best practices.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP Architecture",
+      "url": "https://mip.fwh.is/dev/architecture/",
+      "description": "How MIP works internally: modules, data flow, file structure, the core, and the plugin API.",
+      "priority": "medium"
+    },
+    {
+      "title": "Hooks and plugins in MIP",
+      "url": "https://mip.fwh.is/dev/hooks/",
+      "description": "How to extend MIP with hooks and plugins — entry points, API, examples.",
+      "priority": "medium"
+    },
+    {
+      "title": "For Developers",
+      "url": "https://mip.fwh.is/dev/",
+      "description": "Everything a developer needs to know about MIP — architecture, adding commands, testing, and hooks.",
+      "priority": "medium"
+    },
+    {
+      "title": "Testing in MIP",
+      "url": "https://mip.fwh.is/dev/testing/",
+      "description": "How to write and run tests for MIP — unit tests, integration tests, plugin testing.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP — a fast and modern package manager",
+      "url": "https://mip.fwh.is/",
+      "description": "MIP is a lightweight and fast package manager for Node.js written in JavaScript. Easy to use, works without node_modules, and supports YAML configuration.",
+      "priority": "high"
+    },
+    {
+      "title": "Extended FAQ",
+      "url": "https://mip.fwh.is/other/faq/",
+      "description": "Answers to complex questions about MIP — architecture, plugins, debugging, performance.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP Glossary",
+      "url": "https://mip.fwh.is/other/glossary/",
+      "description": "A brief dictionary of terms used in MIP and the package manager ecosystem.",
+      "priority": "medium"
+    },
+    {
+      "title": "Other",
+      "url": "https://mip.fwh.is/other/",
+      "description": "Additional materials — glossary and extended FAQ.",
+      "priority": "medium"
+    },
+    {
+      "title": "CI/CD with MIP",
+      "url": "https://mip.fwh.is/pro-users/ci-cd/",
+      "description": "How to use MIP in CI/CD pipelines: installation, audit, deploy, GitHub Actions.",
+      "priority": "medium"
+    },
+    {
+      "title": "Other",
+      "url": "https://mip.fwh.is/pro-users/",
+      "description": "Additional materials — glossary and extended FAQ.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP Performance",
+      "url": "https://mip.fwh.is/pro-users/performance/",
+      "description": "How MIP achieves high speed: caching, parallel loading, HTTP/2, and global cache.",
+      "priority": "medium"
+    },
+    {
+      "title": "Quick Q&A (Q&A)",
+      "url": "https://mip.fwh.is/qna/",
+      "description": "The most common questions about MIP — installation, configuration, comparison with npm, troubleshooting.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip audit — проверка безопасности зависимостей",
+      "url": "https://mip.fwh.is/ru/commands/audit/",
+      "description": "Команда audit анализирует дерево зависимостей на наличие известных уязвимостей, сообщает о проблемах и предлагает автоматические исправления.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip cache — управление кэшем пакетов",
+      "url": "https://mip.fwh.is/ru/commands/cache/",
+      "description": "Команда cache позволяет просматривать размер и очищать локальный и глобальный кэш MIP, освобождая место на диске.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip ci — установка для CI/CD окружений",
+      "url": "https://mip.fwh.is/ru/commands/ci/",
+      "description": "Команда ci предназначена для быстрой и надёжной установки зависимостей в CI/CD средах, используя lock-файл и проверяя его целостность.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip create — создание нового проекта из шаблона",
+      "url": "https://mip.fwh.is/ru/commands/create/",
+      "description": "Команда create генерирует структуру проекта на основе готовых шаблонов (Node.js, React, CLI, Express) с автоматической установкой зависимостей.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip dedupe — устранение дублирующихся зависимостей",
+      "url": "https://mip.fwh.is/ru/commands/dedupe/",
+      "description": "Команда dedupe анализирует дерево зависимостей и удаляет дублирующиеся пакеты, оптимизируя структуру и уменьшая размер проекта.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip doctor — диагностика окружения и проекта",
+      "url": "https://mip.fwh.is/ru/commands/doctor/",
+      "description": "Команда doctor проверяет состояние вашего окружения: версии Node.js и MIP, наличие Git, доступ к реестру, права на запись и корректность настроек PATH.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip exec — выполнение бинарников из зависимостей",
+      "url": "https://mip.fwh.is/ru/commands/exec/",
+      "description": "Команда exec позволяет запускать исполняемые файлы из установленных пакетов, не добавляя их глобально. Ищет бинарники в манифесте и автоматически подставляет правильный путь.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip exports — просмотр экспортируемых путей пакета",
+      "url": "https://mip.fwh.is/ru/commands/exports/",
+      "description": "Команда exports показывает все публичные пути экспорта пакета, которые можно импортировать через require или import.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip genlock — генерация lock-файла",
+      "url": "https://mip.fwh.is/ru/commands/genlock/",
+      "description": "Команда genlock создаёт файл mip-lock.yml на основе зависимостей из mip.yml, фиксируя точные версии и URLs для воспроизводимой установки.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip global — управление глобальными пакетами",
+      "url": "https://mip.fwh.is/ru/commands/global/",
+      "description": "Команда global позволяет устанавливать, удалять и просматривать пакеты, установленные глобально для использования из любого места в системе.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip info — информация о пакете",
+      "url": "https://mip.fwh.is/ru/commands/info/",
+      "description": "Команда info показывает подробную информацию о пакете из реестра: описание, автора, версии, домашнюю страницу, репозиторий и дату публикации.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip init — инициализация нового проекта",
+      "url": "https://mip.fwh.is/ru/commands/init/",
+      "description": "Команда init создаёт структуру нового MIP-проекта: mip.yml, папку .mip с поддиректориями и README.md с инструкциями.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip install — установка зависимостей",
+      "url": "https://mip.fwh.is/ru/commands/install/",
+      "description": "Команда install устанавливает пакеты из реестра npm в ваш проект, сохраняет их в mip.yml и создаёт lock-файл с фиксированными версиями.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip language — управление языком интерфейса",
+      "url": "https://mip.fwh.is/ru/commands/language/",
+      "description": "Команда language позволяет просмотреть и изменить язык сообщений MIP в текущем проекте.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip legacy — работа с устаревшими пакетами",
+      "url": "https://mip.fwh.is/ru/commands/legacy/",
+      "description": "Команда legacy помогает выявлять и обрабатывать устаревшие пакеты, которые не обновлялись длительное время или используют устаревшие форматы.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip link",
+      "url": "https://mip.fwh.is/ru/commands/link/",
+      "description": "",
+      "priority": "medium"
+    },
+    {
+      "title": "mip list — список установленных пакетов",
+      "url": "https://mip.fwh.is/ru/commands/list/",
+      "description": "Команда list показывает все установленные пакеты в текущем проекте с их версиями, источником (глобальный кэш или локальный) и статусом.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip repo — интерактивный просмотр GitHub-репозиториев",
+      "url": "https://mip.fwh.is/ru/commands/oldrepo/",
+      "description": "Команда repo позволяет просматривать содержимое GitHub-репозиториев прямо из терминала, навигировать по папкам, читать README и скачивать файлы.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip outdated — проверка устаревших пакетов",
+      "url": "https://mip.fwh.is/ru/commands/outdated/",
+      "description": "Команда outdated сравнивает установленные версии пакетов с последними версиями в реестре и показывает, какие пакеты требуют обновления.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip pe — выполнение команд плагинов",
+      "url": "https://mip.fwh.is/ru/commands/pe/",
+      "description": "Команда pe (plugin-execute) выполняет команды, зарегистрированные в плагинах MIP.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip plugin — управление плагинами",
+      "url": "https://mip.fwh.is/ru/commands/plugin/",
+      "description": "Управление плагинами в MIP: создание, компиляция, активация, выполнение команд.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip repo — интерактивный просмотр GitHub-репозиториев",
+      "url": "https://mip.fwh.is/ru/commands/repo/",
+      "description": "Команда repo открывает TUI-файловый менеджер для навигации по GitHub-репозиториям, просмотра содержимого и скачивания файлов.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip run — запуск пользовательских скриптов",
+      "url": "https://mip.fwh.is/ru/commands/run/",
+      "description": "Команда run выполняет скрипты, определённые в секции scripts файла mip.yml, с поддержкой всех установленных пакетов в PATH.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip search — поиск пакетов в реестре",
+      "url": "https://mip.fwh.is/ru/commands/search/",
+      "description": "Команда search ищет пакеты в реестре npm по ключевому слову, показывая название, версию и описание.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip super-install — супер-быстрая установка пакетов",
+      "url": "https://mip.fwh.is/ru/commands/super-install/",
+      "description": "Команда super-install использует многопоточную загрузку, HTTP/2, параллельную распаковку и супер-кэш для максимально быстрой установки зависимостей.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip uninstall — удаление пакетов",
+      "url": "https://mip.fwh.is/ru/commands/uninstall/",
+      "description": "Команда uninstall удаляет пакеты из проекта, очищая их из глобального кэша, манифеста, mip-lock.yml и mip.yml.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip update — обновление пакетов до последних версий",
+      "url": "https://mip.fwh.is/ru/commands/update/",
+      "description": "Команда update проверяет наличие обновлений для всех зависимостей и устанавливает их после подтверждения пользователя.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip why — анализ зависимостей пакета",
+      "url": "https://mip.fwh.is/ru/commands/why/",
+      "description": "Команда why показывает, почему конкретный пакет установлен в проекте — какие другие пакеты зависят от него и какая версия используется.",
+      "priority": "medium"
+    },
+    {
+      "title": "mip workspaces — управление монорепозиториями",
+      "url": "https://mip.fwh.is/ru/commands/workspaces/",
+      "description": "Команда workspaces позволяет управлять несколькими пакетами в одном репозитории, выполняя команды во всех воркспейсах одновременно.",
+      "priority": "medium"
+    },
+    {
+      "title": "Добавление команд в MIP",
+      "url": "https://mip.fwh.is/ru/dev/adding-commands/",
+      "description": "Как создать и зарегистрировать новую команду в MIP — два способа: встроенная команда (fork) и плагин.",
+      "priority": "medium"
+    },
+    {
+      "title": "Всё о плагинах в MIP",
+      "url": "https://mip.fwh.is/ru/dev/all-plugins/",
+      "description": "Полное руководство по плагинам: структура, хуки, API, команды, примеры и лучшие практики.",
+      "priority": "medium"
+    },
+    {
+      "title": "Архитектура MIP",
+      "url": "https://mip.fwh.is/ru/dev/architecture/",
+      "description": "Как устроен MIP внутри: модули, потоки данных, файловая структура, ядро и API плагинов.",
+      "priority": "medium"
+    },
+    {
+      "title": "Хуки и плагины в MIP",
+      "url": "https://mip.fwh.is/ru/dev/hooks/",
+      "description": "Как расширить MIP с помощью хуков и плагинов — точки входа, API, примеры.",
+      "priority": "medium"
+    },
+    {
+      "title": "Разработчикам",
+      "url": "https://mip.fwh.is/ru/dev/",
+      "description": "Всё, что нужно знать разработчику о MIP — архитектура, добавление команд, тестирование и хуки.",
+      "priority": "medium"
+    },
+    {
+      "title": "Тестирование в MIP",
+      "url": "https://mip.fwh.is/ru/dev/testing/",
+      "description": "Как писать и запускать тесты для MIP — юнит-тесты, интеграционные тесты, тестирование плагинов.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP — быстрый и современный менеджер пакетов",
+      "url": "https://mip.fwh.is/ru/",
+      "description": "MIP — это лёгкий и быстрый менеджер пакетов для Node.js, написанный на JavaScript. Прост в использовании, работает без node_modules и поддерживает YAML-конфиги.",
+      "priority": "medium"
+    },
+    {
+      "title": "Расширенный FAQ",
+      "url": "https://mip.fwh.is/ru/other/faq/",
+      "description": "Ответы на сложные вопросы о MIP — устройство, плагины, отладка, производительность.",
+      "priority": "medium"
+    },
+    {
+      "title": "Глоссарий 📚",
+      "url": "https://mip.fwh.is/ru/other/glossary/",
+      "description": "",
+      "priority": "medium"
+    },
+    {
+      "title": "Прочее",
+      "url": "https://mip.fwh.is/ru/other/",
+      "description": "Дополнительные материалы — глоссарий и расширенный FAQ.",
+      "priority": "medium"
+    },
+    {
+      "title": "CI/CD с MIP",
+      "url": "https://mip.fwh.is/ru/pro-users/ci-cd/",
+      "description": "Как использовать MIP в CI/CD пайплайнах: установка, аудит, деплой, GitHub Actions.",
+      "priority": "medium"
+    },
+    {
+      "title": "Прочее",
+      "url": "https://mip.fwh.is/ru/pro-users/",
+      "description": "Дополнительные материалы — глоссарий и расширенный FAQ.",
+      "priority": "medium"
+    },
+    {
+      "title": "Производительность MIP",
+      "url": "https://mip.fwh.is/ru/pro-users/performance/",
+      "description": "Как MIP достигает высокой скорости: кэширование, параллельная загрузка, HTTP/2 и глобальный кэш.",
+      "priority": "medium"
+    },
+    {
+      "title": "Быстрые вопросы и ответы (Q&A)",
+      "url": "https://mip.fwh.is/ru/qna/",
+      "description": "Самые частые вопросы о MIP — установка, настройка, сравнение с npm, troubleshooting.",
+      "priority": "medium"
+    },
+    {
+      "title": "Конфигурация MIP",
+      "url": "https://mip.fwh.is/ru/setup/configuration/",
+      "description": "Настройка mip.yml: зависимости, скрипты, язык, workspaces.",
+      "priority": "medium"
+    },
+    {
+      "title": "Установка и настройка MIP ⚙️",
+      "url": "https://mip.fwh.is/ru/setup/",
+      "description": "",
+      "priority": "medium"
+    },
+    {
+      "title": "Быстрый старт",
+      "url": "https://mip.fwh.is/ru/setup/quick-start/",
+      "description": "Установка MIP и создание первого проекта за 5 минут.",
+      "priority": "medium"
+    },
+    {
+      "title": "Ошибки установки",
+      "url": "https://mip.fwh.is/ru/troubleshooting/",
+      "description": "Проблемы при установке пакетов и их решение.",
+      "priority": "medium"
+    },
+    {
+      "title": "Ошибки установки",
+      "url": "https://mip.fwh.is/ru/troubleshooting/installation/",
+      "description": "Проблемы при установке пакетов и их решение.",
+      "priority": "medium"
+    },
+    {
+      "title": "Проблемы с lock-файлами",
+      "url": "https://mip.fwh.is/ru/troubleshooting/lockfile/",
+      "description": "Проблемы с mip-lock.json и их решение.",
+      "priority": "medium"
+    },
+    {
+      "title": "Проблемы с lock-файлами",
+      "url": "https://mip.fwh.is/ru/troubleshooting/network/",
+      "description": "Проблемы с mip-lock.yml и их решение.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP Configuration",
+      "url": "https://mip.fwh.is/setup/configuration/",
+      "description": "Configuring mip.yml: dependencies, scripts, language, workspaces.",
+      "priority": "medium"
+    },
+    {
+      "title": "MIP Setup and Configuration",
+      "url": "https://mip.fwh.is/setup/",
+      "description": "How to install MIP and configure it for your project.",
+      "priority": "medium"
+    },
+    {
+      "title": "Quick Start",
+      "url": "https://mip.fwh.is/setup/quick-start/",
+      "description": "Install MIP and create your first project in 5 minutes.",
+      "priority": "medium"
+    },
+    {
+      "title": "Installation Errors",
+      "url": "https://mip.fwh.is/troubleshooting/",
+      "description": "Problems encountered when installing packages and how to solve them.",
+      "priority": "medium"
+    },
+    {
+      "title": "Installation Errors",
+      "url": "https://mip.fwh.is/troubleshooting/installation/",
+      "description": "Problems encountered when installing packages and how to solve them.",
+      "priority": "medium"
+    },
+    {
+      "title": "Lock File Issues 🔒",
+      "url": "https://mip.fwh.is/troubleshooting/lockfile/",
+      "description": "",
+      "priority": "medium"
+    },
+    {
+      "title": "Network & Registries",
+      "url": "https://mip.fwh.is/troubleshooting/network/",
+      "description": "Problems with networks, registries, and how to solve them.",
+      "priority": "medium"
+    }
+  ]
+}

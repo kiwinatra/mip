@@ -5,4 +5,3 @@ describe('test suite boot', () => {
     assert.equal(1 + 1, 2);
   });
 });
-

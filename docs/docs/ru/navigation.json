@@ -1,0 +1,94 @@
+[
+  {
+    "title": "Введение",
+    "icon": "home",
+    "children": [
+      { "title": "Добро пожаловать", "path": "/index.md" },
+      { "title": "Быстрые Q&A", "path": "/qna.md" }
+    ]
+  },
+  {
+    "title": "Команды",
+    "icon": "terminal",
+    "children": [
+      { "title": "audit", "path": "/commands/audit.md" },
+      { "title": "cache", "path": "/commands/cache.md" },
+      { "title": "ci", "path": "/commands/ci.md" },
+      { "title": "create", "path": "/commands/create.md" },
+      { "title": "dedupe", "path": "/commands/dedupe.md" },
+      { "title": "doctor", "path": "/commands/doctor.md" },
+      { "title": "exec", "path": "/commands/exec.md" },
+      { "title": "exports", "path": "/commands/exports.md" },
+      { "title": "genlock", "path": "/commands/genlock.md" },
+      { "title": "global", "path": "/commands/global.md" },
+      { "title": "info", "path": "/commands/info.md" },
+      { "title": "init", "path": "/commands/init.md" },
+      { "title": "install", "path": "/commands/install.md" },
+      { "title": "language", "path": "/commands/language.md" },
+      { "title": "legacy", "path": "/commands/legacy.md" },
+      { "title": "link", "path": "/commands/link.md" },
+      { "title": "list", "path": "/commands/list.md" },
+      { "title": "oldrepo", "path": "/commands/oldrepo.md" },
+      { "title": "outdated", "path": "/commands/outdated.md" },
+      { "title": "repo", "path": "/commands/repo.md" },
+      { "title": "run", "path": "/commandsn.md" },
+      { "title": "search", "path": "/commands/search.md" },
+      { "title": "super-install", "path": "/commands/super-install.md" },
+      { "title": "uninstall", "path": "/commands/uninstall.md" },
+      { "title": "update", "path": "/commands/update.md" },
+      { "title": "why", "path": "/commands/why.md" },
+      { "title": "workspaces", "path": "/commands/workspaces.md" },
+      { "title": "pe", "path": "/commands/pe.md" },
+      { "title": "plugin", "path": "/commands/plugin.md" }
+    ]
+  },
+  {
+    "title": "Настройка",
+    "icon": "cog",
+    "children": [
+      { "title": "Создание проекта", "path": "/setup/index.md" },
+      { "title": "Быстрый старт", "path": "/setup/quick-start.md" },
+      { "title": "Конфигурация", "path": "/setup/configuration.md" }
+    ]
+  },
+  {
+    "title": "Для профи",
+    "icon": "star",
+    "children": [
+      { "title": "Обзор", "path": "/pro-users/index.md" },
+      { "title": "Производительность", "path": "/pro-users/performance.md" },
+      { "title": "CI/CD", "path": "/pro-users/ci-cd.md" }
+    ]
+  },
+  {
+    "title": "Разработчикам",
+    "icon": "code",
+    "children": [
+      { "title": "Главное", "path": "/dev/index.md" },
+      { "title": "Архитектурой", "path": "/dev/architecture.md" },
+      { "title": "Добавление команд", "path": "/dev/adding-commands.md" },
+      { "title": "Тестирование", "path": "/dev/testing.md" },
+      { "title": "Все о плагинах", "path": "/dev/all-plugins.md" },
+      { "title": "Хуки и плагины", "path": "/dev/hooks.md" }
+    ]
+  },
+  {
+    "title": "Решение проблем",
+    "icon": "bug",
+    "children": [
+      { "title": "Общий список", "path": "/troubleshooting/index.md" },
+      { "title": "Ошибки установки", "path": "/troubleshooting/installation.md" },
+      { "title": "Сеть и регистры", "path": "/troubleshooting/network.md" },
+      { "title": "Lock-файлы", "path": "/troubleshooting/lockfile.md" }
+    ]
+  },
+  {
+    "title": "Прочее",
+    "icon": "archive",
+    "children": [
+      { "title": "Обзор", "path": "/other/index.md" },
+      { "title": "Глоссарий", "path": "/other/glossary.md" },
+      { "title": "Расширенный FAQ", "path": "/other/faq.md" }
+    ]
+  }
+]

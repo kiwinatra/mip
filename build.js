@@ -17,9 +17,6 @@
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
-
-
-
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -28,7 +25,7 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 console.log('\n🚀 MIP Builder v4 - Ultimate Package Manager Installer\n');
@@ -44,7 +41,7 @@ const colors = {
   yellow: '\x1b[33m',
   red: '\x1b[31m',
   magenta: '\x1b[35m',
-  reset: '\x1b[0m'
+  reset: '\x1b[0m',
 };
 
 function log(msg, color = 'reset') {
@@ -74,18 +71,21 @@ try {
 function getShellConfig() {
   const shell = process.env.SHELL || '';
   const configs = {
-    'zsh': { name: '.zshrc', path: path.join(homeDir, '.zshrc') },
-    'bash': { name: '.bashrc', path: path.join(homeDir, '.bashrc') },
-    'fish': { name: '.config/fish/config.fish', path: path.join(homeDir, '.config/fish/config.fish') }
+    zsh: { name: '.zshrc', path: path.join(homeDir, '.zshrc') },
+    bash: { name: '.bashrc', path: path.join(homeDir, '.bashrc') },
+    fish: {
+      name: '.config/fish/config.fish',
+      path: path.join(homeDir, '.config/fish/config.fish'),
+    },
   };
-  
+
   if (shell.includes('zsh')) return configs.zsh;
   if (shell.includes('bash')) return configs.bash;
   if (shell.includes('fish')) return configs.fish;
-  
+
   if (fs.existsSync(configs.zsh.path)) return configs.zsh;
   if (fs.existsSync(configs.bash.path)) return configs.bash;
-  
+
   return null;
 }
 
@@ -111,14 +111,14 @@ function getDirSize(dir) {
 
 async function installWithAlias() {
   const shellConfig = getShellConfig();
-  
+
   if (!shellConfig) {
     log('❌ Could not determine shell config', 'red');
     return false;
   }
-  
+
   const aliasLine = `\n# MIP Package Manager\nalias mip="node ${mipScript}"\n`;
-  
+
   if (fs.existsSync(shellConfig.path)) {
     const configContent = fs.readFileSync(shellConfig.path, 'utf8');
     if (configContent.includes('alias mip=')) {
@@ -131,7 +131,7 @@ async function installWithAlias() {
       fs.writeFileSync(shellConfig.path, newContent);
     }
   }
-  
+
   fs.appendFileSync(shellConfig.path, aliasLine);
   log(`✅ Alias added to ${shellConfig.path}`, 'green');
   log(`🔄 Run: source ${shellConfig.path}`, 'blue');
@@ -140,7 +140,7 @@ async function installWithAlias() {
 
 async function installToSystemBin() {
   const systemPaths = ['/usr/local/bin', '/usr/bin'];
-  
+
   for (const systemPath of systemPaths) {
     if (fs.existsSync(systemPath) && fs.statSync(systemPath).isDirectory()) {
       try {
@@ -158,43 +158,43 @@ async function installToSystemBin() {
       }
     }
   }
-  
+
   log('❌ Could not install to system directories', 'red');
   return false;
 }
 
 async function installToUserBin() {
   const userBin = path.join(homeDir, '.local', 'bin');
-  
+
   if (!fs.existsSync(userBin)) {
     fs.mkdirSync(userBin, { recursive: true });
     log(`📁 Created ${userBin}`, 'blue');
   }
-  
+
   const targetPath = path.join(userBin, 'mip');
   if (fs.existsSync(targetPath)) {
     fs.unlinkSync(targetPath);
   }
   fs.symlinkSync(mipScript, targetPath);
-  
+
   const shellConfig = getShellConfig();
   if (shellConfig && fs.existsSync(shellConfig.path)) {
     const pathLine = `\n# MIP Package Manager\nexport PATH="$PATH:${userBin}"\n`;
     const configContent = fs.readFileSync(shellConfig.path, 'utf8');
-    
+
     if (!configContent.includes(userBin)) {
       fs.appendFileSync(shellConfig.path, pathLine);
       log(`✅ Added ${userBin} to PATH in ${shellConfig.path}`, 'green');
     }
   }
-  
+
   log(`✅ Installed to ${targetPath}`, 'green');
   return true;
 }
 
 async function buildBinary() {
   log('\n📦 Building binary...', 'blue');
-  
+
   try {
     // Check if pkg is installed
     try {
@@ -203,33 +203,40 @@ async function buildBinary() {
       log('📥 Installing pkg...', 'yellow');
       execSync('npm install -g pkg', { stdio: 'inherit' });
     }
-    
+
     const binaryName = platform === 'win32' ? 'mip.exe' : `mip-${platform}`;
     const outputDir = path.join(currentDir, 'dist');
     const outputPath = path.join(outputDir, binaryName);
-    
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     log('🔨 Compiling...', 'blue');
-    
+
     let target;
     switch (platform) {
-      case 'linux': target = 'node18-linux-x64'; break;
-      case 'darwin': target = 'node18-macos-x64'; break;
-      case 'win32': target = 'node18-win-x64'; break;
-      default: target = 'node18';
+      case 'linux':
+        target = 'node18-linux-x64';
+        break;
+      case 'darwin':
+        target = 'node18-macos-x64';
+        break;
+      case 'win32':
+        target = 'node18-win-x64';
+        break;
+      default:
+        target = 'node18';
     }
-    
+
     execSync(`npx pkg ${mipScript} --targets ${target} --output ${outputPath}`, {
-      stdio: 'inherit'
+      stdio: 'inherit',
     });
-    
+
     const stats = fs.statSync(outputPath);
     log(`✅ Binary created: ${outputPath}`, 'green');
     log(`📦 Size: ${(stats.size / 1024 / 1024).toFixed(2)} MB`, 'blue');
-    
+
     return outputPath;
   } catch (err) {
     log(`❌ Build failed: ${err.message}`, 'red');
@@ -241,55 +248,61 @@ async function installBinary(binaryPath) {
   if (!binaryPath || !fs.existsSync(binaryPath)) {
     return false;
   }
-  
+
   log('\n💿 Installing binary...', 'blue');
-  
+
   const options = [
-    { name: 'User directory (~/.local/bin)', method: async () => {
-      const userBin = path.join(homeDir, '.local', 'bin');
-      const target = path.join(userBin, 'mip');
-      if (!fs.existsSync(userBin)) fs.mkdirSync(userBin, { recursive: true });
-      fs.copyFileSync(binaryPath, target);
-      fs.chmodSync(target, '755');
-      log(`✅ Copied to ${target}`, 'green');
-      return true;
-    }},
-    { name: 'System directory (requires sudo)', method: async () => {
-      try {
-        execSync(`sudo cp "${binaryPath}" /usr/local/bin/mip`, { stdio: 'inherit' });
-        execSync('sudo chmod +x /usr/local/bin/mip', { stdio: 'inherit' });
-        log('✅ Installed to /usr/local/bin/mip', 'green');
+    {
+      name: 'User directory (~/.local/bin)',
+      method: async () => {
+        const userBin = path.join(homeDir, '.local', 'bin');
+        const target = path.join(userBin, 'mip');
+        if (!fs.existsSync(userBin)) fs.mkdirSync(userBin, { recursive: true });
+        fs.copyFileSync(binaryPath, target);
+        fs.chmodSync(target, '755');
+        log(`✅ Copied to ${target}`, 'green');
         return true;
-      } catch (err) {
-        log(`❌ Failed: ${err.message}`, 'red');
-        return false;
-      }
-    }}
+      },
+    },
+    {
+      name: 'System directory (requires sudo)',
+      method: async () => {
+        try {
+          execSync(`sudo cp "${binaryPath}" /usr/local/bin/mip`, { stdio: 'inherit' });
+          execSync('sudo chmod +x /usr/local/bin/mip', { stdio: 'inherit' });
+          log('✅ Installed to /usr/local/bin/mip', 'green');
+          return true;
+        } catch (err) {
+          log(`❌ Failed: ${err.message}`, 'red');
+          return false;
+        }
+      },
+    },
   ];
-  
+
   log('\nChoose installation method:', 'yellow');
   options.forEach((opt, i) => {
     log(`${i + 1}. ${opt.name}`, 'blue');
   });
   log('0. Skip', 'blue');
-  
+
   const answer = await question('\nYour choice (0-2): ');
-  
+
   if (answer !== '0' && options[parseInt(answer) - 1]) {
     return await options[parseInt(answer) - 1].method();
   }
-  
+
   return false;
 }
 
 function installCompletion() {
   const shell = process.env.SHELL || '';
   const completionDir = path.join(currentDir, 'completion');
-  
+
   if (!fs.existsSync(completionDir)) {
     return;
   }
-  
+
   if (shell.includes('zsh')) {
     const zshCompletionDir = path.join(homeDir, '.zsh/completions');
     if (!fs.existsSync(zshCompletionDir)) {
@@ -322,19 +335,21 @@ function showInstallSummary(method) {
   log('\n✨ Installation complete!\n', 'green');
   log('📋 Summary:', 'magenta');
   log(`  Method: ${method}`);
-  log(`  Location: ${method === 'Alias' ? '~/.zshrc/.bashrc' : method === 'System' ? '/usr/local/bin' : '~/.local/bin'}`);
+  log(
+    `  Location: ${method === 'Alias' ? '~/.zshrc/.bashrc' : method === 'System' ? '/usr/local/bin' : '~/.local/bin'}`
+  );
   log(`  Script: ${mipScript}`);
-  
+
   log('\n🚀 Test it:', 'magenta');
   log('  mip --help');
   log('  mip init');
   log('  mip install lodash');
-  
+
   log('\n💡 Next steps:', 'magenta');
   log('  • Run "mip doctor" to check system');
   log('  • Run "mip create node my-app" to create a project');
   log('  • Run "mip install -g eslint" for global installs');
-  
+
   const shellConfig = getShellConfig();
   if (shellConfig && method === 'Alias') {
     log(`\n🔄 Reload your shell: source ${shellConfig.path}`, 'yellow');
@@ -349,28 +364,28 @@ async function main() {
   log('4. Build binary + install (standalone executable)', 'blue');
   log('5. Full install (alias + user bin + completion)', 'blue');
   log('0. Exit', 'blue');
-  
+
   const choice = await question('\nYour choice (0-5): ');
-  
+
   let installed = false;
   let method = '';
-  
+
   switch (choice) {
     case '1':
       installed = await installWithAlias();
       method = 'Alias';
       break;
-      
+
     case '2':
       installed = await installToSystemBin();
       method = 'System symlink';
       break;
-      
+
     case '3':
       installed = await installToUserBin();
       method = 'User bin';
       break;
-      
+
     case '4':
       const binary = await buildBinary();
       if (binary) {
@@ -378,7 +393,7 @@ async function main() {
         method = 'Binary';
       }
       break;
-      
+
     case '5':
       log('\n🚀 Running full installation...\n', 'green');
       await installWithAlias();
@@ -391,24 +406,24 @@ async function main() {
       installed = true;
       method = 'Full (alias + user bin + binary + completion)';
       break;
-      
+
     case '0':
       log('👋 Goodbye!', 'yellow');
       rl.close();
       return;
-      
+
     default:
       log('❌ Invalid choice', 'red');
       rl.close();
       return;
   }
-  
+
   if (installed) {
     showInstallSummary(method);
   } else {
     log('\n❌ Installation failed or cancelled', 'red');
   }
-  
+
   rl.close();
 }
 
