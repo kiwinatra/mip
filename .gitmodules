@@ -1,0 +1,3 @@
+[submodule "mip-plugins"]
+	path = mip-plugins
+	url = https://github.com/meeple-packager/mip-plugins.git
