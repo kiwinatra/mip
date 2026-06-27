@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIP Dashboard</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e17;
+      color: #e0e6f0;
+      min-height: 100vh;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0e17; }
+    ::-webkit-scrollbar-thumb { background: #1a2332; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2a3a52; }
+
+    /* ===== LAYOUT ===== */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 220px;
+      background: #0d1520;
+      border-right: 1px solid #1a2332;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1a2332;
+    }
+
+    .sidebar-logo .icon { font-size: 28px; }
+    .sidebar-logo .gradient {
+      background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar .version {
+      font-size: 11px;
+      color: #4a5a6f;
+      margin-left: auto;
+      -webkit-text-fill-color: #4a5a6f;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #6b7a8f;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      margin-bottom: 2px;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: #1a2332;
+      color: #e0e6f0;
+    }
+
+    .nav-item.active {
+      background: #1a2a3a;
+      color: #00d4ff;
+    }
+
+    .nav-item .badge {
+      margin-left: auto;
+      background: #1a2332;
+      padding: 0 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #6b7a8f;
+    }
+
+    .nav-item.active .badge {
+      background: #0d2030;
+      color: #00d4ff;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #1a2332;
+      font-size: 12px;
+      color: #2a3a52;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .topbar h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .topbar h1 span {
+      color: #6b7a8f;
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: #6b7a8f;
+    }
+
+    .topbar-right .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ecc71;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ===== TABS ===== */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: #111927;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid #1a2332;
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #6b7a8f;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-card .value {
+      font-size: 26px;
+      font-weight: 700;
+      color: #e0e6f0;
+      margin-top: 4px;
+    }
+
+    .stat-card .sub {
+      font-size: 12px;
+      color: #4a5a6f;
+      margin-top: 2px;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: #111927;
+      border-radius: 10px;
+      border: 1px solid #1a2332;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .card-header .title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .card-header .badge {
+      font-size: 11px;
+      color: #6b7a8f;
+      background: #1a2332;
+      padding: 2px 10px;
+      border-radius: 10px;
+    }
+
+    /* ===== TABLES ===== */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      color: #6b7a8f;
+      font-weight: 500;
+      border-bottom: 1px solid #1a2332;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #0d1520;
+      color: #c8d0dc;
+    }
+
+    tr:hover td {
+      background: #0d1520;
+    }
+
+    .pkg-name {
+      font-weight: 500;
+      color: #e0e6f0;
+    }
+
+    .pkg-version {
+      color: #6b7a8f;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+
+    .pkg-size {
+      color: #4a5a6f;
+      font-size: 12px;
+    }
+
+    .tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #1a2332;
+      color: #6b7a8f;
+    }
+
+    .tag.green { background: #0d2818; color: #2ecc71; }
+    .tag.red { background: #2a0d0d; color: #e74c3c; }
+    .tag.blue { background: #0d1a2a; color: #3498db; }
+    .tag.yellow { background: #2a2a0d; color: #f1c40f; }
+    .tag.purple { background: #1a0d2a; color: #9b59b6; }
+
+    .registry-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #0d1520;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .registry-row:last-child { border-bottom: none; }
+
+    .registry-row .name {
+      font-weight: 500;
+      color: #e0e6f0;
+    }
+
+    .registry-row .url {
+      color: #6b7a8f;
+      font-size: 13px;
+    }
+
+    .registry-row .token-status {
+      font-size: 12px;
+    }
+
+    .registry-row .token-status.set { color: #2ecc71; }
+    .registry-row .token-status.missing { color: #e74c3c; }
+
+    /* ===== LOADING ===== */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #4a5a6f;
+    }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60% { content: '...'; }
+      80% { content: '....'; }
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px;
+      color: #4a5a6f;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+        padding: 16px 8px;
+      }
+
+      .sidebar .nav-text,
+      .sidebar .version,
+      .sidebar .badge,
+      .sidebar-footer {
+        display: none;
+      }
+
+      .sidebar .nav-item {
+        justify-content: center;
+        padding: 10px;
+        font-size: 20px;
+      }
+
+      .sidebar-logo .gradient,
+      .sidebar-logo .version {
+        display: none;
+      }
+
+      .main { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="icon">📦</span>
+      <span class="gradient">MIP</span>
+      <span class="version">v2.1</span>
+    </div>
+
+    <button class="nav-item active" data-tab="overview">
+      📊 <span class="nav-text">Overview</span>
+    </button>
+    <button class="nav-item" data-tab="packages">
+      📦 <span class="nav-text">Packages</span>
+      <span class="badge" id="sidebarPkgCount">0</span>
+    </button>
+    <button class="nav-item" data-tab="store">
+      💾 <span class="nav-text">Store</span>
+      <span class="badge" id="sidebarStoreCount">0</span>
+    </button>
+    <button class="nav-item" data-tab="registries">
+      🔗 <span class="nav-text">Registries</span>
+      <span class="badge" id="sidebarRegistryCount">0</span>
+    </button>
+    <button class="nav-item" data-tab="scripts">
+      📜 <span class="nav-text">Scripts</span>
+      <span class="badge" id="sidebarScriptCount">0</span>
+    </button>
+    <button class="nav-item" data-tab="system">
+      ⚙️ <span class="nav-text">System</span>
+    </button>
+
+    <div class="sidebar-footer">
+      <div id="sidebarTime"></div>
+      <div style="margin-top:4px;">localhost:3000</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <h1 id="pageTitle">📊 Overview <span id="projectNameSub"></span></h1>
+      <div class="topbar-right">
+        <span id="topbarProject">Loading...</span>
+        <span>|</span>
+        <span id="topbarVersion">-</span>
+        <span class="dot"></span>
+        <span>auto</span>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: OVERVIEW                                                 -->
+    <!-- ============================================================ -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="label">📦 Packages</div>
+          <div class="value" id="statPackages">-</div>
+          <div class="sub" id="statPackagesSub">installed</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">💾 Store Size</div>
+          <div class="value" id="statStoreSize">-</div>
+          <div class="sub" id="statStoreSub">global storage</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📋 Dependencies</div>
+          <div class="value" id="statDeps">-</div>
+          <div class="sub" id="statDepsSub">prod + dev</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📜 Scripts</div>
+          <div class="value" id="statScripts">-</div>
+          <div class="sub" id="statScriptsSub">defined</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">🔗 Registries</div>
+          <div class="value" id="statRegistries">-</div>
+          <div class="sub" id="statRegistriesSub">configured</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📁 Workspaces</div>
+          <div class="value" id="statWorkspaces">-</div>
+          <div class="sub" id="statWorkspacesSub">monorepo</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="card">
+          <div class="card-header">
+            <span class="title">📦 Top 5 Packages</span>
+            <span class="badge">by size</span>
+          </div>
+          <div id="overviewTopPackages"><div class="loading">Loading</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="title">🔗 Registries</span>
+            <span class="badge">quick view</span>
+          </div>
+          <div id="overviewRegistries"><div class="loading">Loading</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: PACKAGES                                                 -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab-packages">
+      <div class="card">
+        <div class="card-header">
+          <span class="title">📦 All Packages</span>
+          <span class="badge" id="pkgCountBadge">0</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Version</th>
+                <th>Size</th>
+                <th>Path</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="packagesTableBody">
+              <tr><td colspan="5" class="loading">Loading packages</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: STORE                                                    -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab-store">
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="stat-card">
+          <div class="label">💾 Total Store Size</div>
+          <div class="value" id="storeTotalSize">-</div>
+          <div class="sub">global cache</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📦 Packages in Store</div>
+          <div class="value" id="storeTotalPackages">-</div>
+          <div class="sub">all versions</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📁 Store Path</div>
+          <div class="value" style="font-size:14px;" id="storePath">-</div>
+          <div class="sub">~/.mip/store</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="title">📦 Store Packages</span>
+          <span class="badge">top 50 by size</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Package</th><th>Version</th><th>Size</th></tr>
+            </thead>
+            <tbody id="storeTableBody">
+              <tr><td colspan="3" class="loading">Loading store</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: REGISTRIES                                               -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab-registries">
+      <div class="card">
+        <div class="card-header">
+          <span class="title">🔗 Configured Registries</span>
+          <span class="badge" id="regCountBadge">0</span>
+        </div>
+        <div id="registriesList"><div class="loading">Loading registries</div></div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: SCRIPTS                                                  -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab-scripts">
+      <div class="card">
+        <div class="card-header">
+          <span class="title">📜 Available Scripts</span>
+          <span class="badge" id="scriptCountBadge">0</span>
+        </div>
+        <div id="scriptsList"><div class="loading">Loading scripts</div></div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB: SYSTEM                                                   -->
+    <!-- ============================================================ -->
+    <div class="tab-content" id="tab-system">
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+        <div class="stat-card">
+          <div class="label">Node.js</div>
+          <div class="value" style="font-size:18px;" id="sysNode">-</div>
+          <div class="sub">version</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">MIP</div>
+          <div class="value" style="font-size:18px;" id="sysMip">-</div>
+          <div class="sub">version</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Platform</div>
+          <div class="value" style="font-size:16px;" id="sysPlatform">-</div>
+          <div class="sub" id="sysArch">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Memory</div>
+          <div class="value" style="font-size:18px;" id="sysMemory">-</div>
+          <div class="sub" id="sysMemorySub">free / total</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="title">⚙️ System Details</span>
+          <span class="badge">environment</span>
+        </div>
+        <div style="font-size:13px; color:#6b7a8f; line-height:1.8;">
+          <div><strong style="color:#e0e6f0;">CWD:</strong> <span id="sysCwd">-</span></div>
+          <div><strong style="color:#e0e6f0;">Home:</strong> <span id="sysHome">-</span></div>
+          <div><strong style="color:#e0e6f0;">CPUs:</strong> <span id="sysCpus">-</span></div>
+          <div><strong style="color:#e0e6f0;">Uptime:</strong> <span id="sysUptime">-</span></div>
+          <div><strong style="color:#e0e6f0;">Load Average:</strong> <span id="sysLoad">-</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ================================================================
+  //  STATE
+  // ================================================================
+  const API = '';
+  let refreshInterval = 3000;
+  let currentTab = 'overview';
+  let allData = {};
+
+  // ================================================================
+  //  DOM REFS
+  // ================================================================
+  const $ = id => document.getElementById(id);
+  const $$ = sel => document.querySelectorAll(sel);
+
+  // ================================================================
+  //  FETCH
+  // ================================================================
+  async function fetchJSON(url) {
+    const res = await fetch(API + url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  // ================================================================
+  //  NAVIGATION
+  // ================================================================
+  $$('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      currentTab = tab;
+      $$('.tab-content').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('tab-' + tab);
+      if (target) target.classList.add('active');
+
+      const titles = {
+        overview: '📊 Overview',
+        packages: '📦 Packages',
+        store: '💾 Store',
+        registries: '🔗 Registries',
+        scripts: '📜 Scripts',
+        system: '⚙️ System'
+      };
+      $('pageTitle').textContent = titles[tab] || '📊 Overview';
+      const proj = allData.project?.name || '';
+      $('projectNameSub').textContent = proj ? `· ${proj}` : '';
+    });
+  });
+
+  // ================================================================
+  //  RENDER FUNCTIONS
+  // ================================================================
+
+  function renderOverview(data) {
+    // Stats
+    const pkgTotal = data.packages?.total || 0;
+    $('statPackages').textContent = pkgTotal;
+    $('statPackagesSub').textContent = pkgTotal === 1 ? '1 installed' : `${pkgTotal} installed`;
+
+    $('statStoreSize').textContent = data.store?.totalSize || '0 B';
+    $('statStoreSub').textContent = `${data.store?.packageCount || 0} in global store`;
+
+    const deps = data.project?.totalDependencies || 0;
+    $('statDeps').textContent = deps;
+    $('statDepsSub').textContent = `${data.project?.dependencies || 0} prod · ${data.project?.devDependencies || 0} dev`;
+
+    const scripts = data.project?.scripts || 0;
+    $('statScripts').textContent = scripts;
+    $('statScriptsSub').textContent = scripts === 1 ? '1 script' : `${scripts} scripts`;
+
+    const regs = Object.keys(data.registries?.registries || {}).length;
+    $('statRegistries').textContent = regs;
+    $('statRegistriesSub').textContent = regs === 1 ? '1 registry' : `${regs} registries`;
+
+    const ws = data.project?.workspaces || 0;
+    $('statWorkspaces').textContent = ws;
+    $('statWorkspacesSub').textContent = ws === 1 ? '1 workspace' : `${ws} workspaces`;
+
+    // Top 5 packages
+    const pkgs = data.packages?.packages || [];
+    const top5 = pkgs.slice(0, 5);
+    if (top5.length === 0) {
+      $('overviewTopPackages').innerHTML = '<div class="empty">No packages installed</div>';
+    } else {
+      $('overviewTopPackages').innerHTML = top5.map(p => `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1520;font-size:13px;">
+          <span><span class="pkg-name">${p.name}</span> <span class="pkg-version">@${p.version}</span></span>
+          <span class="pkg-size">${p.size || '—'}</span>
+        </div>
+      `).join('');
+    }
+
+    // Registries quick view
+    const regsData = data.registries?.registries || {};
+    const regEntries = Object.entries(regsData);
+    if (regEntries.length === 0) {
+      $('overviewRegistries').innerHTML = '<div class="empty">No registries configured</div>';
+    } else {
+      $('overviewRegistries').innerHTML = regEntries.map(([name, r]) => `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d1520;font-size:13px;">
+          <span><span class="pkg-name">${name}</span> ${r.isDefault ? '<span class="tag blue">default</span>' : ''} ${r.builtin ? '<span class="tag green">built-in</span>' : ''}</span>
+          <span style="color:#6b7a8f;font-size:12px;">${r.url}</span>
+        </div>
+      `).join('');
+    }
+
+    // Sidebar badges
+    $('sidebarPkgCount').textContent = pkgTotal;
+    $('sidebarStoreCount').textContent = data.store?.packageCount || 0;
+    $('sidebarRegistryCount').textContent = regs;
+    $('sidebarScriptCount').textContent = data.project?.scripts || 0;
+  }
+
+  function renderPackages(data) {
+    const pkgs = data.packages?.packages || [];
+    $('pkgCountBadge').textContent = `${pkgs.length} packages`;
+    if (pkgs.length === 0) {
+      $('packagesTableBody').innerHTML = '<tr><td colspan="5" class="empty">No packages installed</td></tr>';
+      return;
+    }
+    $('packagesTableBody').innerHTML = pkgs.map(p => `
+      <tr>
+        <td><span class="pkg-name">${p.name}</span></td>
+        <td><span class="pkg-version">${p.version}</span></td>
+        <td class="pkg-size">${p.size || '—'}</td>
+        <td style="font-size:11px;color:#4a5a6f;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.path || '—'}</td>
+        <td><span class="tag ${p.exists !== false ? 'green' : 'red'}">${p.exists !== false ? '✓ exists' : '✗ missing'}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderStore(data) {
+    const store = data.store || {};
+    $('storeTotalSize').textContent = store.totalSize || '0 B';
+    $('storeTotalPackages').textContent = store.packageCount || 0;
+    $('storePath').textContent = store.path || '—';
+
+    const pkgs = store.packages || [];
+    if (pkgs.length === 0) {
+      $('storeTableBody').innerHTML = '<tr><td colspan="3" class="empty">Store is empty</td></tr>';
+      return;
+    }
+    $('storeTableBody').innerHTML = pkgs.map(p => `
+      <tr>
+        <td><span class="pkg-name">${p.name}</span></td>
+        <td><span class="pkg-version">${p.version}</span></td>
+        <td class="pkg-size">${p.size || '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderRegistries(data) {
+    const regs = data.registries?.registries || {};
+    const entries = Object.entries(regs);
+    $('regCountBadge').textContent = `${entries.length} configured`;
+
+    if (entries.length === 0) {
+      $('registriesList').innerHTML = '<div class="empty">No registries configured</div>';
+      return;
+    }
+
+    $('registriesList').innerHTML = entries.map(([name, r]) => `
+      <div class="registry-row">
+        <div>
+          <span class="name">${name}</span>
+          ${r.isDefault ? '<span class="tag blue">★ DEFAULT</span>' : ''}
+          ${r.builtin ? '<span class="tag green">built-in</span>' : ''}
+          ${!r.builtin ? '<span class="tag yellow">custom</span>' : ''}
+        </div>
+        <div>
+          <span class="url">${r.url}</span>
+          <span class="token-status ${r.hasToken ? 'set' : 'missing'}">
+            ${r.hasToken ? '🔑 ' + (r.token || '••••') : 'no token'}
+          </span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderScripts(data) {
+    const conf = data.project || {};
+    const scripts = conf.scripts || {};
+    const entries = Object.entries(scripts);
+    $('scriptCountBadge').textContent = `${entries.length} scripts`;
+
+    if (entries.length === 0) {
+      $('scriptsList').innerHTML = '<div class="empty">No scripts defined</div>';
+      return;
+    }
+
+    $('scriptsList').innerHTML = entries.map(([name, cmd]) => `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0d1520;font-size:13px;flex-wrap:wrap;gap:8px;">
+        <span style="font-weight:500;color:#e0e6f0;">${name}</span>
+        <span style="color:#6b7a8f;font-family:monospace;font-size:12px;">${cmd}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderSystem(data) {
+    const sys = data.system || {};
+    $('sysNode').textContent = sys.nodeVersion || '-';
+    $('sysMip').textContent = sys.mipVersion || '-';
+    $('sysPlatform').textContent = sys.platform || '-';
+    $('sysArch').textContent = sys.arch || '-';
+    $('sysMemory').textContent = sys.freeMemory || '-';
+    $('sysMemorySub').textContent = `free of ${sys.totalMemory || '—'}`;
+    $('sysCwd').textContent = sys.cwd || '-';
+    $('sysHome').textContent = sys.homedir || '-';
+    $('sysCpus').textContent = sys.cpus || '-';
+    $('sysUptime').textContent = sys.uptime ? Math.floor(sys.uptime / 3600) + 'h' : '-';
+    $('sysLoad').textContent = sys.loadAverage ? sys.loadAverage.map(v => v.toFixed(2)).join(', ') : '-';
+  }
+
+  // ================================================================
+  //  MAIN REFRESH
+  // ================================================================
+  async function refreshDashboard() {
+    try {
+      const [project, packages, store, registries, system] = await Promise.all([
+        fetchJSON('/api/project'),
+        fetchJSON('/api/packages'),
+        fetchJSON('/api/store'),
+        fetchJSON('/api/registries'),
+        fetchJSON('/api/system')
+      ]);
+
+      allData = { project, packages, store, registries, system };
+
+      // Topbar
+      $('topbarProject').textContent = project.name || 'Unnamed';
+      $('topbarVersion').textContent = project.version || '-';
+
+      // Render all tabs
+      renderOverview(allData);
+      renderPackages(allData);
+      renderStore(allData);
+      renderRegistries(allData);
+      renderScripts(allData);
+      renderSystem(allData);
+
+      // Sidebar time
+      $('sidebarTime').textContent = new Date().toLocaleTimeString();
+
+    } catch (e) {
+      console.error('Refresh error:', e);
+    }
+  }
+
+  // ================================================================
+  //  BOOT
+  // ================================================================
+  refreshDashboard();
+  setInterval(refreshDashboard, refreshInterval);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'r') {
+      e.preventDefault();
+      refreshDashboard();
+    }
+  });
+
+  console.log('🌐 MIP Dashboard v2.0 loaded');
+  console.log('💡 Ctrl+R to refresh');
+</script>
+</body>
+</html>

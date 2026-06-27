@@ -1,6 +1,6 @@
 {
   "name": "mip",
-  "version": "2.0",
+  "version": "2.1",
   "description": "just because npm sucks",
   "main": "bin/mip.js",
   "bin": {

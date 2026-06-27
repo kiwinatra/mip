@@ -301,6 +301,14 @@ async function main() {
       break;
     }
 
+case 'registry': {
+  const { registry } = require('../lib/commands/registry');
+  // Передаем все аргументы после 'registry'
+  const argv = process.argv.slice(3);
+  registry(argv);
+  break;
+}
+
     case 'pe': {
       const { pe } = require('../lib/commands/pe');
       const pluginName = process.argv[3];
@@ -309,6 +317,23 @@ async function main() {
       await pe(pluginName, commandName, args);
       break;
     }
+
+    // В секцию команд добавьте:
+case 'config': {
+  const { config } = require('../lib/commands/config');
+  const argv = process.argv.slice(3);
+  config(argv);
+  break;
+}
+
+// В секцию команд (где все case) добавьте:
+
+case 'server': {
+  const { server } = require('../lib/commands/server');
+  const argv = process.argv.slice(3);
+  server(argv);
+  break;
+}
 
     case 'genlock': {
       const { genlock } = require('../lib/commands/genlock');
