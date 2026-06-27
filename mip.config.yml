@@ -1,0 +1,159 @@
+# ────────────────────────────────────────────────
+# MIP Features Configuration
+# Generated: 2026-06-27T18:34:56.313Z
+# ────────────────────────────────────────────────
+# Documentation: https://mipdocs.fwh.is/features
+#
+# Master switch — set to false to disable ALL feature modifications
+# config.enabled: true
+#
+# To enable/disable a feature:
+#   mip config set features.install.parallel true
+# Or edit this file manually
+# ────────────────────────────────────────────────
+
+
+# === CONFIG ===
+config.enabled: false  # Master switch — disable all feature modifications
+
+# === INSTALL ===
+install.parallel: true  # Install multiple packages in parallel for faster execution
+install.forceReinstall: false  # Always reinstall packages even if already in global store
+install.saveExact: false  # Save exact versions to config (without ^ and ~)
+install.skipIntegrityCheck: false  # Skip package integrity checks (faster but less secure)
+install.dryRun: false  # Simulation mode — shows what would be installed without making changes
+install.ignoreScripts: false  # Do not run install scripts from package.json
+install.ignoreOptional: false  # Ignore optionalDependencies
+install.ignoreEngines: false  # Ignore engines check in package.json
+install.ignorePlatform: false  # Ignore os/cpu checks in package.json
+
+# === UPDATE ===
+update.checkForUpdates: true  # Automatically check for new MIP versions on startup
+update.autoUpdate: false  # Automatically update packages on startup (without confirmation)
+update.prerelease: false  # Allow installation of pre-release versions (alpha, beta, rc)
+update.major: false  # Allow major version updates (may break code)
+update.minor: true  # Allow minor version updates
+update.patch: true  # Allow patch updates
+
+# === AUDIT ===
+audit.enabled: true  # Enable security audit for packages
+audit.fixAutomatically: false  # Automatically fix found vulnerabilities
+audit.ignoreDev: false  # Ignore devDependencies during audit
+audit.ignoreLow: true  # Ignore low severity vulnerabilities
+audit.ignoreModerate: false  # Ignore moderate severity vulnerabilities
+audit.ignoreHigh: false  # Ignore high severity vulnerabilities
+audit.ignoreCritical: false  # Ignore critical severity vulnerabilities (dangerous!)
+audit.parallelScan: true  # Scan packages in parallel for faster execution
+audit.timeout: 5000  # Registry request timeout for audit (ms)
+
+# === CACHE ===
+cache.enabled: true  # Use cache for downloaded packages
+cache.maxSize: 500  # Maximum cache size in MB
+cache.ttl: 86400  # Cache time-to-live in seconds (86400 = 1 day)
+cache.cleanOnExit: false  # Clear cache when MIP exits
+cache.path: ~/.mip/cache  # Cache directory path
+cache.compress: false  # Compress cache to save disk space
+
+# === PERFORMANCE ===
+performance.parallelDownloads: 5  # Number of parallel package downloads
+performance.useHardlinks: false  # Use hard links instead of symlinks (saves disk space)
+performance.optimizeSymlinks: true  # Optimize symlink creation
+performance.useMemoryCache: true  # Cache package metadata in memory
+performance.throttle: false  # Limit download speed (useful for slow networks)
+performance.maxSockets: 15  # Maximum number of sockets for downloads
+
+# === LOGGING ===
+logging.level: info  # Log level: silent | error | warn | info | debug | trace
+logging.color: true  # Colored console output
+logging.timestamp: false  # Show timestamps in logs
+logging.showStack: false  # Show full error stack traces
+logging.file: null  # Log file path (null = stdout only)
+logging.maxSize: 10MB  # Maximum log file size
+
+# === INTERACTIVE ===
+interactive.promptOnInstall: false  # Ask for confirmation before installing
+interactive.promptOnDelete: true  # Ask for confirmation before deleting
+interactive.promptOnUpdate: true  # Ask for confirmation before updating
+interactive.promptOnAudit: false  # Ask for confirmation before running audit
+interactive.promptOnDedupe: true  # Ask for confirmation before deduplication
+interactive.autoConfirm: false  # Auto-confirm all prompts (for CI)
+
+# === REGISTRY ===
+registry.default: npm  # Default package registry
+registry.fallbackToNpm: true  # Fall back to npm if custom registry is unavailable
+registry.strictSSL: true  # Validate registry SSL certificates
+registry.timeout: 30000  # Registry request timeout (ms)
+registry.retryCount: 3  # Number of retry attempts on error
+registry.userAgent: mip  # User-Agent for registry requests
+registry.cacheMetadata: true  # Cache package metadata from registry
+
+# === DEPENDENCY ===
+dependency.resolutionStrategy: semver  # Version resolution strategy: semver | exact | latest
+dependency.dedupeOnInstall: true  # Automatically deduplicate dependencies on install
+dependency.hoist: false  # Hoist dependencies to top level (like npm)
+dependency.workspaceProtocol: true  # Use workspace: protocol for local packages
+dependency.allowConflicts: false  # Allow conflicting versions (may cause errors)
+dependency.ignorePeerDependencies: false  # Ignore peerDependencies
+dependency.optionalDependencies: true  # Install optionalDependencies
+
+# === GIT ===
+git.enabled: true  # Use Git for cloning repositories
+git.branch: main  # Default Git branch
+git.ssh: false  # Use SSH instead of HTTPS for Git
+git.depth: 1  # Clone depth (1 = only latest commit)
+git.privateToken: null  # Token for private repository access
+git.cloneTimeout: 60000  # Repository clone timeout (ms)
+
+# === MONOREPO ===
+monorepo.autoLink: true  # Automatically link local packages in workspace
+monorepo.hoistWorkspaces: false  # Hoist workspace dependencies to root level
+monorepo.ignoreWorkspaceRoot: false  # Ignore root package.json in workspace
+monorepo.runScriptsInOrder: true  # Run workspace scripts in order
+monorepo.parallelScripts: false  # Run workspace scripts in parallel
+
+# === DOCTOR ===
+doctor.checkNodeVersion: true  # Check Node.js version in mip doctor
+doctor.checkDiskSpace: true  # Check free disk space
+doctor.checkGitHubToken: true  # Check for GITHUB_TOKEN presence
+doctor.autoFix: false  # Automatically fix issues in mip doctor
+doctor.checkNetwork: true  # Check network availability
+doctor.checkPermissions: true  # Check file permissions
+doctor.checkSymlinks: true  # Check symlink integrity
+doctor.checkManifest: true  # Check manifest integrity
+
+# === SERVER ===
+server.port: 3000  # Port for web server (mip server)
+server.host: localhost  # Host for web server
+server.autoOpen: false  # Auto-open browser when server starts
+server.refreshInterval: 3000  # Dashboard refresh interval (ms)
+server.darkTheme: true  # Use dark theme in dashboard
+server.authToken: null  # Authentication token for dashboard
+server.enableCors: true  # Enable CORS for dashboard
+
+# === CLI ===
+cli.suggestCommands: true  # Suggest similar commands on error
+cli.autoComplete: true  # Enable terminal autocompletion
+cli.pager: false  # Use pager for long output
+cli.confirmExit: false  # Ask for confirmation on exit
+cli.showTimings: false  # Show command execution time
+cli.noColor: false  # Disable colors in output
+cli.quiet: false  # Minimal output (errors only)
+
+# === PLUGINS ===
+plugins.autoLoad: true  # Auto-load plugins from plugins directory
+plugins.allowUnsecure: false  # Allow installing untrusted plugins
+plugins.path: ./plugins  # Path to plugins directory
+plugins.allowGlobal: false  # Allow global plugins installation
+plugins.verbose: false  # Show verbose plugin output
+
+# === I18N ===
+i18n.language: en  # Interface language (en, ru, etc.)
+i18n.fallback: en  # Fallback language if selected is unavailable
+i18n.loadCustom: true  # Load custom language packs
+
+# === EXPERIMENTAL ===
+experimental.enabled: false  # Enable experimental features (caution!)
+experimental.useNewResolver: false  # Use new dependency resolver
+experimental.fastGlob: false  # Use fast glob for file searching
+experimental.parallelExtract: false  # Extract archives in parallel
+experimental.symlinkCache: false  # Cache symlink information

@@ -16,6 +16,7 @@ const { getApiMethods } = require('../lib/api/api-methods');
 const loader = require('../lib/loader');
 const config = require('../lib/utils/config');
 const i18n = require('../lib/i18n');
+const features = require('../lib/utils/features');
 
 // ОДИН ЭКЗЕМПЛЯР API НА ВЕСЬ ПРОЦЕСС
 const api = getApiMethods();
@@ -95,7 +96,53 @@ if (manifestPath) {
   return loaderPath;
 }
 
+// ==========================================
+// ОБРАБОТКА --genconfig
+// ==========================================
+function handleGenConfig() {
+  const force = process.argv.includes('--force');
+  const configPath = path.join(process.cwd(), 'mip.config.yml');
+  
+  if (fs.existsSync(configPath) && !force) {
+    console.log(`⚠️ Config file already exists: ${configPath}`);
+    console.log('   Use --force to overwrite');
+    process.exit(0);
+  }
+  
+  const result = features.generateConfigFile(process.cwd());
+  if (result) {
+    console.log(`✅ Generated MIP features config: ${result}`);
+    console.log(`   Edit this file to enable/disable features`);
+    console.log(`   Documentation: https://mipdocs.fwh.is/features`);
+  } else {
+    console.log(`❌ Failed to generate config file`);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+// ==========================================
+// ОБРАБОТКА --list-features
+// ==========================================
+function handleListFeatures() {
+  features.printFeatures(process.cwd());
+  process.exit(0);
+}
+
 async function main() {
+  // ==========================================
+  // ОБРАБОТКА СПЕЦИАЛЬНЫХ ФЛАГОВ
+  // ==========================================
+  if (process.argv.includes('--genconfig')) {
+    handleGenConfig();
+    return;
+  }
+  
+  if (process.argv.includes('--list-features')) {
+    handleListFeatures();
+    return;
+  }
+
   // ==========================================
   // АВТОМАТИЧЕСКАЯ МИГРАЦИЯ СТАРЫХ ПРОЕКТОВ
   // ==========================================
@@ -108,6 +155,11 @@ async function main() {
   if (lockMigrated && process.env.DEBUG) {
     console.log(`[DEBUG] Yml server finished: lockfile already migrated`);
   }
+
+  // ==========================================
+  // ЗАГРУЖАЕМ ФИЧИ
+  // ==========================================
+  const mipFeatures = features.loadFeatures(process.cwd());
 
   // ==========================================
   // ЗАГРУЖАЕМ КАСТОМНЫЕ ЯЗЫКИ ИЗ ПЛАГИНОВ
@@ -128,9 +180,9 @@ async function main() {
   const getT = () => getI18n(loadLangForCwd(process.cwd())).t;
 
   // ==========================================
-  // ПРОВЕРКА ВЕРСИИ В САМОМ НАЧАЛЕ
+  // ПРОВЕРКА ВЕРСИИ (если включена)
   // ==========================================
-  if (!versionChecked) {
+  if (!versionChecked && mipFeatures['update.checkForUpdates'] !== false) {
     versionChecked = true;
     await checkForUpdates(currentVersion, getT());
   }
@@ -301,13 +353,12 @@ async function main() {
       break;
     }
 
-case 'registry': {
-  const { registry } = require('../lib/commands/registry');
-  // Передаем все аргументы после 'registry'
-  const argv = process.argv.slice(3);
-  registry(argv);
-  break;
-}
+    case 'registry': {
+      const { registry } = require('../lib/commands/registry');
+      const argv = process.argv.slice(3);
+      registry(argv);
+      break;
+    }
 
     case 'pe': {
       const { pe } = require('../lib/commands/pe');
@@ -318,22 +369,26 @@ case 'registry': {
       break;
     }
 
-    // В секцию команд добавьте:
-case 'config': {
-  const { config } = require('../lib/commands/config');
-  const argv = process.argv.slice(3);
-  config(argv);
-  break;
-}
+    case 'config': {
+      const { config } = require('../lib/commands/config');
+      const argv = process.argv.slice(3);
+      config(argv);
+      break;
+    }
 
-// В секцию команд (где все case) добавьте:
+    case 'server': {
+      const { server } = require('../lib/commands/server');
+      const argv = process.argv.slice(3);
+      server(argv);
+      break;
+    }
 
-case 'server': {
-  const { server } = require('../lib/commands/server');
-  const argv = process.argv.slice(3);
-  server(argv);
-  break;
-}
+    case 'publish': {
+      const { publish } = require('../lib/commands/publish');
+      const argv = process.argv.slice(3);
+      publish(argv);
+      break;
+    }
 
     case 'genlock': {
       const { genlock } = require('../lib/commands/genlock');
