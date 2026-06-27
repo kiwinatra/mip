@@ -1,19 +1,55 @@
-# TODO: Translate documentation (RU -> EN)
+🎯 Идеи для MIP 2.1 (QoL)
+1. mip init --template
 
-## Plan (proposed)
-- Detect all Markdown files under `docs/docs/ru/**/*.md`.
-- Create corresponding English files under `docs/docs/en/**`.
-- Translate frontmatter (`title`, `description`) and all Markdown body text from Russian to English.
-- Keep code blocks, command names, paths, and links intact (adjust `/ru/...` links to `/...` English equivalents).
-- Ensure navigation/paths in `docs/docs/en/navigation.json` match the generated English docs.
-- Run formatting/lint checks if available (at least ensure Markdown is valid UTF-8).
-- After completion, verify no Russian text remains in `docs/docs/en/**/*.md`.
+Уже обсуждали — чтобы можно было сразу создать проект с шаблоном:
+bash
 
-## Steps
-- [ ] Gather list of all Russian markdown files under `docs/docs/ru`.
-- [ ] Inspect existing English docs (if any) to avoid overwriting.
-- [ ] Create EN counterparts for each RU markdown file.
-- [ ] Translate content file-by-file.
-- [ ] Update internal links to point to EN routes.
-- [ ] Verification: grep for Cyrillic in `docs/docs/en/**/*.md`.
+mip init --template react my-app
 
+2. Цветной вывод и прогресс-бары
+
+Сделать вывод команд красивее:
+
+    mip install — прогресс-бар с процентом
+
+    mip outdated — цветная таблица (зелёный/жёлтый/красный)
+
+    mip audit — подсветка severity
+
+3. mip why — показать дерево зависимостей
+
+Сейчас показывает только прямых зависимостей. Можно добавить флаг --tree:
+bash
+
+mip why lodash --tree
+
+4. Автодополнение (completion)
+
+Добавить генерацию автодополнения для bash/zsh:
+bash
+
+mip completion bash > ~/.mip-completion.bash
+source ~/.mip-completion.bash
+
+5. mip run без скрипта — показать все скрипты
+
+Если запустить mip run без аргументов — показать список доступных скриптов из mip.yml.
+6. Кэширование mip search
+
+Сохранять результаты поиска на 5 минут, чтобы не дёргать реестр при каждом поиске.
+7. mip audit --json
+
+Уже есть, но можно добавить --output для сохранения в файл:
+bash
+
+mip audit --json --output audit.json
+
+8. Улучшенный mip doctor
+
+Добавить проверку:
+
+    Свободного места на диске
+
+    Версии Node.js (предупреждение если < 18)
+
+    Наличия GITHUB_TOKEN для mip repo

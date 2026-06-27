@@ -226,5 +226,6 @@
   "super.mode_start": "\nSUPER FAST INSTALL MODE\n",
   "super.installing_all": "Installing {{count}} packages in parallel...\n",
   "super.downloading": "Downloading {{name}}@{{version}}...",
-  "super.done": "\nDone in {{ms}}ms"
+  "super.done": "\nDone in {{ms}}ms",
+  "commands.run.usage_hint": "And to run it, use mip run <script>"
 }

@@ -226,5 +226,6 @@
   "super.mode_start": "\nРЕЖИМ СУПЕР-БЫСТРОЙ УСТАНОВКИ\n",
   "super.installing_all": "Установка {{count}} пакетов параллельно...\n",
   "super.downloading": "Загрузка {{name}}@{{version}}...",
-  "super.done": "\nГотово за {{ms}}мс"
+  "super.done": "\nГотово за {{ms}}мс",
+  "commands.run.usage_hint": "Ну а чтобы запустить, используйте mip run <script>"
 }
