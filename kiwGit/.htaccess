@@ -1,0 +1,50 @@
+# ============================================================
+# kiwiGit - .htaccess (исправленный)
+# ============================================================
+
+# Включаем движок
+RewriteEngine On
+
+# ============================================================
+# КРАСИВЫЕ URL (только для index.php)
+# ============================================================
+
+# Если это не реальный файл или папка — перенаправляем на index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?path=$1 [QSA,L]
+
+# ============================================================
+# API — перенаправление на api.php
+# ============================================================
+
+RewriteRule ^api/(.*)$ api.php?action=$1 [QSA,L]
+
+# ============================================================
+# БЕЗОПАСНОСТЬ
+# ============================================================
+
+# Запрещаем доступ к .gkit папкам
+<FilesMatch "\.gkit">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Запрещаем доступ к системным файлам
+<FilesMatch "^(config\.php|\.env|composer\.json|composer\.lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Отключаем просмотр папок
+Options -Indexes
+
+# ============================================================
+# CORS
+# ============================================================
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, X-API-Key"
+</IfModule>

@@ -48,5 +48,3 @@ coverage/
 *-lock.json
 
 *.backup
-kiwigit.js
-.gkit/
