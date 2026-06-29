@@ -50,3 +50,4 @@ coverage/
 *.backup
 kiwigit.js
 .gkit/
+blogpost/

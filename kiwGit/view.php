@@ -1,16 +1,12 @@
 <?php
 // ============================================================
-// kiwiGit - view.php (GitHub Style)
+// kiwiGit - view.php (GitHub Dark Theme)
 // ============================================================
 
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
 require_once __DIR__ . '/config.php';
-
-// ============================================================
-// ПОЛУЧАЕМ РЕПОЗИТОРИЙ
-// ============================================================
 
 $repoName = $_GET['repo'] ?? '';
 $subPath = $_GET['path'] ?? '';
@@ -72,7 +68,7 @@ function getCurrentBranch($repoPath) {
 function getDirectoryContents($path) {
     $items = [];
     if (!is_dir($path)) return $items;
-    
+
     $files = scandir($path);
     foreach ($files as $file) {
         if ($file === '.' || $file === '..' || $file === '.gkit') continue;
@@ -84,13 +80,13 @@ function getDirectoryContents($path) {
             'modified' => date('c', filemtime($full)),
         ];
     }
-    
+
     usort($items, function($a, $b) {
         if ($a['isDir'] && !$b['isDir']) return -1;
         if (!$a['isDir'] && $b['isDir']) return 1;
         return strcasecmp($a['name'], $b['name']);
     });
-    
+
     return $items;
 }
 
@@ -155,7 +151,6 @@ function isTextFile($path) {
 $commits = getCommits($repoPath);
 $branches = getBranches($repoPath);
 $currentBranch = getCurrentBranch($repoPath);
-$currentPath = $subPath ? '/' . $subPath : '/';
 $fullPath = $repoPath . ($subPath ? '/' . $subPath : '');
 $items = getDirectoryContents($fullPath);
 $fileCount = 0;
@@ -169,7 +164,6 @@ $readmeContent = file_exists($readmePath) ? file_get_contents($readmePath) : nul
 $description = file_exists($gkitPath . '/description') ? trim(file_get_contents($gkitPath . '/description')) : '';
 $isPrivate = file_exists($gkitPath . '/private');
 
-// ===== ПРОСМОТР ФАЙЛА =====
 $viewFile = $_GET['file'] ?? '';
 $fileContent = null;
 $fileInfo = null;
@@ -202,118 +196,645 @@ header('Content-Type: text/html; charset=utf-8');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($repoName) ?> · kiwiGit</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥝</text></svg>">
+
     <style>
+        /* ============================================================
+           GITHUB DARK THEME — точная копия
+           ============================================================ */
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif; background: #f6f8fa; color: #24292f; line-height: 1.5; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        .header { background: #24292f; padding: 16px 0; border-bottom: 1px solid #1c2128; }
-        .header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .header-left .back { color: #8b949e; text-decoration: none; font-size: 20px; }
-        .header-left .back:hover { color: #f0f6fc; }
-        .header-left .repo-name { font-size: 18px; font-weight: 600; color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .header-left .repo-name:hover { color: #f0f6fc; }
-        .header-left .badge { font-size: 11px; font-weight: 500; padding: 0 7px; border-radius: 20px; border: 1px solid #8b949e; color: #8b949e; background: transparent; }
-        .header-left .badge.private { border-color: #58a6ff; color: #58a6ff; }
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        .header-right a { padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; transition: 0.15s; border: 1px solid transparent; }
-        .header-right .clone-btn { background: #238636; color: #fff; border-color: #238636; }
-        .header-right .clone-btn:hover { background: #2ea043; }
-        .header-right .copy-btn { background: #21262d; color: #f0f6fc; border-color: #30363d; }
-        .header-right .copy-btn:hover { background: #30363d; }
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #1c2333;
+            --bg-hover: #1f242f;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+            --accent: #58a6ff;
+            --accent-hover: #79c0ff;
+            --green: #238636;
+            --green-hover: #2ea043;
+            --red: #da3633;
+            --red-hover: #f85149;
+            --orange: #d29922;
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --radius: 6px;
+            --transition: 0.15s ease;
+        }
 
-        .main { padding: 24px 0 40px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
 
-        .repo-info { background: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; }
-        .repo-info .name { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .repo-info .name .badge { font-size: 12px; font-weight: 500; padding: 0 8px; border-radius: 20px; border: 1px solid #d0d7de; color: #57606a; background: #f6f8fa; }
-        .repo-info .name .badge.private { border-color: #d0d7de; }
-        .repo-info .description { font-size: 15px; color: #57606a; margin-top: 4px; }
-        .repo-info .meta { font-size: 13px; color: #57606a; margin-top: 8px; display: flex; gap: 20px; flex-wrap: wrap; }
-        .repo-info .meta span { display: flex; align-items: center; gap: 4px; }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-        .tabs { display: flex; gap: 0; border-bottom: 1px solid #d0d7de; margin-bottom: 20px; background: #ffffff; border-radius: 6px 6px 0 0; padding: 0 16px; }
-        .tabs a { padding: 12px 16px; color: #57606a; text-decoration: none; font-size: 14px; font-weight: 500; border-bottom: 2px solid transparent; transition: 0.15s; display: inline-flex; align-items: center; gap: 6px; }
-        .tabs a:hover { color: #24292f; }
-        .tabs a.active { color: #24292f; border-bottom-color: #fd8c73; }
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg-secondary);
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-        .branch-info { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 14px; color: #57606a; flex-wrap: wrap; }
-        .branch-info .branch-name { background: #f6f8fa; padding: 4px 12px; border-radius: 20px; color: #24292f; border: 1px solid #d0d7de; font-family: monospace; font-size: 13px; }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
 
-        .breadcrumb { padding: 8px 0 12px; font-size: 14px; color: #57606a; }
-        .breadcrumb a { color: #0969da; text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .breadcrumb .separator { margin: 0 4px; color: #8b949e; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .file-list { background: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
-        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #d0d7de; transition: 0.1s; }
-        .file-item:last-child { border-bottom: none; }
-        .file-item:hover { background: #f6f8fa; }
-        .file-item .name { display: flex; align-items: center; gap: 8px; color: #0969da; text-decoration: none; font-size: 14px; font-weight: 500; }
-        .file-item .name:hover { text-decoration: underline; }
-        .file-item .name .icon { font-size: 18px; }
-        .file-item .name.folder { color: #24292f; cursor: pointer; }
-        .file-item .name.folder:hover { color: #0969da; }
-        .file-item .meta { font-size: 13px; color: #57606a; display: flex; gap: 16px; align-items: center; }
-        .file-item .meta .lang { color: #57606a; font-size: 12px; }
+        .header-left .back {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 20px;
+            line-height: 1;
+            transition: var(--transition);
+        }
 
-        .file-viewer { background: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
-        .file-viewer .header { background: #f6f8fa; padding: 12px 16px; border-bottom: 1px solid #d0d7de; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; }
-        .file-viewer .header .file-info { color: #57606a; font-weight: 400; font-size: 13px; }
-        .file-viewer .header .file-info a { color: #0969da; text-decoration: none; margin-left: 12px; }
-        .file-viewer .header .file-info a:hover { text-decoration: underline; }
-        .file-viewer .body { padding: 16px; overflow: auto; max-height: 600px; }
-        .file-viewer .body pre { margin: 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; color: #24292f; white-space: pre-wrap; word-break: break-word; }
-        .file-viewer .body .binary { text-align: center; padding: 40px 20px; color: #57606a; }
-        .file-viewer .body .binary .icon { font-size: 48px; display: block; margin-bottom: 8px; }
+        .header-left .back:hover {
+            color: var(--text-primary);
+        }
 
-        .empty-state { padding: 40px 20px; text-align: center; color: #57606a; }
-        .empty-state .icon { font-size: 40px; display: block; margin-bottom: 8px; opacity: 0.5; }
+        .header-left .repo-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        .commits-section { margin-top: 20px; background: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
-        .commits-section .header { padding: 12px 16px; border-bottom: 1px solid #d0d7de; font-weight: 600; font-size: 14px; color: #24292f; background: #f6f8fa; display: flex; justify-content: space-between; align-items: center; }
-        .commit-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #d0d7de; flex-wrap: wrap; gap: 6px; }
-        .commit-item:last-child { border-bottom: none; }
-        .commit-item:hover { background: #f6f8fa; }
-        .commit-item .hash { font-family: monospace; color: #0969da; font-size: 13px; font-weight: 500; }
-        .commit-item .msg { flex: 1; min-width: 120px; }
-        .commit-item .author { color: #57606a; font-size: 13px; }
-        .commit-item .date { color: #57606a; font-size: 12px; white-space: nowrap; }
+        .header-left .repo-name:hover {
+            color: var(--text-primary);
+        }
 
-        .readme-section { margin-top: 20px; background: #ffffff; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
-        .readme-section .header { padding: 12px 16px; border-bottom: 1px solid #d0d7de; font-weight: 600; font-size: 14px; color: #24292f; background: #f6f8fa; }
-        .readme-section .body { padding: 24px 28px; font-size: 15px; line-height: 1.8; color: #24292f; overflow: auto; }
-        .readme-section .body h1, .readme-section .body h2, .readme-section .body h3 { margin: 20px 0 10px 0; font-weight: 600; }
-        .readme-section .body h1:first-child, .readme-section .body h2:first-child, .readme-section .body h3:first-child { margin-top: 0; }
-        .readme-section .body code { background: #f6f8fa; padding: 2px 6px; border-radius: 4px; font-size: 85%; font-family: 'SF Mono', 'Fira Code', monospace; }
-        .readme-section .body pre { background: #f6f8fa; padding: 14px; border-radius: 6px; overflow: auto; border: 1px solid #d0d7de; margin: 12px 0; }
-        .readme-section .body pre code { background: none; padding: 0; border: none; }
+        .header-left .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 0 7px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: transparent;
+            white-space: nowrap;
+        }
 
-        .back-link { margin-top: 12px; display: inline-block; color: #0969da; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
+        .header-left .badge.private {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
-        .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #d0d7de; font-size: 13px; color: #57606a; text-align: center; }
-        .footer a { color: #0969da; text-decoration: none; }
-        .footer a:hover { text-decoration: underline; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
+        .header-right a {
+            padding: 6px 16px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .header-right .clone-btn {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
+        }
+
+        .header-right .clone-btn:hover {
+            background: var(--green-hover);
+            border-color: var(--green-hover);
+        }
+
+        .header-right .copy-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .header-right .copy-btn:hover {
+            background: var(--bg-hover);
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            padding: 24px 0 40px;
+        }
+
+        /* ===== REPO INFO ===== */
+        .repo-info {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .repo-info .name {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .repo-info .name .badge {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 0 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+        }
+
+        .repo-info .name .badge.private {
+            border-color: var(--border-color);
+        }
+
+        .repo-info .description {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .repo-info .meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .repo-info .meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 0 16px;
+        }
+
+        .tabs a {
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tabs a:hover {
+            color: var(--text-primary);
+        }
+
+        .tabs a.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--orange);
+        }
+
+        /* ===== BRANCH INFO ===== */
+        .branch-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .branch-info .branch-name {
+            background: var(--bg-tertiary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            padding: 8px 0 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb .separator {
+            margin: 0 4px;
+            color: var(--text-muted);
+        }
+
+        /* ===== FILE LIST ===== */
+        .file-list {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .file-item .name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .file-item .name:hover {
+            text-decoration: underline;
+        }
+
+        .file-item .name .icon {
+            font-size: 18px;
+        }
+
+        .file-item .name.folder {
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .file-item .name.folder:hover {
+            color: var(--accent);
+        }
+
+        .file-item .meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .file-item .meta .lang {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* ===== FILE VIEWER ===== */
+        .file-viewer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .file-viewer .header {
+            background: var(--bg-tertiary);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .file-viewer .header .file-info {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .file-viewer .header .file-info a {
+            color: var(--accent);
+            text-decoration: none;
+            margin-left: 12px;
+        }
+
+        .file-viewer .header .file-info a:hover {
+            text-decoration: underline;
+        }
+
+        .file-viewer .body {
+            padding: 16px;
+            overflow: auto;
+            max-height: 600px;
+            background: var(--bg-primary);
+        }
+
+        .file-viewer .body pre {
+            margin: 0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .file-viewer .body .binary {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .file-viewer .body .binary .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .back-link {
+            margin-top: 12px;
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        /* ===== COMMITS ===== */
+        .commits-section {
+            margin-top: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .commits-section .header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .commit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .commit-item:last-child {
+            border-bottom: none;
+        }
+
+        .commit-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .commit-item .hash {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .commit-item .msg {
+            flex: 1;
+            min-width: 120px;
+            color: var(--text-primary);
+        }
+
+        .commit-item .author {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .commit-item .date {
+            color: var(--text-secondary);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* ===== README ===== */
+        .readme-section {
+            margin-top: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .readme-section .header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .readme-section .body {
+            padding: 24px 28px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            overflow: auto;
+        }
+
+        .readme-section .body h1,
+        .readme-section .body h2,
+        .readme-section .body h3 {
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .readme-section .body h1:first-child,
+        .readme-section .body h2:first-child,
+        .readme-section .body h3:first-child {
+            margin-top: 0;
+        }
+
+        .readme-section .body code {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 85%;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            color: var(--text-primary);
+        }
+
+        .readme-section .body pre {
+            background: var(--bg-primary);
+            padding: 14px;
+            border-radius: var(--radius);
+            overflow: auto;
+            border: 1px solid var(--border-color);
+            margin: 12px 0;
+        }
+
+        .readme-section .body pre code {
+            background: none;
+            padding: 0;
+            border: none;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .header .container { flex-wrap: wrap; }
-            .header-right { width: 100%; }
-            .header-right a { flex: 1; text-align: center; }
-            .repo-info .name { font-size: 18px; }
-            .commit-item { flex-direction: column; align-items: flex-start; gap: 4px; }
-            .file-item { flex-direction: column; align-items: flex-start; gap: 4px; }
-            .readme-section .body { padding: 16px; }
-            .tabs { overflow-x: auto; padding: 0 8px; flex-wrap: nowrap; }
-            .tabs a { padding: 10px 12px; font-size: 13px; white-space: nowrap; }
-            .file-viewer .body { padding: 12px; font-size: 12px; }
-            .file-viewer .header { flex-wrap: wrap; gap: 8px; }
+            .header .container {
+                flex-wrap: wrap;
+            }
+            .header-right {
+                width: 100%;
+            }
+            .header-right a {
+                flex: 1;
+                text-align: center;
+            }
+            .repo-info .name {
+                font-size: 18px;
+            }
+            .commit-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .readme-section .body {
+                padding: 16px;
+            }
+            .tabs {
+                overflow-x: auto;
+                padding: 0 8px;
+                flex-wrap: nowrap;
+            }
+            .tabs a {
+                padding: 10px 12px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+            .file-viewer .body {
+                padding: 12px;
+                font-size: 12px;
+            }
+            .file-viewer .header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            .repo-info .meta {
+                font-size: 12px;
+                gap: 12px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="container">
             <div class="header-left">
@@ -332,10 +853,11 @@ header('Content-Type: text/html; charset=utf-8');
         </div>
     </header>
 
+    <!-- ===== MAIN ===== -->
     <div class="main">
         <div class="container">
 
-            <!-- Repo Info -->
+            <!-- ===== REPO INFO ===== -->
             <div class="repo-info">
                 <div class="name">
                     <?= htmlspecialchars($repoName) ?>
@@ -353,13 +875,13 @@ header('Content-Type: text/html; charset=utf-8');
                 </div>
             </div>
 
-            <!-- Branch Info -->
+            <!-- ===== BRANCH INFO ===== -->
             <div class="branch-info">
                 <span>🌿 Branch:</span>
                 <span class="branch-name"><?= htmlspecialchars($currentBranch) ?></span>
             </div>
 
-            <!-- Tabs -->
+            <!-- ===== TABS ===== -->
             <div class="tabs">
                 <a href="view.php?repo=<?= urlencode($repoName) ?><?= $subPath ? '&path=' . urlencode($subPath) : '' ?>" class="<?= !$viewFile ? 'active' : '' ?>">📄 Code</a>
                 <a href="#commits" onclick="document.getElementById('commits').scrollIntoView({behavior:'smooth'}); return false;">📝 Commits</a>
@@ -388,7 +910,7 @@ header('Content-Type: text/html; charset=utf-8');
                                     <span class="icon">📄</span>
                                     <p>This is a binary file.</p>
                                     <p style="font-size:13px;margin-top:8px;">
-                                        <a href="api.php?action=download&repo=<?= urlencode($repoName) ?>&path=<?= urlencode($viewFile) ?>" style="color:#0969da;">Download it</a> to view locally.
+                                        <a href="api.php?action=download&repo=<?= urlencode($repoName) ?>&path=<?= urlencode($viewFile) ?>" style="color:var(--accent);">Download it</a> to view locally.
                                     </p>
                                 </div>
                             <?php endif; ?>
@@ -404,7 +926,7 @@ header('Content-Type: text/html; charset=utf-8');
             <?php else: ?>
                 <!-- ===== СПИСОК ФАЙЛОВ ===== -->
 
-                <!-- Breadcrumb -->
+                <!-- ===== BREADCRUMB ===== -->
                 <div class="breadcrumb">
                     <a href="view.php?repo=<?= urlencode($repoName) ?>">📂 <?= htmlspecialchars($repoName) ?></a>
                     <?php
@@ -419,7 +941,7 @@ header('Content-Type: text/html; charset=utf-8');
                     ?>
                 </div>
 
-                <!-- Files -->
+                <!-- ===== FILES ===== -->
                 <div class="file-list">
                     <?php if (empty($items)): ?>
                         <div class="empty-state">
@@ -450,7 +972,7 @@ header('Content-Type: text/html; charset=utf-8');
                     <?php endif; ?>
                 </div>
 
-                <!-- README (только в корне) -->
+                <!-- ===== README (только в корне) ===== -->
                 <?php if (!$subPath && $readmeContent): ?>
                     <div class="readme-section">
                         <div class="header">📖 README.md</div>
@@ -459,11 +981,11 @@ header('Content-Type: text/html; charset=utf-8');
                 <?php endif; ?>
             <?php endif; ?>
 
-            <!-- Commits -->
+            <!-- ===== COMMITS ===== -->
             <div id="commits" class="commits-section">
                 <div class="header">
                     <span>📝 Commits</span>
-                    <span style="font-weight:400;font-size:13px;color:#57606a;"><?= count($commits) ?> commits</span>
+                    <span style="font-weight:400;font-size:13px;color:var(--text-secondary);"><?= count($commits) ?> commits</span>
                 </div>
                 <?php if (empty($commits)): ?>
                     <div class="empty-state" style="padding:20px;">
@@ -481,13 +1003,14 @@ header('Content-Type: text/html; charset=utf-8');
                         </div>
                     <?php endforeach; ?>
                     <?php if (count($commits) > 20): ?>
-                        <div style="padding:10px 16px;text-align:center;color:#57606a;font-size:13px;border-top:1px solid #d0d7de;">
+                        <div style="padding:10px 16px;text-align:center;color:var(--text-secondary);font-size:13px;border-top:1px solid var(--border-color);">
                             … and <?= count($commits) - 20 ?> more commits
                         </div>
                     <?php endif; ?>
                 <?php endif; ?>
             </div>
 
+            <!-- ===== FOOTER ===== -->
             <div class="footer">
                 🥝 kiwiGit &middot; <a href="index.php">← Back to repositories</a>
             </div>
