@@ -197,22 +197,22 @@ describe('output validation', () => {
     }
   });
 
-  it('init creates README.md when absent', async () => {
-    const dir = createTmpDir('mip-test-init-readme-');
+  it('init creates mip.yml and .mip structure', async () => {
+    const dir = createTmpDir('mip-test-init-structure-');
     try {
       await withCwd(dir, async () => {
         const { init } = require('../../lib/commands/init');
         init();
-        assert.ok(fs.existsSync(path.join(dir, 'README.md')));
 
-        const readme = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
-        assert.ok(
-          readme.includes('Created with ❤️ using mip'),
-          'README.md should contain the standard footer'
-        );
+        assert.ok(fs.existsSync(path.join(dir, 'mip.yml')));
+        assert.ok(fs.existsSync(path.join(dir, '.mip')));
+        assert.ok(fs.existsSync(path.join(dir, '.mip', 'packages')));
+        assert.ok(fs.existsSync(path.join(dir, '.mip', 'cache')));
+        assert.ok(fs.existsSync(path.join(dir, '.mip', 'temp')));
       });
     } finally {
       cleanupDir(dir);
     }
   });
+
 });

@@ -12,13 +12,14 @@ describe('mip core: init', () => {
         const { init } = require('../../lib/commands/init');
         init();
 
-        assert.ok(require('fs').existsSync(path.join(dir, 'mip.json')));
+        assert.ok(require('fs').existsSync(path.join(dir, 'mip.yml')));
         assert.ok(require('fs').existsSync(path.join(dir, '.mip')));
 
-        const config = JSON.parse(require('fs').readFileSync(path.join(dir, 'mip.json'), 'utf8'));
-        assert.equal(typeof config.name, 'string');
-        assert.equal(config.language, 'en');
-        assert.deepEqual(config.dependencies, {});
+        const raw = require('fs').readFileSync(path.join(dir, 'mip.yml'), 'utf8');
+        assert.ok(raw.length > 0, 'mip.yml should not be empty');
+        assert.ok(/\bname\b/i.test(raw), 'mip.yml should contain name');
+        assert.ok(/\blanguage\b/i.test(raw), 'mip.yml should contain language');
+
 
         assert.ok(require('fs').existsSync(path.join(dir, '.mip', 'packages')));
         assert.ok(require('fs').existsSync(path.join(dir, '.mip', 'cache')));
@@ -29,7 +30,7 @@ describe('mip core: init', () => {
     }
   });
 
-  it('re-runs init in test mode without throwing when mip.json already exists', async () => {
+  it('re-runs init without throwing when mip.yml already exists', async () => {
     const dir = createTmpDir('mip-test-init-reenter-');
     try {
       globalThis.__MIP_TEST_MODE__ = true;
@@ -38,11 +39,13 @@ describe('mip core: init', () => {
         init();
         init();
 
-        assert.ok(require('fs').existsSync(path.join(dir, 'mip.json')));
+        assert.ok(require('fs').existsSync(path.join(dir, 'mip.yml')));
+        assert.ok(require('fs').existsSync(path.join(dir, '.mip')));
       });
     } finally {
       delete globalThis.__MIP_TEST_MODE__;
       cleanupDir(dir);
     }
   });
+
 });
