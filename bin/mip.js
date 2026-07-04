@@ -297,6 +297,12 @@ async function main() {
       await execCommand(arg);
       break;
 
+    case 'hello':
+    case 'h':
+      await require('../lib/commands/hello').hello();
+      break;
+
+
     case 'workspaces':
       await workspacesCommand(arg, process.argv[4]);
       break;

@@ -10,6 +10,13 @@ async function withCwd(cwd, fn) {
     throw new Error(`withCwd: directory does not exist: ${cwd}`);
   }
 
+  // Jest-style isolation not available, so ensure tests relying on fresh
+  // module state can opt-in.
+  // eslint-disable-next-line no-undef
+  if (globalThis.__MIP_TEST_MODE__ && typeof globalThis.__MIP_TEST_RESET_MODULES__ === 'boolean') {
+    globalThis.__MIP_TEST_RESET_MODULES__ = true;
+  }
+
   process.chdir(cwd);
   try {
     return await fn();
@@ -17,5 +24,6 @@ async function withCwd(cwd, fn) {
     process.chdir(prev);
   }
 }
+
 
 module.exports = { withCwd };
