@@ -36,4 +36,5 @@ scripts:
   format: prettier --write "**/*.js"
   docs:en: cd docs/docmd_EN && npm run dev
   docs:ru: cd docs/docmd_RU && npm run dev
+  debug: node mip_dgb.js
 workspaces: []

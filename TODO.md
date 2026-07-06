@@ -1,10 +1,5 @@
-# TODO (quality + tests update)
-
-- [ ] Update init tests to match current contract: `mip.yml` + `.mip/` structure (no `mip.json` expectation)
-- [ ] Update README expectation: either implement README creation in `mip init` or adjust tests to match current behavior
-- [ ] Add new tests for migration: `mip.json/mip-lock.json` -> `mip.yml/mip-lock.yml` (purely local, no network)
-- [ ] Add new tests for “init idempotency”: second `init()` should not crash and should not destroy existing `.mip`
-- [ ] Fix/adjust output tests to validate current output strings/behavior
-- [ ] Fix ESLint error in `lib/ui/cli.js` (`no-control-regex`)
-- [ ] Run: `npm test` and `npm run lint` until green
+- [ ] Read peer-resolver tests and design 5 brand-new test cases (new topics, not the earlier proposed ones)
+- [ ] Implement 5 additional `it(...)` tests in `test/core/peer-resolver.spec.js`
+- [ ] Run `npx mocha test/core/peer-resolver.spec.js --exit`
+- [ ] If failures: adjust assertions / mocks and re-run
 
