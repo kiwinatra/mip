@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types"],
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+
+    "rootDir": "./test",
+    "outDir": "./dist-test",
+
+    "types": ["node", "mocha"],
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": ["test/**/*.ts"],
+  "compilerOptions": {
+    "noEmitOnError": false
+  },
+  "exclude": ["dist-test", "node_modules"]
+}
+

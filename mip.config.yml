@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────
 # MIP Features Configuration
-# Generated: 2026-06-27T18:34:56.313Z
+# Generated: 2026-07-07T11:41:53.691Z
 # ────────────────────────────────────────────────
 # Documentation: https://mipdocs.fwh.is/features
 #
@@ -14,7 +14,10 @@
 
 
 # === CONFIG ===
-config.enabled: false  # Master switch — disable all feature modifications
+config.enabled: true  # Master switch — disable all feature modifications
+
+# === MOTD ===
+motd.enabled: true  # Show Message of the Day with quotes and tips
 
 # === INSTALL ===
 install.parallel: true  # Install multiple packages in parallel for faster execution

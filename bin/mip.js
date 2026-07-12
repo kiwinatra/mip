@@ -63,7 +63,6 @@ const isVersion = process.argv.includes('--version') || process.argv.includes('-
 // ==========================================
 
 if (isHelp || isVersion) {
-  // Загружаем ТОЛЬКО i18n для перевода
   const lang = require('../lib/i18n').loadLangForCwd(process.cwd());
   const { t } = require('../lib/i18n').getI18n(lang);
   const pkg = require('../package.json');
@@ -126,16 +125,15 @@ const loader = require('../lib/loader');
 const config = require('../lib/utils/config');
 const i18n = require('../lib/i18n');
 const features = require('../lib/utils/features');
+const motd = require('../lib/utils/motd');
 
 const api = getApiMethods();
 
-// Разрешаем алиасы
 const resolved = resolveAlias(rawInput);
 const command = resolved.command;
 const args = resolved.args || [];
 const arg = args[0] || process.argv[3];
 
-// Подменяем process.argv
 const originalArgv = process.argv;
 process.argv = [originalArgv[0], originalArgv[1], command, ...args];
 
@@ -245,6 +243,13 @@ async function main() {
   const getT = () => getI18n(lang).t;
 
   // ==========================================
+  // ПОКАЗЫВАЕМ MOTD (ЕСЛИ ВКЛЮЧЕН)
+  // ==========================================
+  if (mipFeatures['motd.enabled'] !== false) {
+    motd.showMOTD(process.cwd());
+  }
+
+  // ==========================================
   // ПРОВЕРКА ВЕРСИИ (1 РАЗ В ДЕНЬ)
   // ==========================================
   const lastCheck = getLastUpdateCheck();
@@ -304,7 +309,6 @@ async function main() {
 // ==========================================
 
 function shouldLoadFeatures(command) {
-  // Команды, которым фичи НЕ нужны (быстрый старт)
   const skipFeatures = [
     '--help', '-h', '--version', '-v', 
     'init', 'hello', 'h', 'feel',
