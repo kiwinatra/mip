@@ -1,4 +1,3 @@
-Developement is stopped for now!
 
 # mip — package manager that just works
 

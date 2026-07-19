@@ -1,16 +1,21 @@
-# Mip update 1.6 - Documentation update
+mip 2.2 update (faster whan robtop :3)
 
-## Documentation
-(will be added in future to website when im done with landing page)
+This update was centred to fixing and finishing features.
 
-### Documentation was build with DocMD, and explains everything in mip
+New features:
 
-## Code Review
+[+] Added hello command, which works like neofetch
+[+] Alias command, centered to work with plugins (not pe, normal alias)
 
-### Fixed bugs, and more.
+Fixed features:
 
-stay calm with mip.
+[~] Completed features into all files
+[~] Fixed plugin's API
+[~] maybe fixed completion
+[~] Fixed language command error
 
----
+Known issues:
 
-updated and patched files better be build manually from mip sources.
+[!] mip-lang plugin is not applying languages.
+
+yall keep in mind mip is good

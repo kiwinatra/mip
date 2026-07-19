@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#7b2ffc"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Пакет -->
+  <rect x="3" y="4" width="18" height="16" rx="2" fill="url(#iconGrad)" opacity="0.9"/>
+  
+  <!-- Коробка -->
+  <rect x="5" y="2" width="14" height="4" rx="1" fill="url(#iconGrad)"/>
+  
+  <!-- Полосы на коробке -->
+  <rect x="6" y="3" width="3" height="2" fill="#fff" opacity="0.3"/>
+  <rect x="15" y="3" width="3" height="2" fill="#fff" opacity="0.3"/>
+  
+  <!-- Буква M на пакете -->
+  <text x="7" y="15" font-family="monospace" font-size="10" font-weight="bold" fill="#fff">
+    M
+  </text>
+  
+  <!-- Стрелка вниз -->
+  <path d="M12 18 L8 14 L12 14 L12 12 L16 12 L16 14 L12 14 Z" fill="#fff" opacity="0.8"/>
+</svg>

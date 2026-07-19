@@ -79,7 +79,21 @@ describe('plugins: mip-lang', () => {
       }
     };
 
-    copyRecursive(src, path.join(dir, 'plugins', 'mip-lang'));
+    // In this repo builtin plugin lives under mip-plugins/mip-lang/<something>
+    // and may not exist as a single directory; copy what is present.
+    const srcParent = path.join(cwd, 'mip-plugins');
+    const candidates = fs.existsSync(path.join(srcParent, 'mip-lang'))
+      ? [path.join(srcParent, 'mip-lang')]
+      : fs
+          .readdirSync(srcParent)
+          .filter((x) => x.startsWith('mip-lang'))
+          .map((x) => path.join(srcParent, x));
+
+    const found = candidates.find((p) => fs.existsSync(p));
+    assert.ok(found, `mip-lang source not found in ${srcParent}`);
+
+    copyRecursive(found, path.join(dir, 'plugins', 'mip-lang'));
+
 
     resetSingletons();
     process.chdir(dir);
@@ -156,14 +170,16 @@ describe('plugins: mip-lang', () => {
     assert.ok(idx.includes("mip-lang-pirate"), 'index.js should include plugin name');
   });
 
-  it('mip-lang apply updates mip.json language field via its temp config writer', async () => {
+  it('mip-lang apply updates mip.yml language field via its temp config writer', async () => {
     const pm = requireFresh('../../lib/api/plugin-manager').getPluginManager();
 
     await pm.runCommand('mip-lang', 'apply', ['pirate']);
 
-    const mipJson = JSON.parse(fs.readFileSync(path.join(dir, 'mip.json'), 'utf8'));
-    assert.equal(mipJson.language, 'pirate');
+    const yaml = require('js-yaml');
+    const mipYml = yaml.load(fs.readFileSync(path.join(dir, 'mip.yml'), 'utf8'));
+    assert.equal(mipYml.language, 'pirate');
   });
+
 
   it('plugin-manager registers plugin commands and runCommand executes them without throwing', async () => {
     const pm = requireFresh('../../lib/api/plugin-manager').getPluginManager();

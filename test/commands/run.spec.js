@@ -27,9 +27,15 @@ describe('mip core: run', () => {
         // Ensure .mip exists to avoid path probing overhead.
         fs.mkdirSync(path.join(dir, '.mip'), { recursive: true });
 
+        // Disable interactive prompt for deterministic tests
+        fs.writeFileSync(
+          path.join(dir, 'mip.config.yml'),
+          'config.enabled: true\ninteractive.promptOnRun: false\n',
+          'utf8'
+        );
+
         const { run } = require('../../lib/commands/run');
 
-        // run() uses spawn + listens to close handler that calls process.exit().
         // Intercept process.exit to turn it into an assertion.
         const originalExit = process.exit;
         let exitCode;
@@ -38,9 +44,9 @@ describe('mip core: run', () => {
         };
 
         try {
-          await run('fail');
+          // run() does not reliably resolve; it wires spawn close handler.
+          run('fail');
 
-          // Wait a bit for spawned process close event.
           await new Promise(r => setTimeout(r, 300));
           assert.equal(exitCode, 3);
         } finally {

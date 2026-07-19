@@ -62,6 +62,7 @@ describe('utils/features', function () {
       expect(features.getFeature('install.parallel')).to.equal(features.DEFAULT_FEATURES['install.parallel']);
       expect(features.isFeatureEnabled('install.parallel', tmp)).to.equal(false);
       expect(features.isFeatureDisabled('install.parallel', tmp)).to.equal(true);
+      // global switch must be treated as disabled
       expect(features.isFeaturesEnabled(tmp)).to.equal(false);
     });
   });

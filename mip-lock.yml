@@ -3389,4 +3389,124 @@ packages:
     dependencies: {}
     peerDependencies: {}
     installPath: .mip/yallist/2.1.2
+  tar@7.5.20:
+    peerDependencies: {}
+    version: 7.5.20
+  '@docmd/core@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/core/-/core-0.8.16.tgz
+    dependencies:
+      '@docmd/api': ^0.8.16
+      '@docmd/deployer': ^0.8.16
+      '@docmd/live': ^0.8.16
+      '@docmd/parser': ^0.8.16
+      '@docmd/plugin-analytics': ^0.8.16
+      '@docmd/plugin-git': ^0.8.16
+      '@docmd/plugin-installer': ^0.8.16
+      '@docmd/plugin-llms': ^0.8.16
+      '@docmd/plugin-mermaid': ^0.8.16
+      '@docmd/plugin-okf': ^0.8.16
+      '@docmd/plugin-openapi': ^0.8.16
+      '@docmd/plugin-search': ^0.8.16
+      '@docmd/plugin-seo': ^0.8.16
+      '@docmd/plugin-sitemap': ^0.8.16
+      '@docmd/themes': ^0.8.16
+      '@docmd/tui': ^0.8.16
+      '@docmd/ui': ^0.8.16
+      '@docmd/utils': ^0.8.16
+      esbuild: ^0.28.1
+      ws: ^8.21.1
+    peerDependencies: {}
+    installPath: .mip/@docmd/core/0.8.16
+  '@docmd/plugin-analytics@0.8.16':
+    peerDependencies:
+      '@docmd/api': ^0.8.16
+    version: 0.8.16
+  '@docmd/plugin-seo@0.8.16':
+    peerDependencies:
+      '@docmd/api': ^0.8.16
+    version: 0.8.16
+  '@docmd/plugin-openapi@0.8.16':
+    peerDependencies:
+      '@docmd/api': ^0.8.16
+    version: 0.8.16
+  '@docmd/plugin-git@0.8.16':
+    peerDependencies:
+      '@docmd/api': ^0.8.16
+    version: 0.8.16
+  '@docmd/live@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/live/-/live-0.8.16.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.16
+      '@docmd/plugin-math': ^0.8.16
+      '@docmd/plugin-mermaid': ^0.8.16
+      '@docmd/themes': ^0.8.16
+      '@docmd/tui': ^0.8.16
+      '@docmd/ui': ^0.8.16
+      buffer: ^6.0.3
+      esbuild: ^0.28.1
+      katex: ^0.17.0
+      markdown-it-texmath: ^1.0.0
+    peerDependencies: {}
+    installPath: .mip/@docmd/live/0.8.16
+  '@docmd/tui@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/tui/-/tui-0.8.16.tgz
+    dependencies:
+      chalk: ^4.1.2
+    peerDependencies: {}
+    installPath: .mip/@docmd/tui/0.8.16
+  '@docmd/ui@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/ui/-/ui-0.8.16.tgz
+    dependencies:
+      '@docmd/api': ^0.8.16
+      '@docmd/tui': ^0.8.16
+    peerDependencies: {}
+    installPath: .mip/@docmd/ui/0.8.16
+  '@docmd/api@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/api/-/api-0.8.16.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.16
+      '@docmd/tui': ^0.8.16
+      '@docmd/utils': ^0.8.16
+    peerDependencies: {}
+    installPath: .mip/@docmd/api/0.8.16
+  '@docmd/parser@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/parser/-/parser-0.8.16.tgz
+    dependencies:
+      '@docmd/tui': ^0.8.16
+      '@docmd/utils': ^0.8.16
+      embed-lite: ^0.1.4
+      lite-hl: ^0.1.2
+      lite-matter: ^0.1.1
+      lite-template: ^0.1.2
+      lucide-static: ^0.577.0
+      markdown-it: ^14.3.0
+      markdown-it-abbr: ^1.0.4
+      markdown-it-attrs: ^4.5.0
+      markdown-it-deflist: ^2.1.0
+      markdown-it-emoji: ^2.0.2
+      markdown-it-footnote: ^3.0.3
+      markdown-it-task-lists: ^2.1.1
+    peerDependencies: {}
+    installPath: .mip/@docmd/parser/0.8.16
+  '@docmd/utils@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/utils/-/utils-0.8.16.tgz
+    dependencies: {}
+    peerDependencies: {}
+    installPath: .mip/@docmd/utils/0.8.16
+  markdown-it@14.3.0:
+    peerDependencies: {}
+    version: 14.3.0
+  '@docmd/plugin-installer@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
+  prettier@3.9.5:
+    peerDependencies: {}
+    version: 3.9.5
 version: '1.0'

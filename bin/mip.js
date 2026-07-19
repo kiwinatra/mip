@@ -225,8 +225,50 @@ async function main() {
   // ==========================================
   // ЗАГРУЖАЕМ КАСТОМНЫЕ ЯЗЫКИ (ТОЛЬКО ЕСЛИ ЕСТЬ ПЛАГИНЫ)
   // ==========================================
+  // custom языки должны грузиться из "глобальной" папки mip (рядом с самим mip),
+  // а не только из текущей рабочей директории проекта.
+  const mipRoot = path.resolve(__dirname, '..');
+
+  // Плагины с кастомными локалями лежат в папке mip-plugins (а не в mip/plugins).
+  // i18n.loadCustomLocales() ожидает на cwd папку "plugins".
+  // Поэтому для i18n отдаём cwd, в котором есть plugins/.
+  const globalPluginsRoot = path.join(mipRoot, 'mip-plugins'); // .../mip/mip-plugins
+
+  // В текущей структуре репозитория mip/lang-плагины лежат как:
+  // mip-plugins/mip-<name>/locales/*.json
+  // i18n.loadCustomLocales ожидает cwd/plugins/<plugin>/locales.
+  // Поэтому для i18n прокидываем "mip-plugins" как cwd, а в его составе находим и грузим именно locales.
+  // Чтобы не ломать i18n, используем fallback: грузим locales через ожидаемый layout:
+  // .../mip-plugins/plugins/<plugin>/locales — если папка plugins/ отсутствует, ничего не грузим.
+  const globalPluginsDir = path.join(globalPluginsRoot, 'plugins'); // .../mip/mip-plugins/plugins
+
+  if (fs.existsSync(globalPluginsRoot) && fs.existsSync(globalPluginsDir)) {
+    i18n.loadCustomLocales(globalPluginsRoot);
+  }
+
+  // fallback на совместимость со старым поведением: плагины ищем в cwd проекта
   if (fs.existsSync(path.join(process.cwd(), 'plugins'))) {
     i18n.loadCustomLocales(process.cwd());
+  }
+
+  // дополнительный fallback для текущей структуры mip-plugins/mip-lang/templates/*.json
+  // (там лежат переводы, но нет plugins/<plugin>/locales).
+  try {
+    const langPluginRoot = path.join(mipRoot, 'mip-plugins', 'mip-lang');
+    const templatesDir = path.join(langPluginRoot, 'templates');
+    if (fs.existsSync(templatesDir)) {
+      for (const file of fs.readdirSync(templatesDir)) {
+        if (!file.endsWith('.json')) continue;
+        const lang = path.basename(file, '.json');
+        const content = JSON.parse(fs.readFileSync(path.join(templatesDir, file), 'utf8'));
+        i18n.customLocales = i18n.customLocales || {};
+        i18n.customLanguages = i18n.customLanguages || [];
+        i18n.customLocales[lang] = content;
+        if (!i18n.customLanguages.includes(lang)) i18n.customLanguages.push(lang);
+      }
+    }
+  } catch (e) {
+    // silently
   }
 
   // ==========================================
