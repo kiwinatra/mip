@@ -176,7 +176,7 @@ async function handleCommand(command, arg, args, options, getT) {
       return config(argv);
     }
 
-    case 'server': {
+    case 'page': {
       const { server } = require('../lib/commands/server');
       const argv = process.argv.slice(3);
       return server(argv);
@@ -208,6 +208,8 @@ async function handleCommand(command, arg, args, options, getT) {
       const { exports } = require('../lib/commands/exports');
       return exports(arg);
     }
+
+  
 
     case 'clone': {
   const { clone } = require('../lib/commands/clone');

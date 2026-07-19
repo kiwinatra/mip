@@ -1,5 +1,5 @@
 
-# mip — package manager that just works
+# mip - package manager that just works
 
 <p align="center">
   <a href="https://github.com/kiwinatra/mip/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kiwinatra/mip?style=social"></a>
@@ -30,14 +30,14 @@ mip run start
 
 ## ✨ Features
 
-- ⚡ **Lightning fast** — 10x faster than npm
-- 🌍 **Global cache** — packages stored once in `~/.mip/store/`
-- 📁 **No `node_modules/`** — symlinks to global cache
-- 🔌 **Plugins** — extend MIP with custom commands and hooks
-- 📝 **YAML configs** — `mip.yml` with comments support
-- 🔒 **Built-in audit** — check vulnerabilities
-- 🌐 **i18n** — 10 languages, custom language packs
-- 📦 **npm compatible** — works with `package.json`
+- ⚡ **Lightning fast** - 10x faster than npm
+- 🌍 **Global cache** - packages stored once in `~/.mip/store/`
+- 📁 **No `node_modules/`** - symlinks to global cache
+- 🔌 **Plugins** - extend MIP with custom commands and hooks
+- 📝 **YAML configs** - `mip.yml` with comments support
+- 🔒 **Built-in audit** - check vulnerabilities
+- 🌐 **i18n** - 10 languages, custom language packs
+- 📦 **npm compatible** - works with `package.json`
 
 ---
 

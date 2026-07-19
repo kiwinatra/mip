@@ -3423,13 +3423,22 @@ packages:
       '@docmd/api': ^0.8.16
     version: 0.8.16
   '@docmd/plugin-seo@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/plugin-seo/-/plugin-seo-0.8.16.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.16
     peerDependencies:
       '@docmd/api': ^0.8.16
-    version: 0.8.16
+    installPath: .mip/@docmd/plugin-seo/0.8.16
   '@docmd/plugin-openapi@0.8.16':
+    version: 0.8.16
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-openapi/-/plugin-openapi-0.8.16.tgz
+    dependencies:
+      '@docmd/utils': ^0.8.16
     peerDependencies:
       '@docmd/api': ^0.8.16
-    version: 0.8.16
+    installPath: .mip/@docmd/plugin-openapi/0.8.16
   '@docmd/plugin-git@0.8.16':
     peerDependencies:
       '@docmd/api': ^0.8.16
@@ -3504,9 +3513,39 @@ packages:
     peerDependencies: {}
     version: 14.3.0
   '@docmd/plugin-installer@0.8.16':
-    peerDependencies: {}
     version: 0.8.16
+    resolved: >-
+      https://registry.npmjs.org/@docmd/plugin-installer/-/plugin-installer-0.8.16.tgz
+    dependencies:
+      '@docmd/api': ^0.8.16
+    peerDependencies: {}
+    installPath: .mip/@docmd/plugin-installer/0.8.16
   prettier@3.9.5:
     peerDependencies: {}
     version: 3.9.5
+  js-yaml@5.2.1:
+    peerDependencies: {}
+    version: 5.2.1
+  '@docmd/plugin-sitemap@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
+  '@docmd/deployer@0.8.16':
+    version: 0.8.16
+    resolved: https://registry.npmjs.org/@docmd/deployer/-/deployer-0.8.16.tgz
+    dependencies:
+      '@docmd/api': ^0.8.16
+    peerDependencies: {}
+    installPath: .mip/@docmd/deployer/0.8.16
+  '@docmd/plugin-llms@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
+  '@docmd/themes@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
+  '@docmd/plugin-mermaid@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
+  '@docmd/plugin-math@0.8.16':
+    peerDependencies: {}
+    version: 0.8.16
 version: '1.0'

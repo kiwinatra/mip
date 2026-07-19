@@ -4,7 +4,7 @@
 # ────────────────────────────────────────────────
 # Documentation: https://mipdocs.fwh.is/features
 #
-# Master switch — set to false to disable ALL feature modifications
+# Master switch - set to false to disable ALL feature modifications
 # config.enabled: true
 #
 # To enable/disable a feature:
@@ -14,7 +14,7 @@
 
 
 # === CONFIG ===
-config.enabled: true  # Master switch — disable all feature modifications
+config.enabled: true  # Master switch - disable all feature modifications
 
 # === MOTD ===
 motd.enabled: true  # Show Message of the Day with quotes and tips
@@ -24,7 +24,7 @@ install.parallel: true  # Install multiple packages in parallel for faster execu
 install.forceReinstall: false  # Always reinstall packages even if already in global store
 install.saveExact: false  # Save exact versions to config (without ^ and ~)
 install.skipIntegrityCheck: false  # Skip package integrity checks (faster but less secure)
-install.dryRun: false  # Simulation mode — shows what would be installed without making changes
+install.dryRun: false  # Simulation mode - shows what would be installed without making changes
 install.ignoreScripts: false  # Do not run install scripts from package.json
 install.ignoreOptional: false  # Ignore optionalDependencies
 install.ignoreEngines: false  # Ignore engines check in package.json
@@ -160,3 +160,5 @@ experimental.useNewResolver: false  # Use new dependency resolver
 experimental.fastGlob: false  # Use fast glob for file searching
 experimental.parallelExtract: false  # Extract archives in parallel
 experimental.symlinkCache: false  # Cache symlink information
+
+hello.enabled: false # test

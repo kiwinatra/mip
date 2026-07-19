@@ -14,7 +14,7 @@
  */
 
 // ==========================================
-// БЫСТРЫЙ СТАРТ — ТОЛЬКО САМОЕ НЕОБХОДИМОЕ
+// БЫСТРЫЙ СТАРТ - ТОЛЬКО САМОЕ НЕОБХОДИМОЕ
 // ==========================================
 
 const fs = require('fs');
@@ -151,7 +151,7 @@ function ensureGlobalLoader() {
   if (fs.existsSync(loaderPath)) return loaderPath;
   
   fs.mkdirSync(path.dirname(loaderPath), { recursive: true });
-  const loaderContent = `// ~/.mip/loader.js — глобальный лоадер для MIP
+  const loaderContent = `// ~/.mip/loader.js - глобальный лоадер для MIP
 const fs = require('fs');
 const path = require('path');
 const Module = require('module');
@@ -239,7 +239,7 @@ async function main() {
   // i18n.loadCustomLocales ожидает cwd/plugins/<plugin>/locales.
   // Поэтому для i18n прокидываем "mip-plugins" как cwd, а в его составе находим и грузим именно locales.
   // Чтобы не ломать i18n, используем fallback: грузим locales через ожидаемый layout:
-  // .../mip-plugins/plugins/<plugin>/locales — если папка plugins/ отсутствует, ничего не грузим.
+  // .../mip-plugins/plugins/<plugin>/locales - если папка plugins/ отсутствует, ничего не грузим.
   const globalPluginsDir = path.join(globalPluginsRoot, 'plugins'); // .../mip/mip-plugins/plugins
 
   if (fs.existsSync(globalPluginsRoot) && fs.existsSync(globalPluginsDir)) {
@@ -278,7 +278,7 @@ async function main() {
   loader.setupLoader();
 
   // ==========================================
-  // i18n — ТОЛЬКО НУЖНЫЙ ЯЗЫК
+  // i18n - ТОЛЬКО НУЖНЫЙ ЯЗЫК
   // ==========================================
   const { loadLangForCwd, getI18n } = require('../lib/i18n');
   const lang = loadLangForCwd(process.cwd());
@@ -347,7 +347,7 @@ async function main() {
 }
 
 // ==========================================
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ — НУЖНЫ ЛИ ФИЧИ?
+// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ - НУЖНЫ ЛИ ФИЧИ?
 // ==========================================
 
 function shouldLoadFeatures(command) {
