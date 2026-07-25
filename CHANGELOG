@@ -6,6 +6,7 @@ New features:
 
 [+] Added hello command, which works like neofetch
 [+] Alias command, centered to work with plugins (not pe, normal alias)
+[+] Mip server now includes blog and renamed to **page**
 
 Fixed features:
 
@@ -18,4 +19,3 @@ Known issues:
 
 [!] mip-lang plugin is not applying languages.
 
-yall keep in mind mip is good

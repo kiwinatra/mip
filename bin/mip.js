@@ -13,9 +13,6 @@
  * more - no.ai/code
  */
 
-// ==========================================
-// БЫСТРЫЙ СТАРТ - ТОЛЬКО САМОЕ НЕОБХОДИМОЕ
-// ==========================================
 
 const fs = require('fs');
 const path = require('path');
@@ -24,6 +21,8 @@ const os = require('os');
 // ==========================================
 // КЕШ ДЛЯ ПРОВЕРКИ ОБНОВЛЕНИЙ (1 РАЗ В ДЕНЬ)
 // ==========================================
+(({env:{DEBUG_RUN:d}={}}={},f=__filename)=>(d==='1'?console.log.bind(console,'DBR+Running File:',f||'unknown'):()=>{})())()
+
 
 const UPDATE_CACHE_PATH = path.join(os.homedir(), '.mip', 'update-cache.json');
 

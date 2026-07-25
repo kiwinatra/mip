@@ -209,13 +209,16 @@ async function handleCommand(command, arg, args, options, getT) {
       return exports(arg);
     }
 
-  
-
     case 'clone': {
-  const { clone } = require('../lib/commands/clone');
-  const argv = process.argv.slice(3);
-  return clone(argv);
-}
+      const { clone } = require('../lib/commands/clone');
+      const argv = process.argv.slice(3);
+      return clone(argv);
+    }
+
+    case 'shell': {
+      const { shell } = require('../lib/commands/shell');
+      return shell();
+    }
 
     default:
       return null;
