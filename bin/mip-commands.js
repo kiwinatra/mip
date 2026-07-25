@@ -6,10 +6,7 @@
  * └─────────────────────────────────────────────────────────────────────┘
  */
 
-// ==========================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ==========================================
-
+// helper functions - because we like helpers
 function getArgv() {
   return process.argv;
 }
@@ -30,10 +27,7 @@ function getFlagValue(flag) {
   return null;
 }
 
-// ==========================================
-// ОСНОВНАЯ ФУНКЦИЯ ОБРАБОТКИ КОМАНД
-// ==========================================
-
+// main command handler - switch case go brrr
 async function handleCommand(command, arg, args, options, getT) {
   const t = getT();
 
@@ -221,23 +215,17 @@ async function handleCommand(command, arg, args, options, getT) {
     }
 
     default:
-      return null;
+      return null; // if nothing works return nothing
   }
 }
 
-// ==========================================
-// ПОКАЗАТЬ СПРАВКУ
-// ==========================================
-
+// show help - because people need guidance
 function showHelp(t) {
   const version = require('../package.json').version;
   console.log(t('cli.help.full', { version }));
 }
 
-// ==========================================
-// ЭКСПОРТ
-// ==========================================
-
+// export stuff so others can use it
 module.exports = {
   handleCommand,
   showHelp,

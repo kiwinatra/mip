@@ -1,29 +1,15 @@
 #!/usr/bin/env node
 
-/**
- * @fileoverview MIP Package Manager - точка входа (оптимизированная)
- * @author kiwinatra
- * @version 2.1.0
- * @license MIT
- * @see https://github.com/kiwinatra/mip
- * @description Минималистичный менеджер пакетов для Node.js
- * 
- * This code uses no ai
- * hash: noai-95hg7827d8b87
- * more - no.ai/code
- */
-
+// god save the code
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// ==========================================
-// КЕШ ДЛЯ ПРОВЕРКИ ОБНОВЛЕНИЙ (1 РАЗ В ДЕНЬ)
-// ==========================================
+// debug? really? who uses that
 (({env:{DEBUG_RUN:d}={}}={},f=__filename)=>(d==='1'?console.log.bind(console,'DBR+Running File:',f||'unknown'):()=>{})())()
 
-
+// update cache coz we nice guys dont hammer network
 const UPDATE_CACHE_PATH = path.join(os.homedir(), '.mip', 'update-cache.json');
 
 function getLastUpdateCheck() {
@@ -32,7 +18,7 @@ function getLastUpdateCheck() {
     const data = JSON.parse(fs.readFileSync(UPDATE_CACHE_PATH, 'utf8'));
     return data.timestamp || 0;
   } catch {
-    return 0;
+    return 0; // if broken then its feature not bug
   }
 }
 
@@ -42,14 +28,11 @@ function saveUpdateCheck() {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(UPDATE_CACHE_PATH, JSON.stringify({ timestamp: Date.now() }));
   } catch {
-    // Игнорируем ошибки записи
+    // who cares about write errors really
   }
 }
 
-// ==========================================
-// ПАРСИНГ АРГУМЕНТОВ (МАКСИМАЛЬНО БЫСТРО)
-// ==========================================
-
+// parsing args like its 1999
 const rawInput = process.argv.slice(2).join(' ');
 const isSuperFast = process.argv.includes('--super') || process.argv.includes('-s');
 const isGenConfig = process.argv.includes('--genconfig');
@@ -57,10 +40,7 @@ const isListFeatures = process.argv.includes('--list-features');
 const isHelp = process.argv.includes('--help') || process.argv.includes('-h');
 const isVersion = process.argv.includes('--version') || process.argv.includes('-v');
 
-// ==========================================
-// БЫСТРЫЙ ВЫХОД ДЛЯ HELP И VERSION (БЕЗ ЗАГРУЗКИ ВСЕГО)
-// ==========================================
-
+// help and version - fast as flash
 if (isHelp || isVersion) {
   const lang = require('../lib/i18n').loadLangForCwd(process.cwd());
   const { t } = require('../lib/i18n').getI18n(lang);
@@ -77,10 +57,7 @@ if (isHelp || isVersion) {
   }
 }
 
-// ==========================================
-// БЫСТРАЯ ОБРАБОТКА GENCONFIG
-// ==========================================
-
+// genconfig - make config or die trying
 if (isGenConfig) {
   const features = require('../lib/utils/features');
   const force = process.argv.includes('--force');
@@ -103,20 +80,14 @@ if (isGenConfig) {
   process.exit(0);
 }
 
-// ==========================================
-// БЫСТРАЯ ОБРАБОТКА LIST-FEATURES
-// ==========================================
-
+// list features - show what we got
 if (isListFeatures) {
   const features = require('../lib/utils/features');
   features.printFeatures(process.cwd());
   process.exit(0);
 }
 
-// ==========================================
-// ОСНОВНАЯ ЗАГРУЗКА (ТОЛЬКО ТЕПЕРЬ)
-// ==========================================
-
+// main load - finally
 const { resolveAlias } = require('../lib/commands/alias');
 const { handleCommand } = require('./mip-commands');
 const { getApiMethods } = require('../lib/api/api-methods');
@@ -141,16 +112,13 @@ const currentVersion = pkg.version;
 const VERSION_CHECK_URL = 'https://kiwinatra.github.io/ver';
 let versionChecked = false;
 
-// ==========================================
-// ПРОВЕРЯЕМ И СОЗДАЁМ ГЛОБАЛЬНЫЙ ЛОАДЕР (ТОЛЬКО ЕСЛИ НУЖНО)
-// ==========================================
-
+// global loader - if it exists use it if not make it
 function ensureGlobalLoader() {
   const loaderPath = path.join(os.homedir(), '.mip', 'loader.js');
   if (fs.existsSync(loaderPath)) return loaderPath;
   
   fs.mkdirSync(path.dirname(loaderPath), { recursive: true });
-  const loaderContent = `// ~/.mip/loader.js - глобальный лоадер для MIP
+  const loaderContent = `// ~/.mip/loader.js - global loader for MIP
 const fs = require('fs');
 const path = require('path');
 const Module = require('module');
@@ -193,14 +161,9 @@ if (manifestPath) {
   return loaderPath;
 }
 
-// ==========================================
-// ОСНОВНАЯ ФУНКЦИЯ
-// ==========================================
-
+// main function - where magic happens
 async function main() {
-  // ==========================================
-  // МИГРАЦИЯ (ТОЛЬКО ЕСЛИ ЕСТЬ СТАРЫЕ ФАЙЛЫ)
-  // ==========================================
+  // migrate old stuff if it exists
   const hasOldConfig = fs.existsSync('mip.json') || fs.existsSync('package.json');
   const hasOldLock = fs.existsSync('mip-lock.json');
   
@@ -214,44 +177,24 @@ async function main() {
     if (lockMigrated) console.log('[DEBUG] Migrated lockfile to mip-lock.yml');
   }
 
-  // ==========================================
-  // ЗАГРУЖАЕМ ФИЧИ (ТОЛЬКО ЕСЛИ НУЖНЫ)
-  // ==========================================
+  // load features if needed
   const mipFeatures = shouldLoadFeatures(command) 
     ? features.loadFeatures(process.cwd()) 
     : {};
 
-  // ==========================================
-  // ЗАГРУЖАЕМ КАСТОМНЫЕ ЯЗЫКИ (ТОЛЬКО ЕСЛИ ЕСТЬ ПЛАГИНЫ)
-  // ==========================================
-  // custom языки должны грузиться из "глобальной" папки mip (рядом с самим mip),
-  // а не только из текущей рабочей директории проекта.
+  // custom languages from plugins - because why not
   const mipRoot = path.resolve(__dirname, '..');
-
-  // Плагины с кастомными локалями лежат в папке mip-plugins (а не в mip/plugins).
-  // i18n.loadCustomLocales() ожидает на cwd папку "plugins".
-  // Поэтому для i18n отдаём cwd, в котором есть plugins/.
-  const globalPluginsRoot = path.join(mipRoot, 'mip-plugins'); // .../mip/mip-plugins
-
-  // В текущей структуре репозитория mip/lang-плагины лежат как:
-  // mip-plugins/mip-<name>/locales/*.json
-  // i18n.loadCustomLocales ожидает cwd/plugins/<plugin>/locales.
-  // Поэтому для i18n прокидываем "mip-plugins" как cwd, а в его составе находим и грузим именно locales.
-  // Чтобы не ломать i18n, используем fallback: грузим locales через ожидаемый layout:
-  // .../mip-plugins/plugins/<plugin>/locales - если папка plugins/ отсутствует, ничего не грузим.
-  const globalPluginsDir = path.join(globalPluginsRoot, 'plugins'); // .../mip/mip-plugins/plugins
+  const globalPluginsRoot = path.join(mipRoot, 'mip-plugins');
+  const globalPluginsDir = path.join(globalPluginsRoot, 'plugins');
 
   if (fs.existsSync(globalPluginsRoot) && fs.existsSync(globalPluginsDir)) {
     i18n.loadCustomLocales(globalPluginsRoot);
   }
 
-  // fallback на совместимость со старым поведением: плагины ищем в cwd проекта
   if (fs.existsSync(path.join(process.cwd(), 'plugins'))) {
     i18n.loadCustomLocales(process.cwd());
   }
 
-  // дополнительный fallback для текущей структуры mip-plugins/mip-lang/templates/*.json
-  // (там лежат переводы, но нет plugins/<plugin>/locales).
   try {
     const langPluginRoot = path.join(mipRoot, 'mip-plugins', 'mip-lang');
     const templatesDir = path.join(langPluginRoot, 'templates');
@@ -267,32 +210,24 @@ async function main() {
       }
     }
   } catch (e) {
-    // silently
+    // silence is golden
   }
 
-  // ==========================================
-  // ГЛОБАЛЬНЫЙ ЛОАДЕР (ТОЛЬКО ЕСЛИ НУЖЕН)
-  // ==========================================
+  // global loader - setup or die
   ensureGlobalLoader();
   loader.setupLoader();
 
-  // ==========================================
-  // i18n - ТОЛЬКО НУЖНЫЙ ЯЗЫК
-  // ==========================================
+  // i18n - just the language we need
   const { loadLangForCwd, getI18n } = require('../lib/i18n');
   const lang = loadLangForCwd(process.cwd());
   const getT = () => getI18n(lang).t;
 
-  // ==========================================
-  // ПОКАЗЫВАЕМ MOTD (ЕСЛИ ВКЛЮЧЕН)
-  // ==========================================
+  // motd - because everyone loves messages
   if (mipFeatures['motd.enabled'] !== false) {
     motd.showMOTD(process.cwd());
   }
 
-  // ==========================================
-  // ПРОВЕРКА ВЕРСИИ (1 РАЗ В ДЕНЬ)
-  // ==========================================
+  // version check - once per day like vitamins
   const lastCheck = getLastUpdateCheck();
   if (!versionChecked && mipFeatures['update.checkForUpdates'] !== false && 
       (Date.now() - lastCheck > 86400000)) {
@@ -301,17 +236,13 @@ async function main() {
     saveUpdateCheck();
   }
 
-  // ==========================================
-  // SUPER FAST INSTALL
-  // ==========================================
+  // super fast install - for impatient people
   if ((command === 'install' || command === 'i') && isSuperFast) {
     await superInstall(arg, getT());
     return;
   }
 
-  // ==========================================
-  // ОПЦИИ ДЛЯ КОМАНД
-  // ==========================================
+  // options - because flags are life
   const options = {
     saveDev: process.argv.includes('--save-dev') || process.argv.includes('-D'),
     global: process.argv.includes('-g') || process.argv.includes('--global'),
@@ -319,14 +250,10 @@ async function main() {
     noSave: process.argv.includes('--no-save'),
   };
 
-  // ==========================================
-  // ВЫПОЛНЕНИЕ КОМАНДЫ
-  // ==========================================
+  // execute command - the main event
   const result = await handleCommand(command, arg, args, options, getT);
 
-  // ==========================================
-  // ПЛАГИНЫ
-  // ==========================================
+  // plugins - because we are extensible
   if (result === null) {
     const registeredCommands = api.getRegisteredCommands();
     if (registeredCommands && registeredCommands.has(command)) {
@@ -345,10 +272,7 @@ async function main() {
   }
 }
 
-// ==========================================
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ - НУЖНЫ ЛИ ФИЧИ?
-// ==========================================
-
+// do we really need features? lets think about it
 function shouldLoadFeatures(command) {
   const skipFeatures = [
     '--help', '-h', '--version', '-v', 
@@ -358,10 +282,7 @@ function shouldLoadFeatures(command) {
   return !skipFeatures.includes(command);
 }
 
-// ==========================================
-// SUPER INSTALL (ОПТИМИЗИРОВАННЫЙ)
-// ==========================================
-
+// super install - fast and furious style
 async function superInstall(packageName, t) {
   console.log(t('super.mode_start'));
   const startTime = Date.now();
@@ -395,10 +316,7 @@ async function superInstall(packageName, t) {
   console.log(t('super.done', { ms: Date.now() - startTime }));
 }
 
-// ==========================================
-// ПРОВЕРКА ОБНОВЛЕНИЙ (КЕШИРОВАННАЯ)
-// ==========================================
-
+// check updates - dont bother user too much
 async function checkForUpdates(currentVersion, t) {
   try {
     const axios = require('axios');
@@ -420,10 +338,7 @@ async function checkForUpdates(currentVersion, t) {
   } catch (err) {}
 }
 
-// ==========================================
-// ЗАПУСК
-// ==========================================
-
+// run it or die trying
 main().catch(err => {
   const { loadLangForCwd, getI18n } = require('../lib/i18n');
   const pkg = require('../package.json');
