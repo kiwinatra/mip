@@ -1,25 +1,8 @@
-# TODO: MIP Easter Eggs & Features
+# MIP Rebuild Command - Implementation TODO
 
-## ✅ Выполненые задачи
+## Steps
+- [x] Step 0: Understand codebase structure and patterns
+- [x] Step 1: Create `lib/commands/rebuild.js` - main command implementation
+- [ ] Step 2: Update `bin/mip-commands.js` - register 'rebuild' command
+- [ ] Step 3: Verify the implementation works
 
-### 🥚 1. Easter Egg "42 — Ответ на всё" (lib/commands/install.js)
-- [x] Добавлена функция `checkFortyTwoEasterEgg()`
-- [x] Срабатывает когда в манифесте ровно 42 пакета
-- [x] Показывает ASCII "42" + фейерверк ✨🎆🎇
-- [x] Скрыто: нужно иметь ровно 42 пакета — сложно найти
-
-### 🥚 2. Easter Egg "Призрачный пакет" (lib/commands/list.js)
-- [x] Срабатывает в 42-ю минуту часа ИЛИ если есть пакет `phantom` или `ghost`
-- [x] Показывает ASCII-призрака 👻 + таинственное сообщение
-- [x] Скрыто: 42-я минута бывает раз в час, phantom/ghost пакет нужно установить
-
-### 🥚 3. Easter Egg "Хайку дня" (lib/commands/feel.js)
-- [x] 3% случайный шанс ИЛИ пятница 13-го
-- [x] Показывает случайное хайку про пакетные менеджеры
-- [x] Скрыто: 3% — можно годами не увидеть
-
-### 🥚 4. Bonus: "Пиратский язык" (lib/i18n/locales/pirate.json)
-- [x] Создана полная локаль pirate.json со всеми переводами
-- [x] Добавлен в список доступных языков в MIP
-- [x] Установка: `mip language pirate` или `language: pirate` в mip.yml
-- [x] Скрыто: нужно знать что pirate — валидный язык

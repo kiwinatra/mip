@@ -211,7 +211,7 @@ describe('lib/core/peer-resolver', () => {
       writeLockFiles(dir, {
         packages: {
           react: {
-            version: '17.0.0',
+            version: '17.0.0', // version update
             peerDependencies: {},
           },
         },

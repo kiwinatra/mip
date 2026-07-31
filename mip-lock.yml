@@ -3510,8 +3510,17 @@ packages:
     peerDependencies: {}
     installPath: .mip/@docmd/utils/0.8.16
   markdown-it@14.3.0:
-    peerDependencies: {}
     version: 14.3.0
+    resolved: https://registry.npmjs.org/markdown-it/-/markdown-it-14.3.0.tgz
+    dependencies:
+      argparse: ^2.0.1
+      entities: ^4.5.0
+      linkify-it: ^5.0.2
+      mdurl: ^2.0.0
+      punycode.js: ^2.3.1
+      uc.micro: ^2.1.0
+    peerDependencies: {}
+    installPath: .mip/markdown-it/14.3.0
   '@docmd/plugin-installer@0.8.16':
     version: 0.8.16
     resolved: >-
@@ -3548,4 +3557,158 @@ packages:
   '@docmd/plugin-math@0.8.16':
     peerDependencies: {}
     version: 0.8.16
+  js-yaml@5.2.2:
+    peerDependencies: {}
+    version: 5.2.2
+  lru-cache@11.5.2:
+    peerDependencies: {}
+    version: 11.5.2
+  tar@7.5.22:
+    peerDependencies: {}
+    version: 7.5.22
+  '@docmd/core@0.8.17':
+    version: 0.8.17
+    resolved: https://registry.npmjs.org/@docmd/core/-/core-0.8.17.tgz
+    dependencies:
+      '@docmd/api': ^0.8.17
+      '@docmd/deployer': ^0.8.17
+      '@docmd/live': ^0.8.17
+      '@docmd/parser': ^0.8.17
+      '@docmd/plugin-analytics': ^0.8.17
+      '@docmd/plugin-git': ^0.8.17
+      '@docmd/plugin-installer': ^0.8.17
+      '@docmd/plugin-llms': ^0.8.17
+      '@docmd/plugin-mermaid': ^0.8.17
+      '@docmd/plugin-okf': ^0.8.17
+      '@docmd/plugin-openapi': ^0.8.17
+      '@docmd/plugin-search': ^0.8.17
+      '@docmd/plugin-seo': ^0.8.17
+      '@docmd/plugin-sitemap': ^0.8.17
+      '@docmd/themes': ^0.8.17
+      '@docmd/tui': ^0.8.17
+      '@docmd/ui': ^0.8.17
+      '@docmd/utils': ^0.8.17
+      esbuild: ^0.28.1
+      ws: ^8.21.1
+    peerDependencies: {}
+    installPath: .mip/@docmd/core/0.8.17
+  '@docmd/plugin-analytics@0.8.17':
+    peerDependencies:
+      '@docmd/api': ^0.8.17
+    version: 0.8.17
+  '@docmd/plugin-git@0.8.17':
+    peerDependencies:
+      '@docmd/api': ^0.8.17
+    version: 0.8.17
+  '@docmd/utils@0.8.17':
+    peerDependencies: {}
+    version: 0.8.17
+  '@docmd/api@0.8.17':
+    version: 0.8.17
+    resolved: https://registry.npmjs.org/@docmd/api/-/api-0.8.17.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.17
+      '@docmd/tui': ^0.8.17
+      '@docmd/utils': ^0.8.17
+    peerDependencies: {}
+    installPath: .mip/@docmd/api/0.8.17
+  '@docmd/tui@0.8.17':
+    peerDependencies: {}
+    version: 0.8.17
+  '@docmd/ui@0.8.17':
+    version: 0.8.17
+    resolved: https://registry.npmjs.org/@docmd/ui/-/ui-0.8.17.tgz
+    dependencies:
+      '@docmd/api': ^0.8.17
+      '@docmd/tui': ^0.8.17
+    peerDependencies: {}
+    installPath: .mip/@docmd/ui/0.8.17
+  '@docmd/parser@0.8.17':
+    version: 0.8.17
+    resolved: https://registry.npmjs.org/@docmd/parser/-/parser-0.8.17.tgz
+    dependencies:
+      '@docmd/tui': ^0.8.17
+      '@docmd/utils': ^0.8.17
+      embed-lite: ^0.1.4
+      lite-hl: ^0.1.2
+      lite-matter: ^0.1.1
+      lite-template: ^0.1.2
+      lucide-static: ^0.577.0
+      markdown-it: ^14.3.0
+      markdown-it-abbr: ^1.0.4
+      markdown-it-attrs: ^4.5.0
+      markdown-it-deflist: ^2.1.0
+      markdown-it-emoji: ^2.0.2
+      markdown-it-footnote: ^3.0.3
+      markdown-it-task-lists: ^2.1.1
+    peerDependencies: {}
+    installPath: .mip/@docmd/parser/0.8.17
+  '@docmd/live@0.8.17':
+    version: 0.8.17
+    resolved: https://registry.npmjs.org/@docmd/live/-/live-0.8.17.tgz
+    dependencies:
+      '@docmd/parser': ^0.8.17
+      '@docmd/plugin-math': ^0.8.17
+      '@docmd/plugin-mermaid': ^0.8.17
+      '@docmd/themes': ^0.8.17
+      '@docmd/tui': ^0.8.17
+      '@docmd/ui': ^0.8.17
+      buffer: ^6.0.3
+      esbuild: ^0.28.1
+      katex: ^0.17.0
+      markdown-it-texmath: ^1.0.0
+    peerDependencies: {}
+    installPath: .mip/@docmd/live/0.8.17
+  eslint@10.8.0:
+    version: 10.8.0
+    resolved: https://registry.npmjs.org/eslint/-/eslint-10.8.0.tgz
+    dependencies:
+      ajv: ^6.14.0
+      debug: ^4.3.2
+      espree: ^11.2.0
+      ignore: ^5.2.0
+      esquery: ^1.7.0
+      esutils: ^2.0.2
+      find-up: ^5.0.0
+      is-glob: ^4.0.0
+      minimatch: ^10.2.5
+      optionator: ^0.9.3
+      cross-spawn: ^7.0.6
+      glob-parent: ^6.0.2
+      imurmurhash: ^0.1.4
+      '@eslint/core': ^1.2.1
+      eslint-scope: ^9.1.2
+      '@humanfs/node': ^0.16.6
+      '@types/estree': ^1.0.6
+      fast-deep-equal: ^3.1.3
+      natural-compare: ^1.4.0
+      file-entry-cache: ^8.0.0
+      '@eslint/plugin-kit': ^0.7.2
+      eslint-visitor-keys: ^5.0.1
+      '@eslint/config-array': ^0.23.5
+      '@humanwhocodes/retry': ^0.4.2
+      escape-string-regexp: ^4.0.0
+      '@eslint/config-helpers': ^0.7.0
+      '@eslint-community/regexpp': ^4.12.2
+      '@eslint-community/eslint-utils': ^4.8.0
+      '@humanwhocodes/module-importer': ^1.0.1
+      json-stable-stringify-without-jsonify: ^1.0.1
+    peerDependencies:
+      jiti: '*'
+    installPath: .mip/eslint/10.8.0
+  '@eslint/config-array@0.23.5':
+    peerDependencies: {}
+    version: 0.23.5
+  prettier@3.9.6:
+    peerDependencies: {}
+    version: 3.9.6
+  '@docmd/plugin-installer@0.8.17':
+    peerDependencies: {}
+    version: 0.8.17
+  linkify-it@5.0.2:
+    peerDependencies: {}
+    version: 5.0.2
+  globals@17.8.0:
+    peerDependencies: {}
+    version: 17.8.0
 version: '1.0'

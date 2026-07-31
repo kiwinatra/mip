@@ -5,6 +5,17 @@
  * │   MIT License · Copyright (c) 2026 kiwinatra                        │
  * └─────────────────────────────────────────────────────────────────────┘
  */
+ 
+ /**
+ * file metatags
+ */
+function Metatags() {
+    return {
+        description: "Main Commands registry for mip", 
+        version: "2.2",                 
+        lastUpdate: "Added rebuild command [stg]"  
+    }
+}
 
 // helper functions - because we like helpers
 function getArgv() {
@@ -198,20 +209,21 @@ async function handleCommand(command, arg, args, options, getT) {
       return bundle(argv);
     }
 
-    case 'exports': {
-      const { exports } = require('../lib/commands/exports');
-      return exports(arg);
-    }
-
-    case 'clone': {
-      const { clone } = require('../lib/commands/clone');
-      const argv = process.argv.slice(3);
-      return clone(argv);
-    }
-
-    case 'shell': {
+case 'shell': {
       const { shell } = require('../lib/commands/shell');
       return shell();
+    }
+
+    case 'rebuild': {
+      const { rebuild } = require('../lib/commands/rebuild');
+      const packageNames = args.filter(a => !a.startsWith('-'));
+      const options = {
+        force: hasFlag('--force') || hasFlag('-f'),
+        dryRun: hasFlag('--dry-run'),
+        quiet: hasFlag('--quiet'),
+        script: getFlagValue('--script'),
+      };
+      return rebuild(packageNames.length > 0 ? packageNames : undefined, options);
     }
 
     default:

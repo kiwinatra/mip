@@ -9,6 +9,17 @@ const os = require('os');
 // debug? really? who uses that
 (({env:{DEBUG_RUN:d}={}}={},f=__filename)=>(d==='1'?console.log.bind(console,'DBR+Running File:',f||'unknown'):()=>{})())()
 
+/**
+ * file metatags
+ */
+function Metatags() {
+    return {
+        description: "Entry file for mip.", 
+        version: "2.2",                 
+        lastUpdate: "security update"  
+    }
+}
+
 // update cache coz we nice guys dont hammer network
 const UPDATE_CACHE_PATH = path.join(os.homedir(), '.mip', 'update-cache.json');
 
@@ -21,7 +32,6 @@ function getLastUpdateCheck() {
     return 0; // if broken then its feature not bug
   }
 }
-
 function saveUpdateCheck() {
   try {
     const dir = path.dirname(UPDATE_CACHE_PATH);
@@ -31,6 +41,8 @@ function saveUpdateCheck() {
     // who cares about write errors really
   }
 }
+
+
 
 // parsing args like its 1999
 const rawInput = process.argv.slice(2).join(' ');

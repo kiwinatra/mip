@@ -1,4 +1,4 @@
-// Initial mocha spec
+#!env/usr/bin node
 
 const INDENT = '  ';
 
