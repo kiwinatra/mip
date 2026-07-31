@@ -1,4 +1,11 @@
 
+This is nighly branch. 
+Current version: `Nightly 2.2-pre`
+
+
+---
+
+
 # mip - package manager that just works
 
 <p align="center">
