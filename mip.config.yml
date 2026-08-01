@@ -1,6 +1,7 @@
 # ────────────────────────────────────────────────
 # MIP Features Configuration
-# Generated: 2026-07-07T11:41:53.691Z
+# Generated: 2026-07-31T19:56:01.428Z
+# Language: english (en)
 # ────────────────────────────────────────────────
 # Documentation: https://mipdocs.fwh.is/features
 #
@@ -80,6 +81,7 @@ interactive.promptOnUpdate: true  # Ask for confirmation before updating
 interactive.promptOnAudit: false  # Ask for confirmation before running audit
 interactive.promptOnDedupe: true  # Ask for confirmation before deduplication
 interactive.autoConfirm: false  # Auto-confirm all prompts (for CI)
+interactive.promptOnRun: true  # Ask for confirmation for before running
 
 # === REGISTRY ===
 registry.default: npm  # Default package registry
@@ -160,5 +162,3 @@ experimental.useNewResolver: false  # Use new dependency resolver
 experimental.fastGlob: false  # Use fast glob for file searching
 experimental.parallelExtract: false  # Extract archives in parallel
 experimental.symlinkCache: false  # Cache symlink information
-
-hello.enabled: false # test

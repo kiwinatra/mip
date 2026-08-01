@@ -22,8 +22,9 @@
     "lint": "eslint bin/ lib/",
     "format": "prettier --write \"**/*.js\"",
     "docs:en": "cd docs/docmd_EN && npm run dev",
-    "docs:ru": "cd docs/docmd_RU && npm run dev"
-  },
+    "docs:ru": "cd docs/docmd_RU && npm run dev",
+    "audit": "npm audit"
+      },
   "dependencies": {
     "axios": "^1.16.1",
     "blessed": "0.1.81",

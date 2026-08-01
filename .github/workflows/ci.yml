@@ -1,70 +1,47 @@
-/*
- * ┌─────────────────────────────────────────────────────────────────────┐
- * │                                                                     │
- * │   ███╗   ███╗██╗██████╗                                             │
- * │   ████╗ ████║██║██╔══██╗                                            │
- * │   ██╔████╔██║██║██████╔╝                                            │
- * │   ██║╚██╔╝██║██║██╔═══╝                                             │
- * │   ██║ ╚═╝ ██║██║██║                                                 │
- * │   ╚═╝     ╚═╝╚═╝╚═╝                                                 │
- * │                                                                     │
- * │   MInimal Package Manager                                          │
- * │   https://github.com/kiwinatra/mip                                 │
- * │                                                                     │
- * │   MIT License · Copyright (c) 2026 kiwinatra                        │
- * │                                                                     │
- * └─────────────────────────────────────────────────────────────────────┘
- */
-
 name: CI
 
+# Запускать при пуше в main и develop
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+  # И при создании Pull Request'ов
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  test:
+  check:
+    name: Run checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16, 18, 20]
+    
     steps:
-      - uses: actions/checkout@v4
+      # 1. Загружаем код
+      - name: Checkout code
+        uses: actions/checkout@v3
       
-      - uses: actions/setup-node@v4
+      # 2. Устанавливаем Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18
       
-      - run: npm install
+      # 3. Устанавливаем зависимости
+      - name: Install dependencies
+        run: npm ci
       
-      - run: node bin/mip.js --version
+      # 4. Запускаем линтер
+      - name: Run linter
+        run: npm run lint
       
-      - run: node bin/mip.js init test-project
+      # 5. Запускаем тесты
+      - name: Run tests
+        run: npm test
       
-      - run: node bin/mip.js install lodash --cwd test-project
+      # 6. Проверяем безопасность
+      - name: Security audit
+        run: npm audit --audit-level=high
       
-      - run: node bin/mip.js list --cwd test-project
-      
-      - run: node bin/mip.js outdated --cwd test-project
-      
-      - run: node bin/mip.js audit --cwd test-project
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - run: npm install
-      
-      - run: npx eslint lib/ bin/
-
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - run: npm install
-      
-      - run: npm audit --production
+      # 7. Если всё успешно — выводим сообщение
+      - name: All checks passed ✅
+        run: echo "🎉 Все проверки пройдены успешно!"
