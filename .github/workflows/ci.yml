@@ -216,22 +216,22 @@ jobs:
           TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           NODE_VERSION: ${{ matrix.node-version }}
-          LINT_STATUS: ${{ steps.lint.outcome }}
-          TEST_STATUS: ${{ steps.test.outcome }}
-          AUDIT_STATUS: ${{ steps.audit.outcome }}
-          INSTALL_STATUS: ${{ steps.install-test.outcome }}
-          PLUGIN_STATUS: ${{ steps.plugin-test.outcome }}
-          MIGRATE_STATUS: ${{ steps.migrate-test.outcome }}
-          CACHE_STATUS: ${{ steps.cache-test.outcome }}
-          YAML_STATUS: ${{ steps.yaml-test.outcome }}
-          LINT_TIME: ${{ steps.lint.outputs.duration }}
-          TEST_TIME: ${{ steps.test.outputs.duration }}
-          AUDIT_TIME: ${{ steps.audit.outputs.duration }}
-          INSTALL_TIME: ${{ steps.install-test.outputs.duration }}
-          PLUGIN_TIME: ${{ steps.plugin-test.outputs.duration }}
-          MIGRATE_TIME: ${{ steps.migrate-test.outputs.duration }}
-          CACHE_TIME: ${{ steps.cache-test.outputs.duration }}
-          YAML_TIME: ${{ steps.yaml-test.outputs.duration }}
+          LINT_STATUS: ${{ steps.lint.outcome || 'skipped' }}
+          TEST_STATUS: ${{ steps.test.outcome || 'skipped' }}
+          AUDIT_STATUS: ${{ steps.audit.outcome || 'skipped' }}
+          INSTALL_STATUS: ${{ steps.install-test.outcome || 'skipped' }}
+          PLUGIN_STATUS: ${{ steps.plugin-test.outcome || 'skipped' }}
+          MIGRATE_STATUS: ${{ steps.migrate-test.outcome || 'skipped' }}
+          CACHE_STATUS: ${{ steps.cache-test.outcome || 'skipped' }}
+          YAML_STATUS: ${{ steps.yaml-test.outcome || 'skipped' }}
+          LINT_TIME: ${{ steps.lint.outputs.duration || '0' }}
+          TEST_TIME: ${{ steps.test.outputs.duration || '0' }}
+          AUDIT_TIME: ${{ steps.audit.outputs.duration || '0' }}
+          INSTALL_TIME: ${{ steps.install-test.outputs.duration || '0' }}
+          PLUGIN_TIME: ${{ steps.plugin-test.outputs.duration || '0' }}
+          MIGRATE_TIME: ${{ steps.migrate-test.outputs.duration || '0' }}
+          CACHE_TIME: ${{ steps.cache-test.outputs.duration || '0' }}
+          YAML_TIME: ${{ steps.yaml-test.outputs.duration || '0' }}
           COMMIT: ${{ github.event.head_commit.message }}
           AUTHOR: ${{ github.actor }}
           REPO: ${{ github.repository }}
@@ -240,19 +240,10 @@ jobs:
           SERVER: ${{ github.server_url }}
           SHA: ${{ github.sha }}
         run: |
-          # -------- Функции --------
-          get_status_icon() {
-            if [[ "$1" == "success" ]]; then echo "✅"; else echo "❌"; fi
-          }
-          
-          get_status_text() {
-            if [[ "$1" == "success" ]]; then echo "✅ OK"; else echo "❌ FAIL"; fi
-          }
-          
           # -------- Проверяем общий статус --------
           FAILED_COUNT=0
           for status in "$LINT_STATUS" "$TEST_STATUS" "$AUDIT_STATUS" "$INSTALL_STATUS" "$PLUGIN_STATUS" "$MIGRATE_STATUS" "$CACHE_STATUS" "$YAML_STATUS"; do
-            if [[ "$status" != "success" ]]; then
+            if [[ "$status" == "failure" ]]; then
               ((FAILED_COUNT++))
             fi
           done
@@ -278,14 +269,14 @@ jobs:
           📊 *Статус:* ${STATUS}
 
           📋 *Проверки:*
-          🔍 Линтер:      ${{ steps.lint.outcome }} (${LINT_TIME:-0}мс)
-          🧪 Тесты:       ${{ steps.test.outcome }} (${TEST_TIME:-0}мс)
-          🔒 Аудит:       ${{ steps.audit.outcome }} (${AUDIT_TIME:-0}мс)
-          📦 Установка:   ${{ steps.install-test.outcome }} (${INSTALL_TIME:-0}мс)
-          🔌 Плагины:     ${{ steps.plugin-test.outcome }} (${PLUGIN_TIME:-0}мс)
-          📁 Миграция:    ${{ steps.migrate-test.outcome }} (${MIGRATE_TIME:-0}мс)
-          🌍 Кеш:         ${{ steps.cache-test.outcome }} (${CACHE_TIME:-0}мс)
-          📝 YAML/JSON:   ${{ steps.yaml-test.outcome }} (${YAML_TIME:-0}мс)"
+          🔍 Линтер:      ${LINT_STATUS} (${LINT_TIME}мс)
+          🧪 Тесты:       ${TEST_STATUS} (${TEST_TIME}мс)
+          🔒 Аудит:       ${AUDIT_STATUS} (${AUDIT_TIME}мс)
+          📦 Установка:   ${INSTALL_STATUS} (${INSTALL_TIME}мс)
+          🔌 Плагины:     ${PLUGIN_STATUS} (${PLUGIN_TIME}мс)
+          📁 Миграция:    ${MIGRATE_STATUS} (${MIGRATE_TIME}мс)
+          🌍 Кеш:         ${CACHE_STATUS} (${CACHE_TIME}мс)
+          📝 YAML/JSON:   ${YAML_STATUS} (${YAML_TIME}мс)"
 
           # -------- Если есть ошибки, добавляем детали --------
           if [[ $FAILED_COUNT -gt 0 ]]; then
@@ -294,21 +285,21 @@ jobs:
           ──────────────
           🚨 *Проваленные проверки:*"
 
-            [[ "$LINT_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$LINT_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Линтер — проверь синтаксис, запусти: npm run lint --fix"
-            [[ "$TEST_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$TEST_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Тесты — проверь логи, запусти: npm test -- --verbose"
-            [[ "$AUDIT_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$AUDIT_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Аудит — есть уязвимости, запусти: npm audit fix"
-            [[ "$INSTALL_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$INSTALL_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Установка — MIP не может установить пакет"
-            [[ "$PLUGIN_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$PLUGIN_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Плагины — система плагинов сломана"
-            [[ "$MIGRATE_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$MIGRATE_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Миграция — проблемы с импортом из npm"
-            [[ "$CACHE_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$CACHE_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ Кеш — глобальный кеш не работает"
-            [[ "$YAML_STATUS" != "success" ]] && MSG="${MSG}
+            [[ "$YAML_STATUS" == "failure" ]] && MSG="${MSG}
           ❌ YAML/JSON — проблемы с форматами конфигов"
           fi
           
