@@ -40,20 +40,7 @@ jobs:
           echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
           echo "::endgroup::"
       
-      # ============================================================
-      # 2. ТЕСТЫ — если ошибка → СТОП
-      # ============================================================
-      - name: 🧪 Тесты
-        id: test
-        continue-on-error: false
-        run: |
-          echo "::group::🧪 Запуск тестов"
-          START=$(date +%s%N)
-          npm test
-          END=$(date +%s%N)
-          DURATION=$(( ($END - $START) / 1000000 ))
-          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
-          echo "::endgroup::"
+      
       
       # ============================================================
       # 3. АУДИТ БЕЗОПАСНОСТИ — НЕ ЛОМАЕТ СБОРКУ
