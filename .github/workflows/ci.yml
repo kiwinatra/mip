@@ -9,71 +9,127 @@ on:
 
 jobs:
   check:
-    name: Run checks
+    name: Проверка кода
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
+      - name: Клонирование репозитория
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: Установка Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: Install dependencies
+      - name: Установка зависимостей
         run: npm ci || npm install
       
-      - name: Run linter
+      # ============================================================
+      # 1. ЛИНТЕР
+      # ============================================================
+      - name: 🔍 Линтер (ESLint)
         id: lint
         continue-on-error: true
         run: npm run lint
       
-      - name: Run tests
+      # ============================================================
+      # 2. ТЕСТЫ
+      # ============================================================
+      - name: 🧪 Тесты
         id: test
         continue-on-error: true
         run: npm test
       
-      - name: Security audit
+      # ============================================================
+      # 3. АУДИТ БЕЗОПАСНОСТИ
+      # ============================================================
+      - name: 🔒 Аудит безопасности
         id: audit
         continue-on-error: true
         run: npm audit --audit-level=high || true
       
-      - name: All checks passed ✅
+      # ============================================================
+      # 4. ЕСЛИ ВСЁ ПРОШЛО
+      # ============================================================
+      - name: ✅ Всё прошло
         if: steps.lint.outcome == 'success' && steps.test.outcome == 'success' && steps.audit.outcome == 'success'
-        run: echo "🎉 Все проверки пройдены успешно!"
-      
+        run: echo "🎉 Все проверки пройдены! Можешь мержить."
+
       # ============================================================
-      # TELEGRAM УВЕДОМЛЕНИЕ (только статус + кнопки)
+      # 5. ЕСЛИ ОШИБКА → ОТПРАВЛЯЕМ В TELEGRAM
       # ============================================================
-      - name: 📱 Telegram notification
-        if: always()
+      - name: 📱 ОШИБКА — уведомление в Telegram
+        if: failure()
         env:
           TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          COMMIT: ${{ github.event.head_commit.message }}
+          AUTHOR: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER: ${{ github.server_url }}
+          SHA: ${{ github.sha }}
         run: |
-          if [[ "${{ steps.lint.outcome }}" == "success" && "${{ steps.test.outcome }}" == "success" && "${{ steps.audit.outcome }}" == "success" ]]; then
-            STATUS="✅ PASSED"
+          # Определяем, что упало
+          if [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
+            STEP="🔍 Линтер (ESLint)"
+            FIX="Проверь синтаксис, неиспользуемые переменные, отступы"
+            CMD="npm run lint --fix"
+          elif [[ "${{ steps.test.outcome }}" == "failure" ]]; then
+            STEP="🧪 Тесты"
+            FIX="Запусти тесты локально: npm test"
+            CMD="npm test -- --verbose"
+          elif [[ "${{ steps.audit.outcome }}" == "failure" ]]; then
+            STEP="🔒 Аудит безопасности"
+            FIX="Обнови уязвимые пакеты: npm audit fix"
+            CMD="npm audit fix"
           else
-            STATUS="❌ FAILED"
+            STEP="❌ Неизвестная ошибка"
+            FIX="Смотри логи"
+            CMD=""
           fi
           
-          MSG="${STATUS} *MIP CI*
+          MSG="❌ *MIP CI — ОШИБКА*
+
+          📦 *Репозиторий:* ${REPO}
+          🌿 *Ветка:* ${BRANCH}
+          👤 *Автор:* ${AUTHOR}
+          📝 *Коммит:* ${COMMIT:0:60}...
+
+          ──────────────
+          🚨 *Упало на:* ${STEP}
+
+          💡 *Что делать:*
+          ${FIX}
+
+          🔧 *Команда для фикса:*
+          \`${CMD}\`
+
+          ──────────────
+          🔗 *Логи:* ${SERVER}/${REPO}/actions/runs/${RUN_ID}"
           
-          📦 ${{ github.repository }}
-          🌿 ${{ github.ref_name }}
-          👤 ${{ github.actor }}
-          📝 ${COMMIT:0:50}...
+          if [[ -n "$TOKEN" && -n "$CHAT_ID" ]]; then
+            curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+              -H "Content-Type: application/json" \
+              -d "$(cat <<EOF
+          {
+            "chat_id": "${CHAT_ID}",
+            "text": "${MSG}",
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": true,
+            "reply_markup": {
+              "inline_keyboard": [
+                [
+                  {"text": "📋 Логи", "url": "${SERVER}/${REPO}/actions/runs/${RUN_ID}"},
+                  {"text": "📝 Коммит", "url": "${SERVER}/${REPO}/commit/${SHA}"}
+                ]
+              ]
+            }
+          }
+          EOF
+          )"
+          fi
           
-          📋 Checks:
-          Linter:   ${{ steps.lint.outcome }}
-          Tests:    ${{ steps.test.outcome }}
-          Audit:    ${{ steps.audit.outcome }}"
-          
-          curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
-            -d chat_id="${CHAT_ID}" \
-            -d text="${MSG}" \
-            -d parse_mode="Markdown" \
-            -d disable_web_page_preview="true" \
-            -d reply_markup='{"inline_keyboard":[[{"text":"📋 Logs","url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},{"text":"📝 Commit","url":"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}]],"resize_keyboard":true}'
+          exit 1
