@@ -81,7 +81,7 @@ interactive.promptOnUpdate: true  # Ask for confirmation before updating
 interactive.promptOnAudit: false  # Ask for confirmation before running audit
 interactive.promptOnDedupe: true  # Ask for confirmation before deduplication
 interactive.autoConfirm: false  # Auto-confirm all prompts (for CI)
-interactive.promptOnRun: true  # Ask for confirmation for before running
+interactive.promptOnRun: false  # Ask for confirmation for before running
 
 # === REGISTRY ===
 registry.default: npm  # Default package registry
