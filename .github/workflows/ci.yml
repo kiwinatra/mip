@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
@@ -27,26 +27,37 @@ jobs:
       - name: Run linter
         id: lint
         continue-on-error: true
-        run: npm run lint
+        run: |
+          OUTPUT=$(npm run lint 2>&1) || true
+          echo "$OUTPUT"
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       
       - name: Run tests
         id: test
         continue-on-error: true
-        run: npm test
+        run: |
+          OUTPUT=$(npm test 2>&1) || true
+          echo "$OUTPUT"
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       
       - name: Security audit
         id: audit
         continue-on-error: true
-        run: npm audit --audit-level=high
-      
-      - name: All checks passed ✅
-        if: steps.lint.outcome == 'success' && steps.test.outcome == 'success' && steps.audit.outcome == 'success'
-        run: echo "🎉 Все проверки пройдены успешно!"
+        run: |
+          OUTPUT=$(npm audit --audit-level=high 2>&1) || true
+          echo "$OUTPUT"
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       
       # ============================================================
-      # ОТПРАВКА В TELEGRAM (добавлено)
+      # ОТПРАВКА ДЕТАЛЬНОГО ОТЧЁТА В TELEGRAM
       # ============================================================
-      - name: Send Telegram notification
+      - name: Send detailed Telegram notification
         if: always()
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -54,8 +65,10 @@ jobs:
           STATUS_LINT: ${{ steps.lint.outcome }}
           STATUS_TEST: ${{ steps.test.outcome }}
           STATUS_AUDIT: ${{ steps.audit.outcome }}
+          OUTPUT_LINT: ${{ steps.lint.outputs.output }}
+          OUTPUT_TEST: ${{ steps.test.outputs.output }}
+          OUTPUT_AUDIT: ${{ steps.audit.outputs.output }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
-          COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           # Определяем общий статус
@@ -67,7 +80,16 @@ jobs:
             EMOJI="❌"
           fi
 
-          # Формируем сообщение
+          # Функция для извлечения последних строк ошибок
+          get_last_lines() {
+            echo "$1" | grep -E "error|failed|Error|Failed|ERR" | tail -5 || echo "No errors found"
+          }
+
+          LINT_ERRORS=$(get_last_lines "$OUTPUT_LINT")
+          TEST_ERRORS=$(get_last_lines "$OUTPUT_TEST")
+          AUDIT_ERRORS=$(get_last_lines "$OUTPUT_AUDIT")
+
+          # Формируем сообщение с деталями
           MESSAGE="${EMOJI} *MIP CI Report*
 
           📦 *Repo:* ${{ github.repository }}
@@ -83,6 +105,37 @@ jobs:
           Tests:    $([[ "$STATUS_TEST" == "success" ]] && echo "✅" || echo "❌")
           Security: $([[ "$STATUS_AUDIT" == "success" ]] && echo "✅" || echo "❌")
 
+          ──────────────
+          🔍 *Error Details:*"
+
+          if [[ "$STATUS_LINT" != "success" ]]; then
+            MESSAGE="${MESSAGE}
+          
+          *Linter Errors:*
+          \`\`\`
+          ${LINT_ERRORS}
+          \`\`\`"
+          fi
+
+          if [[ "$STATUS_TEST" != "success" ]]; then
+            MESSAGE="${MESSAGE}
+          
+          *Test Failures:*
+          \`\`\`
+          ${TEST_ERRORS}
+          \`\`\`"
+          fi
+
+          if [[ "$STATUS_AUDIT" != "success" ]]; then
+            MESSAGE="${MESSAGE}
+          
+          *Security Vulnerabilities:*
+          \`\`\`
+          ${AUDIT_ERRORS}
+          \`\`\`"
+          fi
+
+          MESSAGE="${MESSAGE}
           ──────────────
           🔗 *Actions:* ${RUN_URL}"
 
