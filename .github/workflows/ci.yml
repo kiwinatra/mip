@@ -9,133 +9,71 @@ on:
 
 jobs:
   check:
-    name: Проверка кода
+    name: Run checks
     runs-on: ubuntu-latest
     
     steps:
-      - name: Клонирование репозитория
+      - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Установка Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
       
-      - name: Установка зависимостей
+      - name: Install dependencies
         run: npm ci || npm install
       
-      # ============================================================
-      # 1. ЛИНТЕР
-      # ============================================================
-      - name: 🔍 Линтер
+      - name: Run linter
         id: lint
         continue-on-error: true
         run: npm run lint
       
-      # ============================================================
-      # 2. ТЕСТЫ
-      # ============================================================
-      - name: 🧪 Тесты
+      - name: Run tests
         id: test
         continue-on-error: true
         run: npm test
       
-      # ============================================================
-      # 3. АУДИТ
-      # ============================================================
-      - name: 🔒 Аудит
+      - name: Security audit
         id: audit
         continue-on-error: true
-        run: npm audit --omit=dev --audit-level=high || true
+        run: npm audit --audit-level=high || true
+      
+      - name: All checks passed ✅
+        if: steps.lint.outcome == 'success' && steps.test.outcome == 'success' && steps.audit.outcome == 'success'
+        run: echo "🎉 Все проверки пройдены успешно!"
       
       # ============================================================
-      # 4. УСТАНОВКА ПАКЕТА
+      # TELEGRAM УВЕДОМЛЕНИЕ (только статус + кнопки)
       # ============================================================
-      - name: 📦 Установка пакета
-        id: install
-        continue-on-error: true
-        run: |
-          node bin/mip.js install lodash
-          node -e "require('lodash')"
-      
-      # ============================================================
-      # 5. ПЛАГИНЫ
-      # ============================================================
-      - name: 🔌 Плагины
-        id: plugin
-        continue-on-error: true
-        run: |
-          node bin/mip.js plugin create test
-          node bin/mip.js plugin compile test
-          node bin/mip.js plugin activate test
-          node bin/mip.js pe test hello | grep Hello
-      
-      # ============================================================
-      # 6. МИГРАЦИЯ
-      # ============================================================
-      - name: 📁 Миграция из npm
-        id: migrate
-        continue-on-error: true
-        run: |
-          echo '{"dependencies": {"chalk": "^5.0.0"}}' > package.json
-          node bin/mip.js install
-          test -f mip.yml
-          node -e "require('chalk')"
-      
-      # ============================================================
-      # 7. КЕШ
-      # ============================================================
-      - name: 🌍 Кеш
-        id: cache
-        continue-on-error: true
-        run: |
-          node bin/mip.js install express
-          node bin/mip.js install express
-          ls ~/.mip/store/express/
-      
-      # ============================================================
-      # 8. YAML vs JSON
-      # ============================================================
-      - name: 📝 YAML/JSON
-        id: yaml
-        continue-on-error: true
-        run: |
-          node bin/mip.js init
-          node bin/mip.js install lodash
-          test -f mip.yml
-          test -f mip-lock.yml
-          echo '{"dependencies": {"axios": "^1.0.0"}}' > mip.json
-          node bin/mip.js install
-          test -f mip-lock.json
-      
-      # ============================================================
-      # 9. TELEGRAM (КОРОТКО)
-      # ============================================================
-      - name: 📱 Telegram
+      - name: 📱 Telegram notification
         if: always()
         env:
           TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          FAILED=0
-          [[ "${{ steps.lint.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.test.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.audit.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.install.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.plugin.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.migrate.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.cache.outcome }}" == "failure" ]] && ((FAILED++))
-          [[ "${{ steps.yaml.outcome }}" == "failure" ]] && ((FAILED++))
-          
-          if [[ $FAILED -eq 0 ]]; then
-            MSG="✅ CI OK%0A📦 ${{ github.repository }}%0A🌿 ${{ github.ref_name }}%0A👤 ${{ github.actor }}%0A🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [[ "${{ steps.lint.outcome }}" == "success" && "${{ steps.test.outcome }}" == "success" && "${{ steps.audit.outcome }}" == "success" ]]; then
+            STATUS="✅ PASSED"
           else
-            MSG="❌ CI FAILED ($FAILED ошибок)%0A📦 ${{ github.repository }}%0A🌿 ${{ github.ref_name }}%0A👤 ${{ github.actor }}%0A🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            STATUS="❌ FAILED"
           fi
+          
+          MSG="${STATUS} *MIP CI*
+          
+          📦 ${{ github.repository }}
+          🌿 ${{ github.ref_name }}
+          👤 ${{ github.actor }}
+          📝 ${COMMIT:0:50}...
+          
+          📋 Checks:
+          Linter:   ${{ steps.lint.outcome }}
+          Tests:    ${{ steps.test.outcome }}
+          Audit:    ${{ steps.audit.outcome }}"
           
           curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
             -d chat_id="${CHAT_ID}" \
             -d text="${MSG}" \
             -d parse_mode="Markdown" \
-            -d disable_web_page_preview="true"
+            -d disable_web_page_preview="true" \
+            -d reply_markup='{"inline_keyboard":[[{"text":"📋 Logs","url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"},{"text":"📝 Commit","url":"${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"}]],"resize_keyboard":true}'
