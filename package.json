@@ -24,13 +24,14 @@
     "docs:en": "cd docs/docmd_EN && npm run dev",
     "docs:ru": "cd docs/docmd_RU && npm run dev",
     "audit": "npm audit"
-      },
+  },
   "dependencies": {
     "axios": "^1.16.1",
     "blessed": "0.1.81",
     "js-yaml": "^5.1.0",
     "lru-cache": "^10.1.0",
     "semver": "^7.8.0",
+    "serialize-javascript": "^7.0.7",
     "tar": "^7.5.15"
   },
   "devDependencies": {
@@ -46,7 +47,7 @@
     "prettier": "^3.8.4",
     "sinon": "^22.0.0",
     "sonar-scanner": "^3.1.0",
-    "sonarjs": "^1.0.0",
+    "sonarjs": "^0.1.0",
     "typescript": "^5.9.3"
   },
   "pkg": {

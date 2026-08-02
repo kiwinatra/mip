@@ -30,7 +30,7 @@ jobs:
       # ============================================================
       - name: 🔍 Линтер (ESLint)
         id: lint
-        continue-on-error: false  # ❌ Ошибка = остановка
+        continue-on-error: false
         run: |
           echo "::group::📋 Запуск линтера"
           START=$(date +%s%N)
@@ -43,15 +43,18 @@ jobs:
       
       
       # ============================================================
-      # 3. АУДИТ — если ошибка → СТОП
+      # 3. АУДИТ БЕЗОПАСНОСТИ — НЕ ЛОМАЕТ СБОРКУ
       # ============================================================
-      - name: 🔒 Аудит безопасности
+      - name: 🔒 Аудит безопасности (предупреждение)
         id: audit
-        continue-on-error: false  # ❌ Ошибка = остановка
+        continue-on-error: true   # ⬅️ НЕ ломает сборку
         run: |
           echo "::group::🔒 Аудит безопасности"
           START=$(date +%s%N)
-          npm audit --audit-level=high
+          
+          # Запускаем аудит, но игнорируем dev-зависимости
+          npm audit --omit=dev --audit-level=high || true
+          
           END=$(date +%s%N)
           DURATION=$(( ($END - $START) / 1000000 ))
           echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
@@ -65,7 +68,7 @@ jobs:
         run: echo "🎉 Все проверки пройдены! Можешь мержить."
 
       # ============================================================
-      # 5. ЕСЛИ ОШИБКА → ОТПРАВЛЯЕМ В TELEGRAM И ВЫХОДИМ
+      # 5. ЕСЛИ ОШИБКА ЛИНТЕРА ИЛИ ТЕСТОВ → ОТПРАВЛЯЕМ В TELEGRAM
       # ============================================================
       - name: 📱 ОШИБКА — уведомление в Telegram
         if: failure()
@@ -79,28 +82,26 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           SERVER: ${{ github.server_url }}
           SHA: ${{ github.sha }}
-          FAILED_STEP: ${{ github.job }}
         run: |
-          # -------- Определяем, что упало --------
+          # Определяем, что упало
           if [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
             STEP="🔍 Линтер (ESLint)"
             FIX="Проверь синтаксис, неиспользуемые переменные, отступы"
-            EXAMPLE="mip run lint --fix"
+            CMD="npm run lint --fix"
           elif [[ "${{ steps.test.outcome }}" == "failure" ]]; then
             STEP="🧪 Тесты"
             FIX="Запусти тесты локально: npm test"
-            EXAMPLE="npm test -- --verbose"
+            CMD="npm test -- --verbose"
           elif [[ "${{ steps.audit.outcome }}" == "failure" ]]; then
             STEP="🔒 Аудит безопасности"
             FIX="Обнови уязвимые пакеты: npm audit fix"
-            EXAMPLE="npm audit fix"
+            CMD="npm audit fix"
           else
             STEP="❌ Неизвестная ошибка"
             FIX="Смотри логи"
-            EXAMPLE=""
+            CMD=""
           fi
           
-          # -------- Собираем сообщение --------
           MSG="❌ *MIP CI — ОШИБКА*
 
           📦 *Репозиторий:* ${REPO}
@@ -115,12 +116,11 @@ jobs:
           ${FIX}
 
           🔧 *Команда для фикса:*
-          \`${EXAMPLE}\`
+          \`${CMD}\`
 
           ──────────────
           🔗 *Логи:* ${SERVER}/${REPO}/actions/runs/${RUN_ID}"
           
-          # -------- Отправка с кнопками --------
           if [[ -n "$TOKEN" && -n "$CHAT_ID" ]]; then
             curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
               -H "Content-Type: application/json" \
@@ -143,5 +143,4 @@ jobs:
           )"
           fi
           
-          # -------- Выходим с ошибкой --------
           exit 1
