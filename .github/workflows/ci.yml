@@ -40,21 +40,31 @@ jobs:
           echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
           echo "::endgroup::"
       
-      
+      # ============================================================
+      # 2. ТЕСТЫ — если ошибка → СТОП
+      # ============================================================
+      - name: 🧪 Тесты
+        id: test
+        continue-on-error: false
+        run: |
+          echo "::group::🧪 Запуск тестов"
+          START=$(date +%s%N)
+          npm test
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
       
       # ============================================================
       # 3. АУДИТ БЕЗОПАСНОСТИ — НЕ ЛОМАЕТ СБОРКУ
       # ============================================================
       - name: 🔒 Аудит безопасности (предупреждение)
         id: audit
-        continue-on-error: true   # ⬅️ НЕ ломает сборку
+        continue-on-error: true
         run: |
           echo "::group::🔒 Аудит безопасности"
           START=$(date +%s%N)
-          
-          # Запускаем аудит, но игнорируем dev-зависимости
           npm audit --omit=dev --audit-level=high || true
-          
           END=$(date +%s%N)
           DURATION=$(( ($END - $START) / 1000000 ))
           echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
@@ -68,7 +78,7 @@ jobs:
         run: echo "🎉 Все проверки пройдены! Можешь мержить."
 
       # ============================================================
-      # 5. ЕСЛИ ОШИБКА ЛИНТЕРА ИЛИ ТЕСТОВ → ОТПРАВЛЯЕМ В TELEGRAM
+      # 5. ЕСЛИ ОШИБКА → ОТПРАВЛЯЕМ В TELEGRAM
       # ============================================================
       - name: 📱 ОШИБКА — уведомление в Telegram
         if: failure()
@@ -83,7 +93,6 @@ jobs:
           SERVER: ${{ github.server_url }}
           SHA: ${{ github.sha }}
         run: |
-          # Определяем, что упало
           if [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
             STEP="🔍 Линтер (ESLint)"
             FIX="Проверь синтаксис, неиспользуемые переменные, отступы"
@@ -92,10 +101,6 @@ jobs:
             STEP="🧪 Тесты"
             FIX="Запусти тесты локально: npm test"
             CMD="npm test -- --verbose"
-          elif [[ "${{ steps.audit.outcome }}" == "failure" ]]; then
-            STEP="🔒 Аудит безопасности"
-            FIX="Обнови уязвимые пакеты: npm audit fix"
-            CMD="npm audit fix"
           else
             STEP="❌ Неизвестная ошибка"
             FIX="Смотри логи"
