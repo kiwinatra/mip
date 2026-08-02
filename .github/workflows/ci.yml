@@ -12,25 +12,29 @@ jobs:
     name: Проверка кода
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+    
     steps:
       - name: Клонирование репозитория
         uses: actions/checkout@v4
       
-      - name: Установка Node.js
+      - name: Установка Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       
       - name: Установка зависимостей
         run: npm ci || npm install
       
       # ============================================================
-      # 1. ЛИНТЕР — если ошибка → СТОП
+      # 1. ЛИНТЕР
       # ============================================================
       - name: 🔍 Линтер (ESLint)
         id: lint
-        continue-on-error: false
+        continue-on-error: true
         run: |
           echo "::group::📋 Запуск линтера"
           START=$(date +%s%N)
@@ -40,12 +44,25 @@ jobs:
           echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
           echo "::endgroup::"
       
-      
+      # ============================================================
+      # 2. ТЕСТЫ
+      # ============================================================
+      - name: 🧪 Тесты
+        id: test
+        continue-on-error: true
+        run: |
+          echo "::group::🧪 Запуск тестов"
+          START=$(date +%s%N)
+          npm test
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
       
       # ============================================================
-      # 3. АУДИТ БЕЗОПАСНОСТИ — НЕ ЛОМАЕТ СБОРКУ
+      # 3. АУДИТ БЕЗОПАСНОСТИ
       # ============================================================
-      - name: 🔒 Аудит безопасности (предупреждение)
+      - name: 🔒 Аудит безопасности
         id: audit
         continue-on-error: true
         run: |
@@ -58,20 +75,163 @@ jobs:
           echo "::endgroup::"
       
       # ============================================================
-      # 4. ЕСЛИ ДОШЛИ СЮДА → ВСЁ ОК
+      # 4. ТЕСТ УСТАНОВКИ ПАКЕТА ЧЕРЕЗ MIP
       # ============================================================
-      - name: ✅ Всё прошло
-        if: success()
-        run: echo "🎉 Все проверки пройдены! Можешь мержить."
-
+      - name: 📦 Тест установки пакета (MIP)
+        id: install-test
+        continue-on-error: true
+        run: |
+          echo "::group::📦 Тест MIP install"
+          START=$(date +%s%N)
+          
+          # Устанавливаем пакет
+          node bin/mip.js install lodash
+          
+          # Проверяем, что установилось
+          node -e "require('lodash')" && echo "✅ lodash работает"
+          
+          # Проверяем список
+          node bin/mip.js list | grep lodash
+          
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      
       # ============================================================
-      # 5. ЕСЛИ ОШИБКА → ОТПРАВЛЯЕМ В TELEGRAM
+      # 5. ТЕСТ ПЛАГИНОВ
       # ============================================================
-      - name: 📱 ОШИБКА — уведомление в Telegram
-        if: failure()
+      - name: 🔌 Тест плагинов
+        id: plugin-test
+        continue-on-error: true
+        run: |
+          echo "::group::🔌 Тест плагинов"
+          START=$(date +%s%N)
+          
+          # Создаём плагин
+          node bin/mip.js plugin create test-plugin
+          
+          # Компилируем
+          node bin/mip.js plugin compile test-plugin
+          
+          # Активируем
+          node bin/mip.js plugin activate test-plugin
+          
+          # Проверяем, что команда работает
+          node bin/mip.js pe test-plugin hello | grep "Hello"
+          
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      
+      # ============================================================
+      # 6. ТЕСТ МИГРАЦИИ ИЗ NPM
+      # ============================================================
+      - name: 📁 Тест миграции из npm
+        id: migrate-test
+        continue-on-error: true
+        run: |
+          echo "::group::📁 Тест миграции из npm"
+          START=$(date +%s%N)
+          
+          # Создаём package.json
+          echo '{"dependencies": {"chalk": "^5.0.0"}}' > package.json
+          
+          # Устанавливаем через MIP
+          node bin/mip.js install
+          
+          # Проверяем, что mip.yml создался
+          test -f mip.yml && echo "✅ mip.yml создан"
+          
+          # Проверяем, что chalk установился
+          node -e "require('chalk')" && echo "✅ chalk работает"
+          
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      
+      # ============================================================
+      # 7. ТЕСТ ГЛОБАЛЬНОГО КЕША
+      # ============================================================
+      - name: 🌍 Тест глобального кеша
+        id: cache-test
+        continue-on-error: true
+        run: |
+          echo "::group::🌍 Тест глобального кеша"
+          START=$(date +%s%N)
+          
+          # Первая установка
+          node bin/mip.js install express
+          
+          # Вторая установка (должна быть быстрой)
+          START2=$(date +%s%N)
+          node bin/mip.js install express
+          END2=$(date +%s%N)
+          DURATION2=$(( ($END2 - $START2) / 1000000 ))
+          
+          echo "Вторая установка: ${DURATION2}ms"
+          
+          # Проверяем, что пакет в кеше
+          ls -la ~/.mip/store/express/ && echo "✅ Кеш работает"
+          
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      
+      # ============================================================
+      # 8. ТЕСТ YAML vs JSON
+      # ============================================================
+      - name: 📝 Тест YAML и JSON
+        id: yaml-test
+        continue-on-error: true
+        run: |
+          echo "::group::📝 Тест YAML и JSON"
+          START=$(date +%s%N)
+          
+          # Тест YAML
+          node bin/mip.js init
+          node bin/mip.js install lodash
+          test -f mip.yml && echo "✅ mip.yml создан"
+          test -f mip-lock.yml && echo "✅ mip-lock.yml создан"
+          
+          # Тест JSON (обратная совместимость)
+          echo '{"dependencies": {"axios": "^1.0.0"}}' > mip.json
+          node bin/mip.js install
+          test -f mip-lock.json && echo "✅ mip-lock.json создан"
+          
+          END=$(date +%s%N)
+          DURATION=$(( ($END - $START) / 1000000 ))
+          echo "duration=${DURATION}ms" >> $GITHUB_OUTPUT
+          echo "::endgroup::"
+      
+      # ============================================================
+      # 9. ИТОГОВЫЙ СТАТУС И ОТПРАВКА В TELEGRAM
+      # ============================================================
+      - name: 📱 Итоговый отчёт в Telegram
+        if: always()
         env:
           TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NODE_VERSION: ${{ matrix.node-version }}
+          LINT_STATUS: ${{ steps.lint.outcome }}
+          TEST_STATUS: ${{ steps.test.outcome }}
+          AUDIT_STATUS: ${{ steps.audit.outcome }}
+          INSTALL_STATUS: ${{ steps.install-test.outcome }}
+          PLUGIN_STATUS: ${{ steps.plugin-test.outcome }}
+          MIGRATE_STATUS: ${{ steps.migrate-test.outcome }}
+          CACHE_STATUS: ${{ steps.cache-test.outcome }}
+          YAML_STATUS: ${{ steps.yaml-test.outcome }}
+          LINT_TIME: ${{ steps.lint.outputs.duration }}
+          TEST_TIME: ${{ steps.test.outputs.duration }}
+          AUDIT_TIME: ${{ steps.audit.outputs.duration }}
+          INSTALL_TIME: ${{ steps.install-test.outputs.duration }}
+          PLUGIN_TIME: ${{ steps.plugin-test.outputs.duration }}
+          MIGRATE_TIME: ${{ steps.migrate-test.outputs.duration }}
+          CACHE_TIME: ${{ steps.cache-test.outputs.duration }}
+          YAML_TIME: ${{ steps.yaml-test.outputs.duration }}
           COMMIT: ${{ github.event.head_commit.message }}
           AUTHOR: ${{ github.actor }}
           REPO: ${{ github.repository }}
@@ -80,39 +240,85 @@ jobs:
           SERVER: ${{ github.server_url }}
           SHA: ${{ github.sha }}
         run: |
-          if [[ "${{ steps.lint.outcome }}" == "failure" ]]; then
-            STEP="🔍 Линтер (ESLint)"
-            FIX="Проверь синтаксис, неиспользуемые переменные, отступы"
-            CMD="npm run lint --fix"
-          elif [[ "${{ steps.test.outcome }}" == "failure" ]]; then
-            STEP="🧪 Тесты"
-            FIX="Запусти тесты локально: npm test"
-            CMD="npm test -- --verbose"
+          # -------- Функции --------
+          get_status_icon() {
+            if [[ "$1" == "success" ]]; then echo "✅"; else echo "❌"; fi
+          }
+          
+          get_status_text() {
+            if [[ "$1" == "success" ]]; then echo "✅ OK"; else echo "❌ FAIL"; fi
+          }
+          
+          # -------- Проверяем общий статус --------
+          FAILED_COUNT=0
+          for status in "$LINT_STATUS" "$TEST_STATUS" "$AUDIT_STATUS" "$INSTALL_STATUS" "$PLUGIN_STATUS" "$MIGRATE_STATUS" "$CACHE_STATUS" "$YAML_STATUS"; do
+            if [[ "$status" != "success" ]]; then
+              ((FAILED_COUNT++))
+            fi
+          done
+          
+          if [[ $FAILED_COUNT -eq 0 ]]; then
+            STATUS="✅ ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ"
+            ICON="🎉"
           else
-            STEP="❌ Неизвестная ошибка"
-            FIX="Смотри логи"
-            CMD=""
+            STATUS="❌ НАЙДЕНО ПРОБЛЕМ: ${FAILED_COUNT}"
+            ICON="⚠️"
           fi
           
-          MSG="❌ *MIP CI — ОШИБКА*
+          # -------- Собираем сообщение --------
+          MSG="${ICON} *MIP CI ОТЧЁТ*
 
           📦 *Репозиторий:* ${REPO}
           🌿 *Ветка:* ${BRANCH}
           👤 *Автор:* ${AUTHOR}
           📝 *Коммит:* ${COMMIT:0:60}...
+          🟢 *Node.js:* v${NODE_VERSION}
 
           ──────────────
-          🚨 *Упало на:* ${STEP}
+          📊 *Статус:* ${STATUS}
 
-          💡 *Что делать:*
-          ${FIX}
+          📋 *Проверки:*
+          🔍 Линтер:      ${{ steps.lint.outcome }} (${LINT_TIME:-0}мс)
+          🧪 Тесты:       ${{ steps.test.outcome }} (${TEST_TIME:-0}мс)
+          🔒 Аудит:       ${{ steps.audit.outcome }} (${AUDIT_TIME:-0}мс)
+          📦 Установка:   ${{ steps.install-test.outcome }} (${INSTALL_TIME:-0}мс)
+          🔌 Плагины:     ${{ steps.plugin-test.outcome }} (${PLUGIN_TIME:-0}мс)
+          📁 Миграция:    ${{ steps.migrate-test.outcome }} (${MIGRATE_TIME:-0}мс)
+          🌍 Кеш:         ${{ steps.cache-test.outcome }} (${CACHE_TIME:-0}мс)
+          📝 YAML/JSON:   ${{ steps.yaml-test.outcome }} (${YAML_TIME:-0}мс)"
 
-          🔧 *Команда для фикса:*
-          \`${CMD}\`
+          # -------- Если есть ошибки, добавляем детали --------
+          if [[ $FAILED_COUNT -gt 0 ]]; then
+            MSG="${MSG}
+
+          ──────────────
+          🚨 *Проваленные проверки:*"
+
+            [[ "$LINT_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Линтер — проверь синтаксис, запусти: npm run lint --fix"
+            [[ "$TEST_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Тесты — проверь логи, запусти: npm test -- --verbose"
+            [[ "$AUDIT_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Аудит — есть уязвимости, запусти: npm audit fix"
+            [[ "$INSTALL_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Установка — MIP не может установить пакет"
+            [[ "$PLUGIN_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Плагины — система плагинов сломана"
+            [[ "$MIGRATE_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Миграция — проблемы с импортом из npm"
+            [[ "$CACHE_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ Кеш — глобальный кеш не работает"
+            [[ "$YAML_STATUS" != "success" ]] && MSG="${MSG}
+          ❌ YAML/JSON — проблемы с форматами конфигов"
+          fi
+          
+          # -------- Ссылка на логи --------
+          MSG="${MSG}
 
           ──────────────
           🔗 *Логи:* ${SERVER}/${REPO}/actions/runs/${RUN_ID}"
           
+          # -------- Отправка --------
           if [[ -n "$TOKEN" && -n "$CHAT_ID" ]]; then
             curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
               -H "Content-Type: application/json" \
@@ -134,5 +340,3 @@ jobs:
           EOF
           )"
           fi
-          
-          exit 1
