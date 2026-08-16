@@ -43,12 +43,12 @@ mip run start
 
 ## 📚 Documentation
 
-Full documentation is available at: **[mipdocs.fwh.is](https://mipdocs.fwh.is)**
+Full documentation is available at: **[meeple-pakager.github.io](https://meeple-pakager.github.io)**
 
-- [Quick Start](https://mipdocs.fwh.is/setup/quick-start)
-- [Commands](https://mipdocs.fwh.is/commands/install)
-- [Plugins](https://mipdocs.fwh.is/commands/plugin)
-- [Configuration](https://mipdocs.fwh.is/setup/configuration)
+- [Quick Start](https://meeple-pakager.github.io/setup/quick-start)
+- [Commands](https://meeple-pakager.github.io/commands/install)
+- [Plugins](https://meeple-pakager.github.io/commands/plugin)
+- [Configuration](https://meeple-pakager.github.io/setup/configuration)
 
 ---
 
@@ -187,7 +187,7 @@ MIT © [kiwinatra](https://github.com/kiwinatra)
 ## 🔗 Links
 
 - **Website:** [mip.fwh.is](https://mip.fwh.is)
-- **Documentation:** [mipdocs.fwh.is](https://mipdocs.fwh.is)
+- **Documentation:** [meeple-pakager.github.io](https://meeple-pakager.github.io)
 - **GitHub:** [github.com/kiwinatra/mip](https://github.com/kiwinatra/mip)
 - **Issues:** [github.com/kiwinatra/mip/issues](https://github.com/kiwinatra/mip/issues)
 

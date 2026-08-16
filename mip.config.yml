@@ -3,7 +3,7 @@
 # Generated: 2026-07-31T19:56:01.428Z
 # Language: english (en)
 # ────────────────────────────────────────────────
-# Documentation: https://mipdocs.fwh.is/features
+# Documentation: https://meeple-pakager.github.io/features
 #
 # Master switch - set to false to disable ALL feature modifications
 # config.enabled: true

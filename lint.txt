@@ -1,0 +1,123 @@
+
+> mip@2.2 lint
+> eslint bin/ lib/
+
+
+/home/zshx/Desktop/mip/lib/commands/doctor.js
+  410:11  warning  'stats' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/exec.js
+  15:7  warning  'config' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/exports.js
+  23:7  warning  'path' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/genlock.js
+  158:17  warning  'key' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/hello.js
+  2:7   warning  'path' is assigned a value but never used. Allowed unused vars must match /^_/u   no-unused-vars
+  4:19  warning  'spawn' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/info.js
+  60:9  warning  'cacheKey' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  61:9  warning  'cache' is assigned a value but never used. Allowed unused vars must match /^_/u     no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/init.js
+  19:11  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/install.js
+  26:7  warning  'TARBALL_CACHE' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/language.js
+   9:7  warning  'fs' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  10:7  warning  'path' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/list.js
+  106:9   warning  'showLinked' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  212:40  warning  'manifest' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/outdated.js
+   9:7  warning  'fs' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  10:7  warning  'path' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/publish.js
+  252:82  warning  'mipFeatures' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  495:74  warning  'options' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  525:10  warning  'showHelp' is defined but never used. Allowed unused vars must match /^_/u     no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/rebuild.js
+  24:3   warning  'bold' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  28:3   warning  'cyan' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  41:11  warning  't' is assigned a value but never used. Allowed unused vars must match /^_/u     no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/registry.js
+   81:28  warning  'mipFeatures' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  191:31  warning  'mipFeatures' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/repo.js
+  192:9   warning  'useSSH' is assigned a value but never used. Allowed unused vars must match /^_/u          no-unused-vars
+  193:9   warning  'cloneDepth' is assigned a value but never used. Allowed unused vars must match /^_/u      no-unused-vars
+  194:9   warning  'cloneTimeout' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  361:19  warning  'rows' is assigned a value but never used. Allowed unused vars must match /^_/u            no-unused-vars
+  373:11  warning  'leftX' is assigned a value but never used. Allowed unused vars must match /^_/u           no-unused-vars
+  374:11  warning  'rightX' is assigned a value but never used. Allowed unused vars must match /^_/u          no-unused-vars
+  377:11  warning  'maxRightRows' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  380:11  warning  'bottom' is assigned a value but never used. Allowed unused vars must match /^_/u          no-unused-vars
+  397:11  warning  'leftFocusMark' is assigned a value but never used. Allowed unused vars must match /^_/u   no-unused-vars
+  398:11  warning  'rightFocusMark' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  400:11  warning  'leftSel' is assigned a value but never used. Allowed unused vars must match /^_/u         no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/run.js
+  106:15  warning  'pkgName' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/server.js
+  17:7  warning  'store' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/shell.js
+  82:9  warning  'mipFeatures' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/update.js
+   9:7  warning  'fs' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  10:7  warning  'path' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/commands/workspaces.js
+  51:9  warning  'autoLink' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/auditor.js
+  8:7  warning  'crypto' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/dedupe.js
+  196:25  warning  'toKeep' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/fast-resolver.js
+  31:11  warning  'cacheKey' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/legacy-fallback.js
+  9:9  warning  'execSync' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/peer-resolver.js
+  127:40  warning  'parentName' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/core/resolver.js
+  35:44  warning  'parent' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/ui/format.js
+  24:3  warning  'leftSelectedIndex' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/utils/features.js
+  11:7  warning  'os' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/utils/github.js
+  19:7  warning  'axios' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+/home/zshx/Desktop/mip/lib/utils/parallel.js
+  19:9   warning  'Worker' is assigned a value but never used. Allowed unused vars must match /^_/u        no-unused-vars
+  19:17  warning  'isMainThread' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  19:31  warning  'parentPort' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+
+/home/zshx/Desktop/mip/lib/utils/store.js
+  93:44  warning  'data' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+✖ 54 problems (0 errors, 54 warnings)
+
